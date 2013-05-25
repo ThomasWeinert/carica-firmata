@@ -22,13 +22,9 @@ namespace Carica\Firmata {
     public function __get($name) {
       switch ($name) {
       case 'text' :
-        return $this->_text;
       case 'major' :
-        return $this->_major;
       case 'minor' :
-        return $this->_minor;
-      case 'version' :
-        return $this->_version;
+        return $this->{'_'.$name};
       }
       throw new \LogicException(sprintf('Unknown property %s::$%s', get_class($this), $name));
     }
