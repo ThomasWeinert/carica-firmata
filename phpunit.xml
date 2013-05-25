@@ -1,0 +1,19 @@
+<phpunit
+  backupGlobals="false"
+  backupStaticAttributes="false"
+  syntaxCheck="false">
+  <testsuites>
+    <testsuite name="Carica\Firmata">
+      <directory suffix="Test.php">tests</directory>
+    </testsuite>
+  </testsuites>
+  <filter>
+    <whitelist addUncoveredFilesFromWhitelist="true">
+      <directory>src</directory>
+    </whitelist>
+  </filter>
+  <logging>
+    <log type="coverage-html" target="./build/coverage" title="Carica Firmata" 
+      charset="UTF-8" yui="true" highlight="true" lowUpperBound="35" highLowerBound="70"/>
+  </logging>
+</phpunit>

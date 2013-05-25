@@ -1,0 +1,18 @@
+{
+  "name": "carica/firmata",
+  "type": "library",
+  "description": "Firmata client library",
+  "keywords": ["arduino", "firmata"],
+  "homepage": "https://bitbucket.org/ThomasWeinert/carica-firmata/",
+  "license": "MIT",
+  "authors": [
+    {"name": "Thomas Weinert", "email": "thomas@weinert.info"}
+  ],
+  "require": {
+    "php": ">=5.4",
+    "carica/io": "dev-master"
+  },
+  "autoload": {
+    "psr-0": { "Carica\\Io": "src" }
+  }
+}

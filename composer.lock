@@ -1,0 +1,66 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+    ],
+    "hash": "8ba1932bf64362a2d2099ac8098e6a8d",
+    "packages": [
+        {
+            "name": "carica/io",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://bitbucket.org/ThomasWeinert/carica-io.git",
+                "reference": "2da04341d623b4d2267f31a4f8220704e076c7de"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://bitbucket.org/ThomasWeinert/carica-io/get/2da04341d623b4d2267f31a4f8220704e076c7de.zip",
+                "reference": "2da04341d623b4d2267f31a4f8220704e076c7de",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Carica\\Io": "src"
+                }
+            },
+            "notification-url": "http://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Weinert",
+                    "email": "thomas@weinert.info"
+                }
+            ],
+            "description": "Non blocking I/O for PHP",
+            "homepage": "https://bitbucket.org/ThomasWeinert/carica-io/",
+            "keywords": [
+                "asynchronous-io",
+                "non-blocking-io"
+            ],
+            "time": "2013-05-25 13:08:18"
+        }
+    ],
+    "packages-dev": [
+
+    ],
+    "aliases": [
+
+    ],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "carica/io": 20
+    },
+    "platform": {
+        "php": ">=5.4"
+    },
+    "platform-dev": [
+
+    ]
+}
