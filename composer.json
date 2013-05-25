@@ -13,6 +13,6 @@
     "carica/io": "dev-master"
   },
   "autoload": {
-    "psr-0": { "Carica\\Io": "src" }
+    "psr-0": { "Carica\\Firmata": "src" }
   }
 }
