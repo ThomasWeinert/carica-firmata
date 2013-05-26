@@ -20,7 +20,7 @@ $board
   ->activate()
   ->done(
     function () use ($board, $route) {
-      $board->reset();
+      $board->queryAllPinStates();
       $server = new Carica\Io\Network\Server();
       $server->events()->on(
         'connection',

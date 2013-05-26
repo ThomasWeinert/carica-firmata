@@ -29,7 +29,7 @@ namespace Carica\Firmata {
     /**
      * @var integer
      */
-    private $_mode = PIN_STATE_OUTPUT;
+    private $_mode = PIN_STATE_UNKNOWN;
     /**
      * @var integer
      */

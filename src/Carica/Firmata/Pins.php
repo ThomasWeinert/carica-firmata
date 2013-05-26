@@ -8,7 +8,9 @@ namespace Carica\Firmata {
 
     public function __construct(Board $board, array $pinCapabilities) {
       foreach ($pinCapabilities as $pin => $supportedModes) {
-        $this->_pins[$pin] = new Pin($board, $pin, $supportedModes);
+        if (!empty($supportedModes)) {
+          $this->_pins[$pin] = new Pin($board, $pin, $supportedModes);
+        }
       }
     }
 

@@ -27,6 +27,7 @@ namespace Carica\Firmata {
   const COMMAND_PULSE_IN = 0x74;
   const COMMAND_SYSTEM_RESET = 0xFF;
 
+  const PIN_STATE_UNKNOWN = 0xFF; // internal state to recognize unininitialized pins
   const PIN_STATE_INPUT = 0x00;
   const PIN_STATE_OUTPUT = 0x01;
   const PIN_STATE_ANALOG = 0x02;
@@ -333,7 +334,7 @@ namespace Carica\Firmata {
      * @param Response\Sysex\PinStateResponse $response
      */
     private function onPinStateResponse(Response\Sysex\PinStateResponse $response) {
-      $this->events()->emit('pin-state-'.$response->pin, $response->value);
+      $this->events()->emit('pin-state-'.$response->pin, $response->mode, $response->value);
     }
 
     /**
@@ -392,6 +393,15 @@ namespace Carica\Firmata {
     public function queryPinState($pin, Callable $callback) {
       $this->events()->once('pin-state-'.$pin, $callback);
       $this->stream()->write([COMMAND_START_SYSEX, COMMAND_PIN_STATE_QUERY, $pin, COMMAND_END_SYSEX]);
+    }
+
+    /**
+     * Query the status of each pin, this will update all pin objects
+     */
+    public function queryAllPinStates() {
+      foreach ($this->pins as $index => $pin) {
+        $this->stream()->write([COMMAND_START_SYSEX, COMMAND_PIN_STATE_QUERY, $index, COMMAND_END_SYSEX]);
+      }
     }
     /**
      * Add a callback for analog read events on a pin

@@ -68,6 +68,11 @@ namespace Carica\Firmata\Rest {
         $pin = $this->_board->pins[$pinId];
         $parent->appendChild($pinNode = $dom->createElement('pin'));
         $pinNode->setAttribute('number', $pin->pin);
+        $modes = array();
+        foreach ($pin->supports as $mode) {
+          $modes[] = $this->getModeString($mode);
+        }
+        $pinNode->setAttribute('supports', implode(' ', $modes));
         $pinNode->setAttribute('mode', $this->getModeString($pin->mode));
         switch ($pin->mode) {
         case Firmata\PIN_STATE_INPUT :
