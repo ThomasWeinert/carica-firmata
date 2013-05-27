@@ -6,6 +6,7 @@ Carica\Io\Loader::map(
 Carica\Io\Loader::register();
 
 use Carica\Io;
+use Carica\Firmata;
 
 $board = new Firmata\Board(
   //new Io\Stream\Serial('COM3')

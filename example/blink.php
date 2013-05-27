@@ -22,7 +22,7 @@ $board
     function () use ($board, $loop) {
       echo "Firmata ".$board->version." active\n";
 
-      $led = 3;
+      $led = 13;
       $board->pinMode($led, Firmata\PIN_STATE_OUTPUT);
       echo "PIN: $led\n";
 
