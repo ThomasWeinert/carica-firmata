@@ -455,7 +455,8 @@ namespace Carica\Firmata {
       $port = floor($pin / 8);
       $portValue = 0;
       for ($i = 0; $i < 8; $i++) {
-        if ($this->_pins[8 * $port + $i]->digital) {
+        $index = 8 * $port + $i;
+        if (isset($this->_pins[$index]) && $this->_pins[$index]->digital) {
           $portValue |= (1 << $i);
         }
       }
