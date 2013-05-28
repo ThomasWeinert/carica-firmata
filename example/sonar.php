@@ -1,9 +1,5 @@
 <?php
-require('../vendor/autoload.php');
-Carica\Io\Loader::map(
-  ['Carica\Firmata' => __DIR__.'/../src/Carica/Firmata']
-);
-Carica\Io\Loader::register();
+$board = require('./bootstrap.php');
 
 use Carica\Io;
 use Carica\Firmata;

@@ -1,17 +1,10 @@
 <?php
-require('../vendor/autoload.php');
-Carica\Io\Loader::map(
-  ['Carica\Firmata' => __DIR__.'/../src/Carica/Firmata']
-);
-Carica\Io\Loader::register();
+$board = require('./bootstrap.php');
 
 use Carica\Io;
 use Carica\Firmata;
 use Carica\Io\Network\Http;
 
-$board = new Firmata\Board(
-  new Io\Stream\Tcp('127.0.0.1', 5339)
-);
 $route = new Carica\Io\Network\Http\Route();
 $route->match('/pins', new Firmata\Rest\Pins($board));
 $route->match('/pins/{pin}', new Firmata\Rest\Pin($board));

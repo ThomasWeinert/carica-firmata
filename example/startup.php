@@ -1,16 +1,8 @@
 <?php
-require('../vendor/autoload.php');
-Carica\Io\Loader::map(
-  ['Carica\Firmata' => __DIR__.'/../src/Carica/Firmata']
-);
-Carica\Io\Loader::register();
+$board = require('./bootstrap.php');
 
 use Carica\Io;
 use Carica\Firmata;
-
-$board = new Firmata\Board(
-  $stream = new Io\Stream\Serial\Dio('COM7:')
-);
 
 $loop = Io\Event\Loop\Factory::get();
 
@@ -27,7 +19,7 @@ $board->events()->on(
   }
 );
 
-$active = $board
+$board
   ->activate()
   ->done(
     function () {
