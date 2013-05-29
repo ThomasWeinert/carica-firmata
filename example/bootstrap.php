@@ -1,5 +1,5 @@
 <?php
-require('../vendor/autoload.php');
+require(__DIR__.'/../vendor/autoload.php');
 
 Carica\Io\Loader::map(
   ['Carica\Firmata' => __DIR__.'/../src/Carica/Firmata']
@@ -9,7 +9,7 @@ Carica\Io\Loader::register();
 use Carica\Io;
 use Carica\Firmata;
 
-if (@include('./configuration.php')) {
+if (@include(__DIR__.'/configuration.php')) {
   if (CARICA_FIRMATA_MODE == 'tcp') {
     return  new Firmata\Board(
       new Io\Stream\Tcp(CARICA_FIRMATA_TCP_SERVER, CARICA_FIRMATA_TCP_PORT)
