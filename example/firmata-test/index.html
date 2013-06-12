@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Firmata Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="files/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="files/bootstrap/css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="files/toggle/bootstrap.css">
+    <link rel="stylesheet" href="files/toggle/toggle-switch.css">
+    <style type="text/css">
+      body {
+        margin: 2em 0em;
+      }
+      .pin-control {
+        height: 8.5em;
+        padding: 0.5em;
+      }
+      .pin-control h3 {
+        line-height: 1.2em;
+        margin: 0.2em;
+      }
+      label.disabled,
+      .switch label.disabled {
+        cursor: default;
+        opacity: 0.65;
+        filter: alpha(opacity=65);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">   
+      <div class="row firmataBoard">
+      </div>
+    </div>
+    <script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
+    <script type="text/javascript" src="files/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="files/firmata.js"></script>
+    <script type="text/javascript">
+      jQuery(
+        function() {
+          jQuery('.firmataBoard').firmata();
+        }  
+      );
+    </script>
+  </body>
+</html>
