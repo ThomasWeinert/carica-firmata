@@ -163,7 +163,12 @@
       }
       this.update();
       var that = this;
-      $.get(url)
+      $.ajax(
+         {
+           url : url,
+           cache : false
+         }
+       )
        .always(
          function () {
            that.blockUpdates = false;
@@ -200,7 +205,12 @@
       this.container = container;
       this.options = $.extend(this.options, options);
       var that = this;
-      $.get(this.options.url)
+      $.ajax(
+         {
+           url : this.options.url,
+           cache : false
+         }
+       )
        .done(
          function (response) {
            $(response).find('board pin').each(
@@ -219,7 +229,12 @@
       var that = this;
       window.setTimeout(
         function() {
-          $.get(that.options.url)
+          $.ajax(
+             {
+               url : that.options.url,
+               cache : false
+             }
+           )
            .done(
              function (response) {
                $(response).find('board pin').each(
@@ -228,6 +243,10 @@
                    that.pins[key].update($(this));
                  }  
                );
+             }
+           )
+           .always(
+             function() {
                that.schedule();
              }
            );
