@@ -87,7 +87,7 @@
       this.element.find('input[type="radio"]').click(
           $.proxy(this.send, this)
         );
-      this.element.find('input[type="number"]').change(
+      this.element.find('input[type="number"],input[type="range"]').change(
           $.proxy(this.send, this)
         );
       this.update(pinData);
@@ -126,12 +126,10 @@
         this.element.find('.pin-mode-pwm input:not(:focus)').val(this.analog);
         break;
       case 'analog' :
-        this.element.find('.pin-mode-analog .progress .bar').css(
-          'width',
-          Math.round(
-            parseInt(this.analog) * 100 / 1023
-          ).toString() + '%'
-        );
+        var $percent = Math.round(parseInt(this.analog) * 100 / 1023).toString() + '%'; 
+        this.element.find('.pin-mode-analog .progress .bar')
+          .css('width', $percent)
+          .text($percent);
         break;
       case 'servo' :
         this.element.find('.pin-mode-servo input:not(:focus)').val(this.analog);
