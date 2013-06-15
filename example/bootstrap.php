@@ -10,6 +10,11 @@ use Carica\Io;
 use Carica\Firmata;
 
 if (@include(__DIR__.'/configuration.php')) {
+
+  if (!defined('CARICA_FIRMATA_SERIAL_BAUD')) {
+    define('CARICA_FIRMATA_SERIAL_BAUD', 57600);
+  }
+
   if (CARICA_FIRMATA_MODE == 'tcp') {
     return  new Firmata\Board(
       new Io\Stream\Tcp(CARICA_FIRMATA_TCP_SERVER, CARICA_FIRMATA_TCP_PORT)
