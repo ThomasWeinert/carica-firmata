@@ -1,5 +1,5 @@
 <?php
-$board = require('./bootstrap.php');
+$board = require(__DIR__.'/bootstrap.php');
 
 use Carica\Io;
 use Carica\Firmata;
