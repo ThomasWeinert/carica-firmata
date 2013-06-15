@@ -14,6 +14,7 @@ define('CARICA_FIRMATA_MODE', 'serial');
  * serial connection options * 
  */
 define('CARICA_FIRMATA_SERIAL_DEVICE', '/dev/tty0');
+//define('CARICA_FIRMATA_SERIAL_BAUD', 57600); // default is 57600
 
 /**
  * tcp connection options *
