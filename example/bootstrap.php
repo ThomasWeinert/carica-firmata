@@ -15,12 +15,15 @@ if (@include(__DIR__.'/configuration.php')) {
       new Io\Stream\Tcp(CARICA_FIRMATA_TCP_SERVER, CARICA_FIRMATA_TCP_PORT)
     );
   } elseif (CARICA_FIRMATA_MODE == 'serial-dio') {
-    return  new Firmata\Board(
-      new Io\Stream\Serial\Dio(CARICA_FIRMATA_SERIAL_DEVICE)
+    return new Firmata\Board(
+      new Io\Stream\Serial\Dio(
+          CARICA_FIRMATA_SERIAL_DEVICE,
+          CARICA_FIRMATA_SERIAL_BAUD
+      )
     );
   } else {
     return  new Firmata\Board(
-      new Io\Stream\Serial(CARICA_FIRMATA_SERIAL_DEVICE)
+      new Io\Stream\Serial(CARICA_FIRMATA_SERIAL_DEVICE, CARICA_FIRMATA_SERIAL_BAUD)
     );
   }
 } else {
