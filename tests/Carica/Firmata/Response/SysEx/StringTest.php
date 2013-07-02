@@ -9,6 +9,9 @@ namespace Carica\Firmata\Response\SysEx {
 
   class StringTest extends \PHPUnit_Framework_TestCase {
 
+    /**
+     * @covers Carica\Firmata\Response\SysEx\String
+     */
     public function testConstructor() {
       $string = new String(
         0x71,

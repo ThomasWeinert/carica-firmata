@@ -10,14 +10,14 @@ namespace Carica\Firmata {
       $this->_command = $command;
     }
 
-    public function command() {
+    public function getCommand() {
       return $this->_command;
     }
 
     public function __get($name) {
       switch ($name) {
       case 'command' :
-        return $this->_command;
+        return $this->getCommand();
       }
       throw new \LogicException(
         sprintf('Unknown property %s::$%s', get_class($this), $name)
