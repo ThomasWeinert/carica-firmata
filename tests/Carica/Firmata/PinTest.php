@@ -200,6 +200,59 @@ namespace Carica\Firmata {
       $this->assertEquals(DIGITAL_HIGH, $pin->value);
     }
 
+      /*
+     * @covers Carica\Firmata\Pin
+     */
+    public function testEventPinState() {
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $pin = new Pin($board, 12, array(PIN_STATE_OUTPUT, PIN_STATE_ANALOG));
+      $board->events()->emit('pin-state-12', PIN_STATE_ANALOG, 23);
+      $this->assertEquals(PIN_STATE_ANALOG, $pin->mode);
+      $this->assertEquals(23, $pin->analog);
+    }
+
+    /*
+     * @covers Carica\Firmata\Pin
+     */
+    public function testEventAnalogRead() {
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $pin = new Pin($board, 12, array(PIN_STATE_ANALOG));
+      $board->events()->emit('analog-read-12', 23);
+      $this->assertEquals(23, $pin->analog);
+    }
+
+    /*
+     * @covers Carica\Firmata\Pin
+     */
+    public function testEventDigitalRead() {
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $pin = new Pin($board, 12, array(PIN_STATE_ANALOG));
+      $board->events()->emit('digital-read-12', TRUE);
+      $this->assertTrue($pin->digital);
+    }
+
+    /*
+     * @covers Carica\Firmata\Pin
+     */
+    public function testSupportsExpectingTrue() {
+      $board = $this->getBoardFixture();
+      $pin = new Pin($board, 12, array(PIN_STATE_OUTPUT, PIN_STATE_ANALOG));
+      $this->assertTrue(
+        $pin->supports(PIN_STATE_ANALOG)
+      );
+    }
+
+    /*
+     * @covers Carica\Firmata\Pin
+     */
+    public function testSupportsExpectingFalse() {
+      $board = $this->getBoardFixture();
+      $pin = new Pin($board, 12, array(PIN_STATE_OUTPUT, PIN_STATE_ANALOG));
+      $this->assertFalse(
+        $pin->supports(PIN_STATE_PWM)
+      );
+    }
+
     /*****************
      * Fixtures
      *****************/
