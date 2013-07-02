@@ -32,6 +32,31 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @covers Carica\Firmata\Pins::count
+     */
+    public function testCountableExpectingZero() {
+      $pins = new Pins(
+        $board = $this->getBoardFixture(),
+        []
+      );
+      $this->assertCount(0, $pins);
+    }
+
+    /**
+     * @covers Carica\Firmata\Pins::count
+     */
+    public function testCountableExpectingTwo() {
+      $pins = new Pins(
+        $board = $this->getBoardFixture(),
+        [
+          21 => [PIN_STATE_OUTPUT],
+          42 => [PIN_STATE_OUTPUT]
+        ]
+      );
+      $this->assertCount(2, $pins);
+    }
+
+    /**
      * @covers Carica\Firmata\Pins::offsetExists
      */
     public function testArrayAccessOffsetExistsExpectingTrue() {
