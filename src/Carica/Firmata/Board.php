@@ -211,8 +211,8 @@ namespace Carica\Firmata {
      * @param Carica\Firmata\Response $response
      */
     public function onResponse(Response $response) {
-      if (isset($this->_responseHandler[$response->command])) {
-        $callback = array($this, $this->_responseHandler[$response->command]);
+      if (isset($this->_responseHandler[$response->getCommand()])) {
+        $callback = array($this, $this->_responseHandler[$response->getCommand()]);
         return $callback($response);
       }
     }
