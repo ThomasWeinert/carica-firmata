@@ -21,6 +21,10 @@ namespace Carica\Firmata\Response\SysEx {
         'Hallo',
         $string->text
       );
+      $this->assertEquals(
+        0x71,
+        $string->command
+      );
     }
   }
 }
