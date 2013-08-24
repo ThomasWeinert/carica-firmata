@@ -18,7 +18,7 @@ namespace Carica\Firmata\Response\Sysex {
       case 'text' :
         return $this->_text;
       }
-      parent::__get($name);
+      return parent::__get($name);
     }
   }
 }

@@ -28,7 +28,7 @@ namespace Carica\Firmata\Response\Sysex {
       case 'pins' :
         return $this->_pins;
       }
-      parent::__get($name);
+      return parent::__get($name);
     }
   }
 }

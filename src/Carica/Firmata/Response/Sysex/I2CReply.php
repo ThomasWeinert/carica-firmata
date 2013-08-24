@@ -26,7 +26,7 @@ namespace Carica\Firmata\Response\Sysex {
       case 'data' :
         return $this->_duration;
       }
-      parent::__get($name);
+      return parent::__get($name);
     }
   }
 }

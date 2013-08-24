@@ -22,7 +22,7 @@ namespace Carica\Firmata\Response\Midi {
       case 'minor' :
         return $this->_minor;
       }
-      parent::__get($name);
+      return parent::__get($name);
     }
   }
 }

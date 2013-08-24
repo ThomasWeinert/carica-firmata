@@ -26,7 +26,7 @@ namespace Carica\Firmata\Response\Sysex {
       case 'minor' :
         return $this->_minor;
       }
-      parent::__get($name);
+      return parent::__get($name);
     }
   }
 }

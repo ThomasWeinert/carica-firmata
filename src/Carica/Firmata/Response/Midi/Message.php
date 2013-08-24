@@ -22,7 +22,7 @@ namespace Carica\Firmata\Response\Midi {
       case 'value' :
         return $this->_value;
       }
-      parent::__get($name);
+      return parent::__get($name);
     }
   }
 }

@@ -10,7 +10,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Response
      */
     public function testReadPropertyCommand() {
-      $response = new Response_TestProxy(0x42, [0x42, 0x00]);
+      $response = new Response_TestProxy(0x42, [0x42, 0x00, 0x00]);
       $this->assertEquals(0x42, $response->command);
     }
 
@@ -18,7 +18,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Response
      */
     public function testReadInvalidPropertyExpectingException() {
-      $response = new Response_TestProxy(0x42, [0x42, 0x00]);
+      $response = new Response_TestProxy(0x42, [0x42, 0x00, 0x00]);
       $this->setExpectedException('LogicException');
       $dummy = $response->INVALID_PROPERTY;
     }
