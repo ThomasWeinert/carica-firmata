@@ -30,6 +30,10 @@ namespace Carica\Firmata\Response\SysEx {
       $this->assertEquals(
         'Sample', $version->name
       );
+      $this->assertEquals(
+        0x79,
+        $version->command
+      );
     }
   }
 }
