@@ -11,9 +11,9 @@ namespace Carica\Firmata\Response\Sysex {
 
     public function __construct($command, array $bytes) {
       parent::__construct($command, $bytes);
-      $this->_pin = $bytes[1];
-      $data = self::decodeBytes(array_slice($bytes, 3));
-      $duration = unpack('N', $data);
+      $pin = unpack('C', self::decodeBytes([$bytes[1], $bytes[2]]));
+      $this->_pin = $pin[1];
+      $duration = unpack('N', self::decodeBytes(array_slice($bytes, 3)));
       $this->_duration = $duration[1];
     }
 
