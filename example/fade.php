@@ -12,8 +12,8 @@ $board
     function () use ($board, $loop) {
       echo "Firmata ".$board->version." active\n";
 
-      $led = 3;
-      $board->pinMode($led, Firmata\PIN_STATE_PWM);
+      $led = 9;
+      $board->pinMode($led, Firmata\Board::PIN_STATE_PWM);
       echo "PIN: $led\n";
 
       $loop->setInterval(

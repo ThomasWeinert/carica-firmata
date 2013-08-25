@@ -236,12 +236,7 @@ namespace Carica\Firmata {
       } elseif ($value > $resolution) {
         $value = $resolution;
       }
-      if ($this->_valueInitialized && $this->_value == $value) {
-        return;
-      }
-      $this->_value = $value;
-      $this->_valueInitialized = TRUE;
-      $this->_board->analogWrite($this->_pin, $value);
+      $this->setValue($value);
     }
 
     /**

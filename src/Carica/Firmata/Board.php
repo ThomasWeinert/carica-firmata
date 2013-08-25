@@ -436,7 +436,7 @@ namespace Carica\Firmata {
      * @param integer $value 0-255
      */
     public function analogWrite($pin, $value) {
-      $this->_pins[$pin]->setAnalog($value);
+      $this->_pins[$pin]->setValue($value);
       $this->stream()->write(
         [self::ANALOG_MESSAGE | $pin, $value & 0x7F, ($value >> 7) & 0x7F]
       );
