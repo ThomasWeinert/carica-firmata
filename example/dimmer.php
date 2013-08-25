@@ -19,11 +19,10 @@ $board
 
       $board->analogRead(
         $dimmerPin,
-        function($value) use ($board, $ledPin) {
-          $value = 1023 - $value;
-          $barLength = round($value * 0.07);
-          $dimmed = floor($value * 255 / 1023);
-          echo str_pad($dimmed, 3, 0, STR_PAD_LEFT), ' ';
+        function($value) use ($board, $dimmerPin, $ledPin) {
+          $dimmed = 1 - round($board->pins[$dimmerPin]->analog, 1);
+          $barLength = round(70 * $dimmed);
+          echo str_pad(round($dimmed * 1000), 4, 0, STR_PAD_LEFT), ' ';
           echo str_repeat('=', $barLength), "\n";
           $board->pins[$ledPin]->analog = $dimmed;
         }

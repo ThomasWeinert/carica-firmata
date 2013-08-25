@@ -41,9 +41,10 @@ namespace Carica\Firmata\Rest {
           }
           if (isset($request->query['digital'])) {
             $pin->digital = $request->query['digital'] == 'yes' ? TRUE : FALSE;
-          }
-          if (isset($request->query['analog'])) {
+          } elseif (isset($request->query['analog'])) {
             $pin->analog = (int)$request->query['analog'];
+          } elseif (isset($request->query['value'])) {
+            $pin->value = (int)$request->query['value'];
           }
           $this->appendPin($boardNode, $pinId);
         }
@@ -82,9 +83,10 @@ namespace Carica\Firmata\Rest {
         case self::PIN_STATE_ANALOG :
         case self::PIN_STATE_PWM :
         case self::PIN_STATE_SERVO :
-          $pinNode->setAttribute('analog', $pin->analog);
+          $pinNode->setAttribute('analog', round($pin->analog, 4));
           break;
         }
+        $pinNode->setAttribute('value', $pin->value);
       }
     }
 

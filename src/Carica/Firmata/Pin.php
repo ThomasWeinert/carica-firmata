@@ -8,8 +8,8 @@ namespace Carica\Firmata {
    * @property-read Carica\Firmata\Board $board
    * @property-read integer $pin
    * @property-read array $supports
-   * @property-read integer $value
-   * @property integer $analog Get/set the pin value using an analog integer value
+   * @property integer $value Get/set the pin value using an analog integer value
+   * @property integer $analog Get/set the pin value using a float between 0 and 1
    * @property boolean $digital Get/set the pin value using an boolean value
    */
   class Pin {
@@ -58,6 +58,7 @@ namespace Carica\Firmata {
       $this->_board = $board;
       $this->_pin = (int)$pin;
       $this->_supports = $supports;
+      $this->_mode = reset($supports);
       $this->attachEvents();
     }
 
@@ -148,7 +149,7 @@ namespace Carica\Firmata {
       case 'digital' :
         return ($this->_value == Board::DIGITAL_HIGH);
       case 'analog' :
-        return $this->_value;
+        return $this->getAnalog();
       }
       throw new \LogicException(sprintf('Unknown property %s::$%s', get_class($this), $name));
     }
@@ -213,11 +214,25 @@ namespace Carica\Firmata {
     }
 
     /**
-     * Setter method for the analog property. Allows to set change the value on the pin.
-     * @param unknown $value
+     * Getter method for the anlog value
+     * @return float between 0 and 1
      */
-    public function setAnalog($value) {
-      $value = (int)$value;
+    public function getAnalog() {
+      return $this->_value / $this->_board->resolutions[$this->_mode];
+    }
+
+    /**
+     * Setter method for the analog property. Allows to set change the value on the pin.
+     * @param float $value between 0 and 1
+     */
+    public function setAnalog($percent) {
+      $resolution = $this->_board->resolutions[$this->_mode];
+      $value = round($percent * $resolution);
+      if ($value < 0) {
+        $value = 0;
+      } elseif ($value > $resolution) {
+        $value = $resolution;
+      }
       if ($this->_valueInitialized && $this->_value == $value) {
         return;
       }

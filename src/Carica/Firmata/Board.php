@@ -85,6 +85,11 @@ namespace Carica\Firmata {
     private $_firmware= NULL;
 
     /**
+     * @var Carica\Firmata\Resolutions
+     */
+    private $_resolutions = NULL;
+
+    /**
      * Map command responses to private event handlers
      * @var array(integer=>string)
      */
@@ -109,6 +114,7 @@ namespace Carica\Firmata {
     public function __construct(Io\Stream $stream) {
       $this->_stream = $stream;
       $this->_pins = new \ArrayObject();
+      $this->_resolutions = new Resolutions();
     }
 
     /**
@@ -200,6 +206,8 @@ namespace Carica\Firmata {
         return isset($this->_firmware) ? $this->_firmware : new Version(0,0);
       case 'pins' :
         return $this->_pins;
+      case 'resolutions' :
+        return $this->_resolutions;
       }
       throw new \LogicException(sprintf('Unknown property %s::$%s', __CLASS__, $name));
     }

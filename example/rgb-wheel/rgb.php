@@ -11,21 +11,21 @@ $route->match(
   function (Http\Request $request) use ($board) {
     if (isset($request->query['r'])) {
       $red = (int)$request->query['r'];
-      $board->pins[10]->analog = ($red > 0 && $red < 256) ? $red : 0;
+      $board->pins[10]->value = ($red > 0 && $red < 256) ? $red : 0;
     }
     if (isset($request->query['g'])) {
       $green = (int)$request->query['g'];
-      $board->pins[11]->analog = ($green > 0 && $green < 256) ? $green : 0;
+      $board->pins[11]->value = ($green > 0 && $green < 256) ? $green : 0;
     }
     if (isset($request->query['b'])) {
       $blue = (int)$request->query['b'];
-      $board->pins[9]->analog = ($blue > 0 && $blue < 256) ? $blue : 0;
+      $board->pins[9]->value = ($blue > 0 && $blue < 256) ? $blue : 0;
     }
     $response = $request->createResponse();
     $response->content = new Http\Response\Content\String(
-      'Red: '.$board->pins[10]->analog.", ".
-      'Green: '.$board->pins[11]->analog.", ".
-      'Blue: '.$board->pins[9]->analog
+      'Red: '.$board->pins[10]->value.", ".
+      'Green: '.$board->pins[11]->value.", ".
+      'Blue: '.$board->pins[9]->value
     );
     return $response;
   }
