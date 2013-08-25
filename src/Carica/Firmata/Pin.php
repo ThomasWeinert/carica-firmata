@@ -29,7 +29,7 @@ namespace Carica\Firmata {
     /**
      * @var integer
      */
-    private $_mode = PIN_STATE_UNKNOWN;
+    private $_mode = Board::PIN_STATE_UNKNOWN;
     /**
      * @var integer
      */
@@ -146,7 +146,7 @@ namespace Carica\Firmata {
       case 'value' :
         return $this->_value;
       case 'digital' :
-        return ($this->_value == DIGITAL_HIGH);
+        return ($this->_value == Board::DIGITAL_HIGH);
       case 'analog' :
         return $this->_value;
       }
@@ -203,7 +203,7 @@ namespace Carica\Firmata {
      * @param boolean $isActive
      */
     public function setDigital($isActive) {
-      $value = (boolean)$isActive ? DIGITAL_HIGH : DIGITAL_LOW;
+      $value = (boolean)$isActive ? Board::DIGITAL_HIGH : Board::DIGITAL_LOW;
       if ($this->_valueInitialized && $this->_value == $value) {
         return;
       }

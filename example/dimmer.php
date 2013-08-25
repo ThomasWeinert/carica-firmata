@@ -14,8 +14,8 @@ $board
 
       $dimmerPin = 14;
       $ledPin = 9;
-      $board->pins[$dimmerPin]->mode = Firmata\PIN_STATE_ANALOG;
-      $board->pins[$ledPin]->mode = Firmata\PIN_STATE_PWM;
+      $board->pins[$dimmerPin]->mode = Firmata\Board::PIN_STATE_ANALOG;
+      $board->pins[$ledPin]->mode = Firmata\Board::PIN_STATE_PWM;
 
       $board->analogRead(
         $dimmerPin,

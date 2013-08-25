@@ -25,13 +25,13 @@ namespace Carica\Firmata\Request\I2C {
         ->stream()
         ->write(
           array(
-            FIRMATA\COMMAND_START_SYSEX,
-            FIRMATA\COMMAND_I2C_REQUEST,
+            Firmata\Board::START_SYSEX,
+            Firmata\Board::I2C_REQUEST,
             $this->_slaveAddress,
-            FIRMATA\I2C_MODE_READ << 3,
+            Firmata\Board::I2C_MODE_READ << 3,
             $this->_length & 0x7F,
             ($this->_length >> 7) & 0x7F,
-            FIRMATA\COMMAND_END_SYSEX
+            Firmata\Board::END_SYSEX
           )
       );
     }

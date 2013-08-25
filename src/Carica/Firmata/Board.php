@@ -5,43 +5,6 @@ namespace Carica\Firmata {
   use Carica\Io;
   use Carica\Io\Event;
 
-  const COMMAND_PIN_MODE = 0xF4;
-  const COMMAND_REPORT_DIGITAL = 0xD0;
-  const COMMAND_REPORT_ANALOG = 0xC0;
-  const COMMAND_DIGITAL_MESSAGE = 0x90;
-  const COMMAND_START_SYSEX = 0xF0;
-  const COMMAND_END_SYSEX = 0xF7;
-  const COMMAND_QUERY_FIRMWARE = 0x79;
-  const COMMAND_REPORT_VERSION = 0xF9;
-  const COMMAND_ANALOG_MESSAGE = 0xE0;
-  const COMMAND_CAPABILITY_QUERY = 0x6B;
-  const COMMAND_CAPABILITY_RESPONSE = 0x6C;
-  const COMMAND_PIN_STATE_QUERY = 0x6D;
-  const COMMAND_PIN_STATE_RESPONSE = 0x6E;
-  const COMMAND_ANALOG_MAPPING_QUERY = 0x69;
-  const COMMAND_ANALOG_MAPPING_RESPONSE = 0x6A;
-  const COMMAND_I2C_REQUEST = 0x76;
-  const COMMAND_I2C_REPLY = 0x77;
-  const COMMAND_I2C_CONFIG = 0x78;
-  const COMMAND_STRING_DATA = 0x71;
-  const COMMAND_PULSE_IN = 0x74;
-  const COMMAND_SYSTEM_RESET = 0xFF;
-
-  const PIN_STATE_UNKNOWN = 0xFF; // internal state to recognize unininitialized pins
-  const PIN_STATE_INPUT = 0x00;
-  const PIN_STATE_OUTPUT = 0x01;
-  const PIN_STATE_ANALOG = 0x02;
-  const PIN_STATE_PWM = 0x03;
-  const PIN_STATE_SERVO = 0x04;
-
-  const DIGITAL_LOW = 0;
-  const DIGITAL_HIGH = 1;
-
-  const I2C_MODE_WRITE = 0;
-  const I2C_MODE_READ = 1;
-  const I2C_MODE_CONTINOUS_READ = 2;
-  const I2C_MODE_STOP_READING = 3;
-
   /**
    * This class represents an Arduino board running firmata.
    *
@@ -52,6 +15,43 @@ namespace Carica\Firmata {
   class Board {
 
     use Event\Emitter\Aggregation;
+
+    const PIN_MODE = 0xF4;
+    const REPORT_DIGITAL = 0xD0;
+    const REPORT_ANALOG = 0xC0;
+    const DIGITAL_MESSAGE = 0x90;
+    const START_SYSEX = 0xF0;
+    const END_SYSEX = 0xF7;
+    const QUERY_FIRMWARE = 0x79;
+    const REPORT_VERSION = 0xF9;
+    const ANALOG_MESSAGE = 0xE0;
+    const CAPABILITY_QUERY = 0x6B;
+    const CAPABILITY_RESPONSE = 0x6C;
+    const PIN_STATE_QUERY = 0x6D;
+    const PIN_STATE_RESPONSE = 0x6E;
+    const ANALOG_MAPPING_QUERY = 0x69;
+    const ANALOG_MAPPING_RESPONSE = 0x6A;
+    const I2C_REQUEST = 0x76;
+    const I2C_REPLY = 0x77;
+    const I2C_CONFIG = 0x78;
+    const STRING_DATA = 0x71;
+    const PULSE_IN = 0x74;
+    const SYSTEM_RESET = 0xFF;
+
+    const PIN_STATE_UNKNOWN = 0xFF; // internal state to recognize unininitialized pins
+    const PIN_STATE_INPUT = 0x00;
+    const PIN_STATE_OUTPUT = 0x01;
+    const PIN_STATE_ANALOG = 0x02;
+    const PIN_STATE_PWM = 0x03;
+    const PIN_STATE_SERVO = 0x04;
+
+    const DIGITAL_LOW = 0;
+    const DIGITAL_HIGH = 1;
+
+    const I2C_MODE_WRITE = 0;
+    const I2C_MODE_READ = 1;
+    const I2C_MODE_CONTINOUS_READ = 2;
+    const I2C_MODE_STOP_READING = 3;
 
     /**
      * @var array
@@ -89,16 +89,16 @@ namespace Carica\Firmata {
      * @var array(integer=>string)
      */
     private $_responseHandler = array(
-      COMMAND_REPORT_VERSION => 'onReportVersion',
-      COMMAND_ANALOG_MESSAGE => 'onAnalogMessage',
-      COMMAND_DIGITAL_MESSAGE => 'onDigitalMessage',
-      COMMAND_STRING_DATA => 'onStringData',
-      COMMAND_PULSE_IN => 'onPulseIn',
-      COMMAND_QUERY_FIRMWARE => 'onQueryFirmware',
-      COMMAND_CAPABILITY_RESPONSE => 'onCapabilityResponse',
-      COMMAND_PIN_STATE_RESPONSE => 'onPinStateResponse',
-      COMMAND_ANALOG_MAPPING_RESPONSE => 'onAnalogMappingResponse',
-      COMMAND_I2C_REPLY => 'onI2CReply'
+      self::REPORT_VERSION => 'onReportVersion',
+      self::ANALOG_MESSAGE => 'onAnalogMessage',
+      self::DIGITAL_MESSAGE => 'onDigitalMessage',
+      self::STRING_DATA => 'onStringData',
+      self::PULSE_IN => 'onPulseIn',
+      self::QUERY_FIRMWARE => 'onQueryFirmware',
+      self::CAPABILITY_RESPONSE => 'onCapabilityResponse',
+      self::PIN_STATE_RESPONSE => 'onPinStateResponse',
+      self::ANALOG_MAPPING_RESPONSE => 'onAnalogMappingResponse',
+      self::I2C_REPLY => 'onI2CReply'
     );
 
     /**
@@ -225,8 +225,8 @@ namespace Carica\Firmata {
     private function onReportVersion(Response\Midi\ReportVersion $response) {
       $this->_version = new Version($response->major, $response->minor);
       for ($i = 0; $i < 16; $i++) {
-        $this->stream()->write([COMMAND_REPORT_DIGITAL | $i, 1]);
-        $this->stream()->write([COMMAND_REPORT_ANALOG | $i, 1]);
+        $this->stream()->write([self::REPORT_DIGITAL | $i, 1]);
+        $this->stream()->write([self::REPORT_ANALOG | $i, 1]);
       }
       $this->events()->emit('reportversion');
     }
@@ -341,7 +341,7 @@ namespace Carica\Firmata {
      * Reset board
      */
     public function reset() {
-      $this->stream()->write([COMMAND_SYSTEM_RESET]);
+      $this->stream()->write([self::SYSTEM_RESET]);
     }
 
     /**
@@ -351,7 +351,7 @@ namespace Carica\Firmata {
      */
     public function reportVersion(Callable $callback) {
       $this->events()->once('reportversion', $callback);
-      $this->stream()->write([COMMAND_REPORT_VERSION]);
+      $this->stream()->write([self::REPORT_VERSION]);
     }
 
     /**
@@ -361,7 +361,7 @@ namespace Carica\Firmata {
      */
     public function queryFirmware(Callable $callback) {
       $this->events()->once('queryfirmware', $callback);
-      $this->stream()->write([COMMAND_START_SYSEX, COMMAND_QUERY_FIRMWARE, COMMAND_END_SYSEX]);
+      $this->stream()->write([self::START_SYSEX, self::QUERY_FIRMWARE, self::END_SYSEX]);
     }
 
     /**
@@ -371,7 +371,7 @@ namespace Carica\Firmata {
      */
     public function queryCapabilities(Callable $callback) {
       $this->events()->once('capability-query', $callback);
-      $this->stream()->write([COMMAND_START_SYSEX, COMMAND_CAPABILITY_QUERY, COMMAND_END_SYSEX]);
+      $this->stream()->write([self::START_SYSEX, self::CAPABILITY_QUERY, self::END_SYSEX]);
     }
 
     /**
@@ -381,7 +381,7 @@ namespace Carica\Firmata {
      */
     public function queryAnalogMapping(Callable  $callback) {
       $this->events()->once('analog-mapping-query', $callback);
-      $this->stream()->write([COMMAND_START_SYSEX, COMMAND_ANALOG_MAPPING_QUERY, COMMAND_END_SYSEX]);
+      $this->stream()->write([self::START_SYSEX, self::ANALOG_MAPPING_QUERY, self::END_SYSEX]);
     }
 
     /**
@@ -392,7 +392,7 @@ namespace Carica\Firmata {
      */
     public function queryPinState($pin, Callable $callback) {
       $this->events()->once('pin-state-'.$pin, $callback);
-      $this->stream()->write([COMMAND_START_SYSEX, COMMAND_PIN_STATE_QUERY, $pin, COMMAND_END_SYSEX]);
+      $this->stream()->write([self::START_SYSEX, self::PIN_STATE_QUERY, $pin, self::END_SYSEX]);
     }
 
     /**
@@ -400,7 +400,7 @@ namespace Carica\Firmata {
      */
     public function queryAllPinStates() {
       foreach ($this->pins as $index => $pin) {
-        $this->stream()->write([COMMAND_START_SYSEX, COMMAND_PIN_STATE_QUERY, $index, COMMAND_END_SYSEX]);
+        $this->stream()->write([self::START_SYSEX, self::PIN_STATE_QUERY, $index, self::END_SYSEX]);
       }
     }
     /**
@@ -430,7 +430,7 @@ namespace Carica\Firmata {
     public function analogWrite($pin, $value) {
       $this->_pins[$pin]->setAnalog($value);
       $this->stream()->write(
-        [COMMAND_ANALOG_MESSAGE | $pin, $value & 0x7F, ($value >> 7) & 0x7F]
+        [self::ANALOG_MESSAGE | $pin, $value & 0x7F, ($value >> 7) & 0x7F]
       );
     }
 
@@ -445,13 +445,13 @@ namespace Carica\Firmata {
     }
 
     /**
-     * Write a digital value for a pin (on/off, DIGITAL_LOW/DIGITAL_HIGH)
+     * Write a digital value for a pin (on/off, self::DIGITAL_LOW/self::DIGITAL_HIGH)
      *
      * @param integer $pin 0-16
      * @param integer $value 0-1
      */
     public function digitalWrite($pin, $value) {
-      $this->_pins[$pin]->setDigital($value == DIGITAL_HIGH);
+      $this->_pins[$pin]->setDigital($value == self::DIGITAL_HIGH);
       $port = floor($pin / 8);
       $portValue = 0;
       for ($i = 0; $i < 8; $i++) {
@@ -461,24 +461,24 @@ namespace Carica\Firmata {
         }
       }
       $this->stream()->write(
-        [COMMAND_DIGITAL_MESSAGE | $port, $portValue & 0x7F, ($portValue >> 7) & 0x7F]
+        [self::DIGITAL_MESSAGE | $port, $portValue & 0x7F, ($portValue >> 7) & 0x7F]
       );
     }
 
     /**
      * Set the mode of a pin:
-     *   PIN_STATE_INPUT,
-     *   PIN_STATE_OUTPUT,
-     *   PIN_STATE_ANALOG,
-     *   PIN_STATE_PWM,
-     *   PIN_STATE_SERVO
+     *   Carica\Firmata::PIN_STATE_INPUT,
+     *   Carica\Firmata::PIN_STATE_OUTPUT,
+     *   Carica\FirmataPIN_STATE_ANALOG,
+     *   Carica\FirmataPIN_STATE_PWM,
+     *   Carica\FirmataPIN_STATE_SERVO
      *
      * @param integer $pin 0-16
      * @param integer $mode
      */
     public function pinMode($pin, $mode) {
       $this->pins[$pin]->setMode($mode);
-      $this->stream()->write([COMMAND_PIN_MODE, $pin, $mode]);
+      $this->stream()->write([self::PIN_MODE, $pin, $mode]);
     }
 
     /**
@@ -491,11 +491,11 @@ namespace Carica\Firmata {
         ->stream()
         ->write(
            array(
-             COMMAND_START_SYSEX,
-             COMMAND_I2C_CONFIG,
+             self::START_SYSEX,
+             self::I2C_CONFIG,
              delay >> 0xFF,
              (delay >> 8) & 0XFF,
-             COMMAND_END_SYSEX
+             self::END_SYSEX
            )
         );
     }
@@ -535,7 +535,7 @@ namespace Carica\Firmata {
      * @param integer $pulseLength
      * @param integer $timeout
      */
-    public function pulseIn($pin, $callback, $value = DIGITAL_HIGH, $pulseLength = 5, $timeout = 1000000) {
+    public function pulseIn($pin, $callback, $value = self::DIGITAL_HIGH, $pulseLength = 5, $timeout = 1000000) {
       $this->events()->once('pulse-in-'.$pin, $callback);
       $request = new Request\PulseIn($this, $pin, $value, $pulseLength, $timeout);
       $request->send();

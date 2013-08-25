@@ -31,15 +31,15 @@ namespace Carica\Firmata\Request\I2C {
     public function send() {
       $data = pack(
         'CCCC',
-        FIRMATA\COMMAND_START_SYSEX,
-        FIRMATA\COMMAND_I2C_REQUEST,
+        Firmata\Board::START_SYSEX,
+        Firmata\Board::I2C_REQUEST,
         $this->_slaveAddress,
-        I2C_MODE_WRITE << 3
+        Firmata\Board::I2C_MODE_WRITE << 3
       );
-      $data .= self::encodeBytes($this->_data);
+      $data .= Firmata\Board::encodeBytes($this->_data);
       $data .= pack(
         'C',
-        FIRMATA\COMMAND_END_SYSEX
+        Firmata\Board::END_SYSEX
       );
       $this->board()->stream()->write($data);
     }

@@ -6,10 +6,6 @@ namespace Carica\Firmata {
 
   class BufferTest extends \PHPUnit_Framework_TestCase {
 
-    public function setUp() {
-      class_exists('Carica\Firmata\Board');
-    }
-
     /**
      * @covers Carica\Firmata\Buffer
      * @dataProvider provideDataWithVersionAtEnd

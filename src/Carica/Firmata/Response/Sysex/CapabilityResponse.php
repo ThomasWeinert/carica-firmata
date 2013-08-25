@@ -7,11 +7,11 @@ namespace Carica\Firmata\Response\Sysex {
   class CapabilityResponse extends Firmata\Response\Sysex {
 
     private $_supported = array(
-      Firmata\PIN_STATE_INPUT,
-      Firmata\PIN_STATE_OUTPUT,
-      Firmata\PIN_STATE_ANALOG,
-      Firmata\PIN_STATE_PWM,
-      Firmata\PIN_STATE_SERVO
+      self::PIN_STATE_INPUT,
+      self::PIN_STATE_OUTPUT,
+      self::PIN_STATE_ANALOG,
+      self::PIN_STATE_PWM,
+      self::PIN_STATE_SERVO
     );
 
     private $_pins = array();

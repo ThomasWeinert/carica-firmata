@@ -13,16 +13,16 @@ namespace Carica\Firmata {
     private $_lastReponse = NULL;
 
     private $_classes = array(
-      COMMAND_REPORT_VERSION => 'Midi\ReportVersion',
-      COMMAND_ANALOG_MESSAGE => 'Midi\Message',
-      COMMAND_DIGITAL_MESSAGE => 'Midi\Message',
-      COMMAND_STRING_DATA => 'Sysex\String',
-      COMMAND_PULSE_IN => 'Sysex\PulseIn',
-      COMMAND_QUERY_FIRMWARE => 'Sysex\QueryFirmware',
-      COMMAND_CAPABILITY_RESPONSE => 'Sysex\CapabilityResponse',
-      COMMAND_PIN_STATE_RESPONSE => 'Sysex\PinStateResponse',
-      COMMAND_ANALOG_MAPPING_RESPONSE => 'Sysex\AnalogMappingResponse',
-      COMMAND_I2C_REPLY => 'SysEx\I2CReply'
+      Board::REPORT_VERSION => 'Midi\ReportVersion',
+      Board::ANALOG_MESSAGE => 'Midi\Message',
+      Board::DIGITAL_MESSAGE => 'Midi\Message',
+      Board::STRING_DATA => 'Sysex\String',
+      Board::PULSE_IN => 'Sysex\PulseIn',
+      Board::QUERY_FIRMWARE => 'Sysex\QueryFirmware',
+      Board::CAPABILITY_RESPONSE => 'Sysex\CapabilityResponse',
+      Board::PIN_STATE_RESPONSE => 'Sysex\PinStateResponse',
+      Board::ANALOG_MAPPING_RESPONSE => 'Sysex\AnalogMappingResponse',
+      Board::I2C_REPLY => 'SysEx\I2CReply'
     );
 
     public function addData($data) {
@@ -37,7 +37,7 @@ namespace Carica\Firmata {
 
     private function addByte($byte) {
       if (!$this->_versionReceived) {
-        if ($byte !== COMMAND_REPORT_VERSION) {
+        if ($byte !== Board::REPORT_VERSION) {
           return;
         } else {
           $this->_versionReceived = TRUE;
@@ -53,13 +53,13 @@ namespace Carica\Firmata {
       if ($byteCount > 0) {
         $first = reset($this->_bytes);
         $last = end($this->_bytes);
-        if ($first === COMMAND_START_SYSEX &&
-            $last === COMMAND_END_SYSEX) {
+        if ($first === Board::START_SYSEX &&
+            $last === Board::END_SYSEX) {
           if ($byteCount > 2) {
             $this->handleResponse($this->_bytes[1], array_slice($this->_bytes, 1, -1));
           }
           $this->_bytes = array();
-        } elseif ($byteCount == 3 && $first !== COMMAND_START_SYSEX) {
+        } elseif ($byteCount == 3 && $first !== Board::START_SYSEX) {
           $command = ($first < 240) ? ($first & 0xF0) : $first;
           $this->handleResponse($command, $this->_bytes);
           $this->_bytes = array();

@@ -15,14 +15,14 @@ $board
       $buttonPin = 2;
       $ledPin = 13;
 
-      $board->pins[$buttonPin]->mode = Firmata\PIN_STATE_INPUT;
-      $board->pins[$ledPin]->mode = Firmata\PIN_STATE_OUTPUT;
+      $board->pins[$buttonPin]->mode = Firmata\Board::PIN_STATE_INPUT;
+      $board->pins[$ledPin]->mode = Firmata\Board::PIN_STATE_OUTPUT;
 
       $board->digitalRead(
         $buttonPin,
         function($value) use ($board, $ledPin) {
           echo ($value == Firmata\DIGITAL_HIGH) ? "Button down\n" :  "Button up\n";
-          $board->pins[$ledPin]->digital = $value == Firmata\DIGITAL_HIGH;
+          $board->pins[$ledPin]->digital = $value == Firmata\Board::DIGITAL_HIGH;
         }
       );
     }
