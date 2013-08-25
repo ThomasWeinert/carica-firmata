@@ -76,13 +76,13 @@ namespace Carica\Firmata\Rest {
         $pinNode->setAttribute('supports', implode(' ', $modes));
         $pinNode->setAttribute('mode', $this->getModeString($pin->mode));
         switch ($pin->mode) {
-        case self::PIN_STATE_INPUT :
-        case self::PIN_STATE_OUTPUT :
+        case Firmata\Board::PIN_STATE_INPUT :
+        case Firmata\Board::PIN_STATE_OUTPUT :
           $pinNode->setAttribute('digital', $pin->digital ? 'yes' : 'no');
           break;
-        case self::PIN_STATE_ANALOG :
-        case self::PIN_STATE_PWM :
-        case self::PIN_STATE_SERVO :
+        case Firmata\Board::PIN_STATE_ANALOG :
+        case Firmata\Board::PIN_STATE_PWM :
+        case Firmata\Board::PIN_STATE_SERVO :
           $pinNode->setAttribute('analog', round($pin->analog, 4));
           break;
         }

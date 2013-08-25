@@ -7,7 +7,8 @@
     number : 0,
     mode : 'output',
     digital : 'yes',
-    analog : 0,
+    analog : 0.0,
+    value : 0,
     blockUpdates : false,
     isChanged : false,
     
@@ -106,7 +107,11 @@
         }
         this.analog = pinData.attr('analog');
         if (typeof this.analog == 'undefined') {
-          this.analog = 0;
+          this.analog = 0.0;
+        }
+        this.value = pinData.attr('analog');
+        if (typeof this.value == 'undefined') {
+          this.value = 0;
         }
       }
       var selected = '.pin-mode-' + this.mode;
@@ -123,16 +128,16 @@
         }
         break;
       case 'pwm' :
-        this.element.find('.pin-mode-pwm input:not(:focus)').val(this.analog);
+        this.element.find('.pin-mode-pwm input:not(:focus)').val(this.value);
         break;
       case 'analog' :
-        var $percent = Math.round(parseInt(this.analog) * 100 / 1023).toString() + '%'; 
+        var $percent = Math.round(parseFloat(this.analog) * 100).toString() + '%'; 
         this.element.find('.pin-mode-analog .progress .bar')
           .css('width', $percent)
-          .text($percent);
+          .text(this.value);
         break;
       case 'servo' :
-        this.element.find('.pin-mode-servo input:not(:focus)').val(this.analog);
+        this.element.find('.pin-mode-servo input:not(:focus)').val(this.value);
         break;
       }
     },
@@ -153,12 +158,12 @@
       case 'analog' :
         break;
       case 'pwm' :
-        this.analog = this.element.find('.pin-mode-pwm input').prop('value');
-        url += '&analog=' + this.analog;
+        this.value = this.element.find('.pin-mode-pwm input').prop('value');
+        url += '&value=' + this.value;
         break;
       case 'servo' :
-        this.analog = this.element.find('.pin-mode-servo input').prop('value');
-        url += '&analog=' + this.analog;
+        this.value = this.element.find('.pin-mode-servo input').prop('value');
+        url += '&value=' + this.value;
         break;
       }
       this.update();

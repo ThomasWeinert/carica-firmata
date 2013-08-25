@@ -166,6 +166,9 @@ namespace Carica\Firmata {
       case 'mode' :
         $this->setMode($value);
         return;
+      case 'value' :
+        $this->setValue($value);
+        return;
       case 'digital' :
         $this->setDigital($value);
         return;
@@ -233,6 +236,20 @@ namespace Carica\Firmata {
       } elseif ($value > $resolution) {
         $value = $resolution;
       }
+      if ($this->_valueInitialized && $this->_value == $value) {
+        return;
+      }
+      $this->_value = $value;
+      $this->_valueInitialized = TRUE;
+      $this->_board->analogWrite($this->_pin, $value);
+    }
+
+    /**
+     * Setter method for the analog property. Allows to set change the value on the pin.
+     * @param float $value between 0 and 1
+     */
+    public function setValue($value) {
+      $value = (int)$value;
       if ($this->_valueInitialized && $this->_value == $value) {
         return;
       }
