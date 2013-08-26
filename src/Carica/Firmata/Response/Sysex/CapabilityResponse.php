@@ -11,7 +11,8 @@ namespace Carica\Firmata\Response\Sysex {
       Firmata\Board::PIN_STATE_OUTPUT,
       Firmata\Board::PIN_STATE_ANALOG,
       Firmata\Board::PIN_STATE_PWM,
-      Firmata\Board::PIN_STATE_SERVO
+      Firmata\Board::PIN_STATE_SERVO,
+      Firmata\Board::PIN_STATE_I2C
     );
 
     private $_resolutions = array(

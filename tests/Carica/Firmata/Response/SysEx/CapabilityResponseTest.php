@@ -136,12 +136,14 @@ namespace Carica\Firmata\Response\SysEx {
           array( // pin 18 a4
             Firmata\Board::PIN_STATE_INPUT => 1,
             Firmata\Board::PIN_STATE_OUTPUT => 1,
-            Firmata\Board::PIN_STATE_ANALOG => 1023
+            Firmata\Board::PIN_STATE_ANALOG => 1023,
+            Firmata\Board::PIN_STATE_I2C => 1
           ),
           array( // pin 19 a5
             Firmata\Board::PIN_STATE_INPUT => 1,
             Firmata\Board::PIN_STATE_OUTPUT => 1,
-            Firmata\Board::PIN_STATE_ANALOG => 1023
+            Firmata\Board::PIN_STATE_ANALOG => 1023,
+            Firmata\Board::PIN_STATE_I2C => 1
           ),
           array( // pin 20 a6
             Firmata\Board::PIN_STATE_ANALOG => 1023
