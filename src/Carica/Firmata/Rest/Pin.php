@@ -15,6 +15,7 @@ namespace Carica\Firmata\Rest {
       Firmata\Board::PIN_STATE_ANALOG => 'analog',
       Firmata\Board::PIN_STATE_PWM => 'pwm',
       Firmata\Board::PIN_STATE_SERVO => 'servo',
+      Firmata\Board::PIN_STATE_SHIFT => 'shift',
       Firmata\Board::PIN_STATE_I2C => 'i2c'
     );
 

@@ -44,6 +44,7 @@ namespace Carica\Firmata {
     const PIN_STATE_ANALOG = 0x02;
     const PIN_STATE_PWM = 0x03;
     const PIN_STATE_SERVO = 0x04;
+    const PIN_STATE_SHIFT = 0x05;
     const PIN_STATE_I2C = 0x06;
 
     const DIGITAL_LOW = 0;
