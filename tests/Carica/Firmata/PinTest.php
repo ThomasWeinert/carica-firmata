@@ -234,6 +234,23 @@ namespace Carica\Firmata {
       $this->assertEquals(Board::DIGITAL_HIGH, $pin->value);
     }
 
+    /*
+     * @covers Carica\Firmata\Pin::__set
+     * @covers Carica\Firmata\Pin::setValue
+     */
+    public function testSetValue() {
+      $board = $this->getBoardFixture();
+      $board
+        ->expects($this->once())
+        ->method('analogWrite')
+        ->with(12, 128);
+
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_PWM => 255));
+      $pin->value = 128;
+      $pin->value = 128;
+      $this->assertEquals(128, $pin->value);
+    }
+
       /*
      * @covers Carica\Firmata\Pin
      */
