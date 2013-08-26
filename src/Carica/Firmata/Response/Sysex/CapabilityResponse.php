@@ -14,30 +14,33 @@ namespace Carica\Firmata\Response\Sysex {
       Firmata\Board::PIN_STATE_SERVO
     );
 
+    private $_resolutions = array(
+      1 => 1,
+      8 => 255,
+      10 => 1023,
+      14 => 360
+    );
+
     private $_pins = array();
 
     public function __construct($command, array $bytes) {
       parent::__construct($command, $bytes);
       $length = count($bytes);
-      $supported = 0;
-      $byteIndex = 0;
-      for ($i = 1; $i < $length; ++$i) {
-        if ($bytes[$i] == 127) {
-          $modes = array();
-          foreach ($this->_supported as $mode) {
-            if ($supported & (1 << $mode)) {
-              $modes[] = $mode;
-            }
+      $pin = 0;
+      $i = 1;
+      while ($i < $length) {
+        if ($bytes[$i] == 0x7F) {
+          if (!isset($this->_pins[$pin])) {
+            $this->_pins[$pin] = array();
           }
-          $this->_pins[] = $modes;
-          $supported = 0;
-          $byteIndex = 0;
+          ++$pin;
+          ++$i;
           continue;
+        } elseif (in_array($bytes[$i], $this->_supported) &&
+                  isset($this->_resolutions[$bytes[$i + 1]])) {
+          $this->_pins[$pin][$bytes[$i]] = $this->_resolutions[$bytes[$i + 1]];
         }
-        if ($byteIndex === 0) {
-          $supported |= (1 << $bytes[$i]);
-        }
-        $byteIndex ^= $byteIndex;
+        $i += 2;
       }
     }
 

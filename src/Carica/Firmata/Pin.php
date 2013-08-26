@@ -23,7 +23,9 @@ namespace Carica\Firmata {
      */
     private $_pin = 0;
     /**
-     * @var array(integer)
+     * Array of supported modes and resolutions
+     *
+     * @var array(integer => integer)
      */
     private $_supports = array();
     /**
@@ -58,7 +60,7 @@ namespace Carica\Firmata {
       $this->_board = $board;
       $this->_pin = (int)$pin;
       $this->_supports = $supports;
-      $this->_mode = reset($supports);
+      $this->_mode = reset(array_keys($supports));
       $this->attachEvents();
     }
 
@@ -189,7 +191,7 @@ namespace Carica\Firmata {
      */
     public function setMode($mode) {
       $mode = (int)$mode;
-      if (!in_array($mode, $this->_supports)) {
+      if (!array_key_exists($mode, $this->_supports)) {
         throw new Exception\UnsupportedMode($this->_pin, $mode);
       }
       if ($this->_modeInitialized && $this->_mode == $mode) {
@@ -221,7 +223,7 @@ namespace Carica\Firmata {
      * @return float between 0 and 1
      */
     public function getAnalog() {
-      return $this->_value / $this->_board->resolutions[$this->_mode];
+      return $this->_value / $this->_supports[$this->_mode];
     }
 
     /**
@@ -229,7 +231,7 @@ namespace Carica\Firmata {
      * @param float $value between 0 and 1
      */
     public function setAnalog($percent) {
-      $resolution = $this->_board->resolutions[$this->_mode];
+      $resolution = $this->_supports[$this->_mode];
       $value = round($percent * $resolution);
       if ($value < 0) {
         $value = 0;
@@ -260,7 +262,7 @@ namespace Carica\Firmata {
      * @return boolean
      */
     public function supports($mode) {
-      return in_array($mode, $this->_supports);
+      return array_key_exists($mode, $this->_supports);
     }
   }
 }

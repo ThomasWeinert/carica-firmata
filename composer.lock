@@ -11,12 +11,12 @@
             "source": {
                 "type": "git",
                 "url": "https://bitbucket.org/ThomasWeinert/carica-io.git",
-                "reference": "347cbdb73170a39eaf16b0daf69055bba667fe79"
+                "reference": "7879329bcfed876261ae3147a6f85b837c3bbc18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://bitbucket.org/ThomasWeinert/carica-io/get/347cbdb73170a39eaf16b0daf69055bba667fe79.zip",
-                "reference": "347cbdb73170a39eaf16b0daf69055bba667fe79",
+                "url": "https://bitbucket.org/ThomasWeinert/carica-io/get/7879329bcfed876261ae3147a6f85b837c3bbc18.zip",
+                "reference": "7879329bcfed876261ae3147a6f85b837c3bbc18",
                 "shasum": ""
             },
             "require": {
@@ -44,7 +44,7 @@
                 "asynchronous-io",
                 "non-blocking-io"
             ],
-            "time": "2013-06-15 16:08:25"
+            "time": "2013-08-26 20:30:27"
         }
     ],
     "packages-dev": [

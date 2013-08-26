@@ -12,10 +12,10 @@ namespace Carica\Firmata {
      */
     public function testConstructor() {
       $board = $this->getBoardFixture();
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT => 1));
       $this->assertSame($board, $pin->board);
       $this->assertEquals(12, $pin->pin);
-      $this->assertEquals(array(Board::PIN_STATE_OUTPUT), $pin->supports);
+      $this->assertEquals(array(Board::PIN_STATE_OUTPUT => 1), $pin->supports);
     }
 
     /**
@@ -23,7 +23,7 @@ namespace Carica\Firmata {
      * @dataProvider providePinProperties
      */
     public function testPropertyIsset($propertyName) {
-      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT));
+      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT => 1));
       $this->assertTrue(isset($pin->{$propertyName}));
     }
 
@@ -31,7 +31,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Pin::__isset
      */
     public function testPropertyIssetWithInvalidPropertyExpectingFalse() {
-      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT));
+      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT => 1));
       $this->assertFalse(isset($pin->INVALID_PROPERTY));
     }
 
@@ -39,7 +39,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Pin::__set
      */
     public function testSetInvalidPropertyExpectingException() {
-      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT));
+      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT => 1));
       $this->setExpectedException('LogicException');
       $pin->INVALID_PROPERTY = 'trigger';
     }
@@ -48,7 +48,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Pin::__get
      */
     public function testGetInvalidPropertyExpectingException() {
-      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT));
+      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT => 1));
       $this->setExpectedException('LogicException');
       $dummy = $pin->INVALID_PROPERTY;
     }
@@ -58,7 +58,7 @@ namespace Carica\Firmata {
      */
     public function testGetBoard() {
       $board = $this->getBoardFixture();
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT => 1));
       $this->assertSame($board, $pin->board);
     }
 
@@ -67,7 +67,7 @@ namespace Carica\Firmata {
      */
     public function testSetBoardExpectingException() {
       $board = $this->getBoardFixture();
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT => 1));
       $this->setExpectedException('LogicException');
       $pin->board = $board;
     }
@@ -76,7 +76,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Pin::__get
      */
     public function testGetPin() {
-      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT));
+      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT => 1));
       $this->assertEquals(12, $pin->pin);
     }
 
@@ -84,7 +84,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Pin::__set
      */
     public function testSetPinExpectingException() {
-      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT));
+      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT => 1));
       $this->setExpectedException('LogicException');
       $pin->pin = 13;
     }
@@ -93,15 +93,15 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Pin::__get
      */
     public function testGetSupports() {
-      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT, Board::PIN_STATE_ANALOG));
-      $this->assertEquals(array(Board::PIN_STATE_OUTPUT, Board::PIN_STATE_ANALOG), $pin->supports);
+      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT => 1, Board::PIN_STATE_ANALOG => 1023));
+      $this->assertEquals(array(Board::PIN_STATE_OUTPUT => 1, Board::PIN_STATE_ANALOG => 1023), $pin->supports);
     }
 
     /*
      * @covers Carica\Firmata\Pin::__set
      */
     public function testSetSupportsExpectingException() {
-      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT));
+      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT => 1));
       $this->setExpectedException('LogicException');
       $pin->supports = array();
     }
@@ -110,8 +110,8 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Pin::__get
      */
     public function testGetMode() {
-      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT, Board::PIN_STATE_ANALOG));
-      $this->assertEquals(array(Board::PIN_STATE_OUTPUT, Board::PIN_STATE_ANALOG), $pin->supports);
+      $pin = new Pin($this->getBoardFixture(), 12, array(Board::PIN_STATE_OUTPUT => 1, Board::PIN_STATE_ANALOG => 1023));
+      $this->assertEquals(array(Board::PIN_STATE_OUTPUT => 1, Board::PIN_STATE_ANALOG => 1023), $pin->supports);
     }
 
     /*
@@ -126,7 +126,7 @@ namespace Carica\Firmata {
         ->method('pinMode')
         ->with(12, Board::PIN_STATE_OUTPUT);
 
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT, Board::PIN_STATE_ANALOG));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT => 1, Board::PIN_STATE_ANALOG => 1023));
       $pin->mode = Board::PIN_STATE_OUTPUT;
       $this->assertEquals(Board::PIN_STATE_OUTPUT, $pin->mode);
     }
@@ -143,7 +143,7 @@ namespace Carica\Firmata {
         ->method('pinMode')
         ->with(12, Board::PIN_STATE_ANALOG);
 
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT, Board::PIN_STATE_ANALOG));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT => 1, Board::PIN_STATE_ANALOG => 1023));
       $pin->mode = Board::PIN_STATE_ANALOG;
       $pin->mode = Board::PIN_STATE_ANALOG;
       $this->assertEquals(Board::PIN_STATE_ANALOG, $pin->mode);
@@ -159,7 +159,7 @@ namespace Carica\Firmata {
         ->expects($this->never())
         ->method('pinMode');
 
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT => 1));
       $this->setExpectedException('\Carica\Firmata\Exception\UnsupportedMode');
       $pin->mode = Board::PIN_STATE_ANALOG;
     }
@@ -174,13 +174,8 @@ namespace Carica\Firmata {
         ->expects($this->once())
         ->method('analogWrite')
         ->with(12, 128);
-      $board
-        ->expects($this->any())
-        ->method('__get')
-        ->with('resolutions')
-        ->will($this->returnValue(new Resolutions()));
 
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_PWM));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_PWM => 255));
       $pin->analog = 0.5;
       $pin->analog = 0.5;
       $this->assertEquals(0.5, $pin->analog, '', 0.01);
@@ -197,13 +192,8 @@ namespace Carica\Firmata {
         ->expects($this->once())
         ->method('analogWrite')
         ->with(12, 0);
-      $board
-        ->expects($this->any())
-        ->method('__get')
-        ->with('resolutions')
-        ->will($this->returnValue(new Resolutions()));
 
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_PWM));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_PWM => 255));
       $pin->analog = -0.5;
       $this->assertEquals(0, $pin->analog, '', 0.01);
       $this->assertEquals(0, $pin->value);
@@ -219,13 +209,8 @@ namespace Carica\Firmata {
         ->expects($this->once())
         ->method('analogWrite')
         ->with(12, 255);
-      $board
-        ->expects($this->any())
-        ->method('__get')
-        ->with('resolutions')
-        ->will($this->returnValue(new Resolutions()));
 
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_PWM));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_PWM => 255));
       $pin->analog = 99;
       $this->assertEquals(1, $pin->analog, '', 0.01);
       $this->assertEquals(255, $pin->value);
@@ -242,7 +227,7 @@ namespace Carica\Firmata {
         ->method('digitalWrite')
         ->with(12, Board::DIGITAL_HIGH);
 
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT, Board::PIN_STATE_ANALOG));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT => 1, Board::PIN_STATE_ANALOG => 1023));
       $pin->digital = TRUE;
       $pin->digital = TRUE;
       $this->assertTrue($pin->digital);
@@ -254,7 +239,7 @@ namespace Carica\Firmata {
      */
     public function testEventPinState() {
       $board = new Board($this->getMock('Carica\Io\Stream'));
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT, Board::PIN_STATE_ANALOG));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT => 1, Board::PIN_STATE_ANALOG => 1023));
       $board->events()->emit('pin-state-12', Board::PIN_STATE_ANALOG, 255);
       $this->assertEquals(Board::PIN_STATE_ANALOG, $pin->mode);
       $this->assertEquals(0.25, $pin->analog, '', 0.01);
@@ -265,7 +250,7 @@ namespace Carica\Firmata {
      */
     public function testEventAnalogRead() {
       $board = new Board($this->getMock('Carica\Io\Stream'));
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_ANALOG));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_ANALOG => 1023));
       $board->events()->emit('analog-read-12', 512);
       $this->assertEquals(0.5, $pin->analog, '', 0.01);
     }
@@ -275,7 +260,7 @@ namespace Carica\Firmata {
      */
     public function testEventDigitalRead() {
       $board = new Board($this->getMock('Carica\Io\Stream'));
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_ANALOG));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_ANALOG => 1023));
       $board->events()->emit('digital-read-12', TRUE);
       $this->assertTrue($pin->digital);
     }
@@ -285,7 +270,7 @@ namespace Carica\Firmata {
      */
     public function testSupportsExpectingTrue() {
       $board = $this->getBoardFixture();
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT, Board::PIN_STATE_ANALOG));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT => 1, Board::PIN_STATE_ANALOG => 1023));
       $this->assertTrue(
         $pin->supports(Board::PIN_STATE_ANALOG)
       );
@@ -296,7 +281,7 @@ namespace Carica\Firmata {
      */
     public function testSupportsExpectingFalse() {
       $board = $this->getBoardFixture();
-      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT, Board::PIN_STATE_ANALOG));
+      $pin = new Pin($board, 12, array(Board::PIN_STATE_OUTPUT => 1, Board::PIN_STATE_ANALOG => 1023));
       $this->assertFalse(
         $pin->supports(Board::PIN_STATE_PWM)
       );
