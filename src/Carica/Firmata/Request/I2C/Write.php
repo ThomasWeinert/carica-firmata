@@ -36,7 +36,7 @@ namespace Carica\Firmata\Request\I2C {
         $this->_slaveAddress,
         Firmata\Board::I2C_MODE_WRITE << 3
       );
-      $data .= Firmata\Board::encodeBytes($this->_data);
+      $data .= self::encodeBytes($this->_data);
       $data .= pack(
         'C',
         Firmata\Board::END_SYSEX
