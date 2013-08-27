@@ -34,7 +34,7 @@ namespace Carica\Firmata\Response\Sysex {
           continue;
         } else {
           $mode = $bytes[$i];
-          if ($mode == Firmata\Board::PIN_STATE_SERVO) {
+          if ($mode == Firmata\Board::PIN_MODE_SERVO) {
             /*
              * Servo reports an resolution of 14 bits (maxmimum value 16383), but
              * uses mostly degrees to set the position, so we use 1 as a full circle of

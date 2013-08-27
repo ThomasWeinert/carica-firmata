@@ -15,8 +15,8 @@ $board
       $buttonPin = 2;
       $ledPin = 13;
 
-      $board->pins[$buttonPin]->mode = Firmata\Board::PIN_STATE_INPUT;
-      $board->pins[$ledPin]->mode = Firmata\Board::PIN_STATE_OUTPUT;
+      $board->pins[$buttonPin]->mode = Firmata\Board::PIN_MODE_INPUT;
+      $board->pins[$ledPin]->mode = Firmata\Board::PIN_MODE_OUTPUT;
 
       $board->digitalRead(
         $buttonPin,

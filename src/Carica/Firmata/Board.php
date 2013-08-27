@@ -38,14 +38,14 @@ namespace Carica\Firmata {
     const PULSE_IN = 0x74;
     const SYSTEM_RESET = 0xFF;
 
-    const PIN_STATE_UNKNOWN = 0xFF; // internal state to recognize unininitialized pins
-    const PIN_STATE_INPUT = 0x00;
-    const PIN_STATE_OUTPUT = 0x01;
-    const PIN_STATE_ANALOG = 0x02;
-    const PIN_STATE_PWM = 0x03;
-    const PIN_STATE_SERVO = 0x04;
-    const PIN_STATE_SHIFT = 0x05;
-    const PIN_STATE_I2C = 0x06;
+    const PIN_MODE_UNKNOWN = 0xFF; // internal state to recognize unininitialized pins
+    const PIN_MODE_INPUT = 0x00;
+    const PIN_MODE_OUTPUT = 0x01;
+    const PIN_MODE_ANALOG = 0x02;
+    const PIN_MODE_PWM = 0x03;
+    const PIN_MODE_SERVO = 0x04;
+    const PIN_MODE_SHIFT = 0x05;
+    const PIN_MODE_I2C = 0x06;
 
     const DIGITAL_LOW = 0;
     const DIGITAL_HIGH = 1;
@@ -289,7 +289,7 @@ namespace Carica\Firmata {
         if (isset($this->_pins[8 * $response->port + $i])) {
           $pinNumber = 8 * $response->port + $i;
           $pin = $this->_pins[$pinNumber];
-          if ($pin->mode == PIN_STATE_INPUT) {
+          if ($pin->mode == PIN_MODE_INPUT) {
             $value = ($response->value >> ($i & 0x07)) & 0x01;
           } else {
             $value = $pin->value;
@@ -469,11 +469,11 @@ namespace Carica\Firmata {
 
     /**
      * Set the mode of a pin:
-     *   Carica\Firmata::PIN_STATE_INPUT,
-     *   Carica\Firmata::PIN_STATE_OUTPUT,
-     *   Carica\FirmataPIN_STATE_ANALOG,
-     *   Carica\FirmataPIN_STATE_PWM,
-     *   Carica\FirmataPIN_STATE_SERVO
+     *   Carica\Firmata::PIN_MODE_INPUT,
+     *   Carica\Firmata::PIN_MODE_OUTPUT,
+     *   Carica\FirmataPIN_MODE_ANALOG,
+     *   Carica\FirmataPIN_MODE_PWM,
+     *   Carica\FirmataPIN_MODE_SERVO
      *
      * @param integer $pin 0-16
      * @param integer $mode

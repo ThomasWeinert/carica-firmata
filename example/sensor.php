@@ -15,8 +15,8 @@ $board
       $sensorPin = 16;
       $ledPin = 13;
 
-      $board->pins[$sensorPin]->mode = Firmata\Board::PIN_STATE_ANALOG;
-      $board->pins[$ledPin]->mode = Firmata\Board::PIN_STATE_OUTPUT;
+      $board->pins[$sensorPin]->mode = Firmata\Board::PIN_MODE_ANALOG;
+      $board->pins[$ledPin]->mode = Firmata\Board::PIN_MODE_OUTPUT;
 
       echo "Sensor: $sensorPin\n";
       echo "Led: $ledPin\n";

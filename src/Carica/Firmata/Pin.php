@@ -31,7 +31,7 @@ namespace Carica\Firmata {
     /**
      * @var integer
      */
-    private $_mode = Board::PIN_STATE_UNKNOWN;
+    private $_mode = Board::PIN_MODE_UNKNOWN;
     /**
      * @var integer
      */
