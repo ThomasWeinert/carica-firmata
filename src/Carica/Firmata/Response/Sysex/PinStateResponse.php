@@ -4,6 +4,11 @@ namespace Carica\Firmata\Response\Sysex {
 
   use Carica\Firmata;
 
+  /**
+   * @property-read integer $pin
+   * @property-read integer $mode
+   * @property-read integer $value
+   */
   class PinStateResponse extends Firmata\Response\Sysex {
 
     private $_pin = 0;
