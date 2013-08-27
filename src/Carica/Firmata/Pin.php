@@ -263,7 +263,7 @@ namespace Carica\Firmata {
      * @return integer
      */
     public function getMaximum() {
-      return $this->_supports[$this->_mode]; 
+      return $this->_supports[$this->_mode];
     }
 
     /**
