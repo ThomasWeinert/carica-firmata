@@ -4,6 +4,11 @@ namespace Carica\Firmata\Response\Sysex {
 
   use Carica\Firmata;
 
+  /**
+   * @property-read integer $slaveAddress
+   * @property-read integer $register
+   * @property-read string $data
+   */
   class I2CReply extends Firmata\Response\Sysex {
 
     private $_slaveAddress = 0;
@@ -12,9 +17,9 @@ namespace Carica\Firmata\Response\Sysex {
 
     public function __construct($command, array $bytes) {
       parent::__construct($command, $bytes);
-      $this->_slaveAddress = self::decodeBytes(array_slice($bytes, 1, 2));
-      $this->_register = self::decodeBytes(array_slice($bytes, 3, 2));
-      $this->_data = self::decodeBytes(array_slice($bytes, 3));
+      $this->_slaveAddress = $bytes[1] | ($bytes[2] << 7);
+      $this->_register = $bytes[3] | ($bytes[4] << 7);
+      $this->_data = self::decodeBytes(array_slice($bytes, 5));
     }
 
     public function __get($name) {
@@ -22,9 +27,9 @@ namespace Carica\Firmata\Response\Sysex {
       case 'slaveAddress' :
         return $this->_slaveAddress;
       case 'register' :
-        return $this->_duration;
+        return $this->_register;
       case 'data' :
-        return $this->_duration;
+        return $this->_data;
       }
       return parent::__get($name);
     }
