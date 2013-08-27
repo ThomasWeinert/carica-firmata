@@ -7,14 +7,14 @@ namespace Carica\Firmata\Request {
   class PulseIn extends Firmata\Request {
 
     private $_pin = 0;
-    private $_value = self::DIGITAL_HIGH;
+    private $_value = Firmata\Board::DIGITAL_HIGH;
     private $_pulseLength = 0;
     private $_timeout = 1000000;
 
     public function __construct(
       Firmata\Board $board,
       $pin,
-      $value = self::DIGITAL_HIGH,
+      $value = Firmata\Board::DIGITAL_HIGH,
       $pulseLength = 5,
       $timeout = 1000000
     ) {
@@ -33,7 +33,7 @@ namespace Carica\Firmata\Request {
         $this->_pin,
         $this->_value
       );
-      $data .= Firmata\Board::encodeBytes(
+      $data .= self::encodeBytes(
         pack(
          'NN',
          $this->_pulseLength,
