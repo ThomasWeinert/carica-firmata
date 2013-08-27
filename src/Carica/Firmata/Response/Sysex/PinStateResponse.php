@@ -6,14 +6,6 @@ namespace Carica\Firmata\Response\Sysex {
 
   class PinStateResponse extends Firmata\Response\Sysex {
 
-    private $_supported = array(
-      Firmata\Board::PIN_STATE_INPUT,
-      Firmata\Board::PIN_STATE_OUTPUT,
-      Firmata\Board::PIN_STATE_ANALOG,
-      Firmata\Board::PIN_STATE_PWM,
-      Firmata\Board::PIN_STATE_SERVO
-    );
-
     private $_pin = 0;
     private $_mode = 0;
     private $_value = 0;
@@ -24,8 +16,8 @@ namespace Carica\Firmata\Response\Sysex {
       $this->_pin = $bytes[1];
       $this->_mode = $bytes[2];
       $this->_value = $bytes[3];
-      for ($i = 4, $shift = 7; $i < 6, $i < $length; $i++, $shift *= 2) {
-        $this->_value |= ($bytes[4] << $shift);
+      for ($i = 4, $shift = 7; $i < $length; ++$i, $shift *= 2) {
+        $this->_value |= ($bytes[$i] << $shift);
       }
     }
 
