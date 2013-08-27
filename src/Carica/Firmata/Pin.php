@@ -148,6 +148,8 @@ namespace Carica\Firmata {
         return $this->_mode;
       case 'value' :
         return $this->_value;
+      case 'maximum' :
+        return $this->getMaximum();
       case 'digital' :
         return ($this->_value == Board::DIGITAL_HIGH);
       case 'analog' :
@@ -231,7 +233,7 @@ namespace Carica\Firmata {
      * @param float $value between 0 and 1
      */
     public function setAnalog($percent) {
-      $resolution = $this->_supports[$this->_mode];
+      $resolution = $this->maximum;
       $value = round($percent * $resolution);
       if ($value < 0) {
         $value = 0;
@@ -253,6 +255,15 @@ namespace Carica\Firmata {
       $this->_value = $value;
       $this->_valueInitialized = TRUE;
       $this->_board->analogWrite($this->_pin, $value);
+    }
+
+    /**
+     * Return the maximum value of the current mode
+     *
+     * @return integer
+     */
+    public function getMaximum() {
+      return $this->_supports[$this->_mode]; 
     }
 
     /**

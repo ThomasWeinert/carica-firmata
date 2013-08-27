@@ -4,24 +4,15 @@ namespace Carica\Firmata\Response\Sysex {
 
   use Carica\Firmata;
 
+  /**
+   * The $pins property reports the supportes modes for each value. The key of the array for
+   * each pin is the mode, the element contains the maxmimum value.
+   * 
+   * array(pin_number => array(mode => maximum))
+   * 
+   * @property array(integer=>array(integer=>integer)) $pins
+   */
   class CapabilityResponse extends Firmata\Response\Sysex {
-
-    private $_supported = array(
-      Firmata\Board::PIN_STATE_INPUT,
-      Firmata\Board::PIN_STATE_OUTPUT,
-      Firmata\Board::PIN_STATE_ANALOG,
-      Firmata\Board::PIN_STATE_PWM,
-      Firmata\Board::PIN_STATE_SERVO,
-      Firmata\Board::PIN_STATE_SHIFT,
-      Firmata\Board::PIN_STATE_I2C
-    );
-
-    private $_resolutions = array(
-      1 => 1,
-      8 => 255,
-      10 => 1023,
-      14 => 360
-    );
 
     private $_pins = array();
 
@@ -32,15 +23,30 @@ namespace Carica\Firmata\Response\Sysex {
       $i = 1;
       while ($i < $length) {
         if ($bytes[$i] == 0x7F) {
+          /*
+           * pin report end, check if it was added to the array, if not add an empty element
+           */
           if (!isset($this->_pins[$pin])) {
             $this->_pins[$pin] = array();
           }
           ++$pin;
           ++$i;
           continue;
-        } elseif (in_array($bytes[$i], $this->_supported) &&
-                  isset($this->_resolutions[$bytes[$i + 1]])) {
-          $this->_pins[$pin][$bytes[$i]] = $this->_resolutions[$bytes[$i + 1]];
+        } else {
+          $mode = $bytes[$i];
+          if ($mode == Firmata\Board::PIN_STATE_SERVO) {
+            /*
+             * Servo reports an resolution of 14 bits (maxmimum value 16383), but
+             * uses mostly degrees to set the position, so we use 1 as a full circle of
+             * 360 degrees 
+             */
+            $this->_pins[$pin][$mode] = 359;
+          } else {
+            /*
+             * The resolution of the pins is reported as a bit count
+             */
+            $this->_pins[$pin][$mode] = pow(2, (int)$bytes[$i + 1]) - 1;
+          }
         }
         $i += 2;
       }

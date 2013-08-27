@@ -50,68 +50,68 @@ namespace Carica\Firmata\Response\SysEx {
           array( // pin 2
             Firmata\Board::PIN_STATE_INPUT => 1,
             Firmata\Board::PIN_STATE_OUTPUT => 1,
-            Firmata\Board::PIN_STATE_SERVO => 360
+            Firmata\Board::PIN_STATE_SERVO => 359
           ),
           array( // pin 3
             Firmata\Board::PIN_STATE_INPUT => 1,
             Firmata\Board::PIN_STATE_OUTPUT => 1,
             Firmata\Board::PIN_STATE_PWM => 255,
-            Firmata\Board::PIN_STATE_SERVO => 360
+            Firmata\Board::PIN_STATE_SERVO => 359
           ),
           array( // pin 4
             Firmata\Board::PIN_STATE_INPUT => 1,
             Firmata\Board::PIN_STATE_OUTPUT => 1,
-            Firmata\Board::PIN_STATE_SERVO => 360
+            Firmata\Board::PIN_STATE_SERVO => 359
           ),
           array( // pin 5
             Firmata\Board::PIN_STATE_INPUT => 1,
             Firmata\Board::PIN_STATE_OUTPUT => 1,
             Firmata\Board::PIN_STATE_PWM => 255,
-            Firmata\Board::PIN_STATE_SERVO => 360
+            Firmata\Board::PIN_STATE_SERVO => 359
           ),
           array( // pin 6
             Firmata\Board::PIN_STATE_INPUT => 1,
             Firmata\Board::PIN_STATE_OUTPUT => 1,
             Firmata\Board::PIN_STATE_PWM => 255,
-            Firmata\Board::PIN_STATE_SERVO => 360
+            Firmata\Board::PIN_STATE_SERVO => 359
           ),
           array( // pin 7
             Firmata\Board::PIN_STATE_INPUT => 1,
             Firmata\Board::PIN_STATE_OUTPUT => 1,
-            Firmata\Board::PIN_STATE_SERVO => 360
+            Firmata\Board::PIN_STATE_SERVO => 359
           ),
           array( // pin 8
             Firmata\Board::PIN_STATE_INPUT => 1,
             Firmata\Board::PIN_STATE_OUTPUT => 1,
-            Firmata\Board::PIN_STATE_SERVO => 360
+            Firmata\Board::PIN_STATE_SERVO => 359
           ),
           array( // pin 9
             Firmata\Board::PIN_STATE_INPUT => 1,
             Firmata\Board::PIN_STATE_OUTPUT => 1,
             Firmata\Board::PIN_STATE_PWM => 255,
-            Firmata\Board::PIN_STATE_SERVO => 360
+            Firmata\Board::PIN_STATE_SERVO => 359
           ),
           array( // pin 10
             Firmata\Board::PIN_STATE_INPUT => 1,
             Firmata\Board::PIN_STATE_OUTPUT => 1,
             Firmata\Board::PIN_STATE_PWM => 255,
-            Firmata\Board::PIN_STATE_SERVO => 360
+            Firmata\Board::PIN_STATE_SERVO => 359
           ),
           array( // pin 11
             Firmata\Board::PIN_STATE_INPUT => 1,
             Firmata\Board::PIN_STATE_OUTPUT => 1,
             Firmata\Board::PIN_STATE_PWM => 255,
-            Firmata\Board::PIN_STATE_SERVO => 360
+            Firmata\Board::PIN_STATE_SERVO => 359
           ),
           array( // pin 12
             Firmata\Board::PIN_STATE_INPUT => 1,
             Firmata\Board::PIN_STATE_OUTPUT => 1,
-            Firmata\Board::PIN_STATE_SERVO => 360
+            Firmata\Board::PIN_STATE_SERVO => 359
           ),
           array( // pin 13
             Firmata\Board::PIN_STATE_INPUT => 1,
             Firmata\Board::PIN_STATE_OUTPUT => 1,
-            Firmata\Board::PIN_STATE_SERVO => 360
+            Firmata\Board::PIN_STATE_SERVO => 359
           ),
           array( // pin 14 a0
             Firmata\Board::PIN_STATE_INPUT => 1,
