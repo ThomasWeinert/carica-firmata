@@ -8,7 +8,7 @@ namespace Carica\Firmata\Response\SysEx {
 
   use Carica\Firmata;
 
-  class AnalogMappingResponseTest extends \PHPUnit_Framework_TestCase {
+  class PinStateResponseTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Carica\Firmata\Response\SysEx\PinStateResponse
@@ -21,7 +21,7 @@ namespace Carica\Firmata\Response\SysEx {
       $this->assertEquals($value, $response->value);
       $this->assertEquals(Firmata\Board::PIN_STATE_RESPONSE, $response->command);
     }
-    
+
     public static function providePinStateExamples() {
       return array(
         array(
