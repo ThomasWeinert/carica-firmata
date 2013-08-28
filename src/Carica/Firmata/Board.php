@@ -289,7 +289,7 @@ namespace Carica\Firmata {
         if (isset($this->_pins[8 * $response->port + $i])) {
           $pinNumber = 8 * $response->port + $i;
           $pin = $this->_pins[$pinNumber];
-          if ($pin->mode == PIN_MODE_INPUT) {
+          if ($pin->mode == self::PIN_MODE_INPUT) {
             $value = ($response->value >> ($i & 0x07)) & 0x01;
           } else {
             $value = $pin->value;
