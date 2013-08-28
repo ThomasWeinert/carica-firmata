@@ -109,7 +109,7 @@
         if (typeof this.analog == 'undefined') {
           this.analog = 0.0;
         }
-        this.value = pinData.attr('analog');
+        this.value = pinData.attr('value');
         if (typeof this.value == 'undefined') {
           this.value = 0;
         }
