@@ -31,6 +31,63 @@ namespace Carica\Firmata\Rest {
       );
     }
 
+    /**
+     * @covers Carica\Firmata\Rest\Pin
+     */
+    public function testWithActiveBoard() {
+      $handler = new Pin($this->getBoardFixture());
+      $response = $handler($this->getRequestFixture(), array());
+
+      $this->assertXmlStringEqualsXmlString(
+        '<?xml version="1.0" encoding="utf-8"?><board active="yes" firmata="21.42"/>',
+        $response->content->document->saveXml()
+      );
+    }
+
+    private function getBoardFixture(array $pins = array()) {
+      $board = $this
+        ->getMockBuilder('Carica\Firmata\Board')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $board
+        ->expects($this->once())
+        ->method('isActive')
+        ->will($this->returnValue(TRUE));
+      $board
+        ->expects($this->any())
+        ->method('__get')
+        ->will(
+          $this->returnValueMap(
+            array(
+              array('version', '21.42'),
+              array('pins', $pins)
+            )
+          )
+        );
+      return $board;
+    }
+
+    private function getPinFixture($data = array()) {
+      $pin = $this
+        ->getMockBuilder('Carica\Firmata\Pin')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $pin
+        ->expects($this->any())
+        ->method('__get')
+        ->will(
+          $this->returnValueMap(
+            array(
+              array('pin', isset($data['pin']) ? 0 : $data['pin']),
+              array('digital', isset($data['digital']) ? 0 : $data['digital']),
+              array('analog', isset($data['analog']) ? 0 : $data['analog']),
+              array('value', isset($data['value']) ? 0 : $data['value']),
+            )
+          )
+        );
+      return $pin;
+    }
+
     private function getRequestFixture() {
       $connection = $this
         ->getMockBuilder('Carica\Io\Network\Http\Connection')

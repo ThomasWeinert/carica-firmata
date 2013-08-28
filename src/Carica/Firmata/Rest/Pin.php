@@ -38,7 +38,7 @@ namespace Carica\Firmata\Rest {
       if ($this->_board->isActive()) {
         $boardNode->setAttribute('active', 'yes');
         $boardNode->setAttribute('firmata', (string)$this->_board->version);
-        $pinId = (int)$parameters['pin'];
+        $pinId = isset($parameters['pin']) ? (int)$parameters['pin'] : -1;
         if (isset($this->_board->pins[$pinId])) {
           $pin = $this->_board->pins[$pinId];
           if (isset($request->query['mode'])) {
