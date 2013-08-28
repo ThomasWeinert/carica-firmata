@@ -14,10 +14,22 @@ namespace Carica\Firmata\Rest {
       $this->_board = $board;
     }
 
+    /**
+     *
+     * @param Http\Request $request
+     * @param array $parameters
+     * @return Http\Response
+     */
     public function __invoke() {
       return call_user_func_array(array($this, 'handle'), func_get_args());
     }
 
+    /**
+     *
+     * @param Http\Request $request
+     * @param array $parameters
+     * @return Http\Response
+     */
     public function handle(Http\Request $request, array $parameters) {
       $response = $request->createResponse();
       $response->content = new Http\Response\Content\Xml;
