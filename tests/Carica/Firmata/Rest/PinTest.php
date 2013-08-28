@@ -69,6 +69,31 @@ namespace Carica\Firmata\Rest {
       );
     }
 
+    /**
+     * @covers Carica\Firmata\Rest\Pin
+     */
+    public function testWithAnalogPin() {
+      $pin = $this->getPinFixture(
+        array(
+          'pin' => 42,
+          'mode' => Firmata\Board::PIN_MODE_ANALOG,
+          'analog' => 23,
+          'value' => 23,
+          'supports' => array(Firmata\Board::PIN_MODE_ANALOG => 1023)
+        )
+      );
+      $handler = new Pin($this->getBoardFixture(array(42 => $pin)));
+      $response = $handler($this->getRequestFixture(), array('pin' => 42));
+
+      $this->assertXmlStringEqualsXmlString(
+        '<?xml version="1.0" encoding="utf-8"?>'.
+        '<board active="yes" firmata="21.42">'.
+          '<pin number="42" supports="analog" mode="analog" analog="23" value="23"/>'.
+        '</board>',
+        $response->content->document->saveXml()
+      );
+    }
+
     private function getBoardFixture(array $pins = array()) {
       $board = $this
         ->getMockBuilder('Carica\Firmata\Board')
