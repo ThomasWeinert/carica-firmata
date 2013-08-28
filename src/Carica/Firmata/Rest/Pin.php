@@ -57,7 +57,7 @@ namespace Carica\Firmata\Rest {
     }
 
     private function setPinMode(Firmata\Pin $pin, $modeString) {
-      if ($mode = array_search($modeString, $this->_modeStrings)) {
+      if (FALSE !== ($mode = array_search($modeString, $this->_modeStrings))) {
         try {
           $pin->mode= $mode;
         } catch (Firmata\Exception\UnsupportedMode $e) {
@@ -72,7 +72,7 @@ namespace Carica\Firmata\Rest {
         $parent->appendChild($pinNode = $dom->createElement('pin'));
         $pinNode->setAttribute('number', $pin->pin);
         $modes = array();
-        foreach ($pin->supports as $mode) {
+        foreach ($pin->supports as $mode => $resolution) {
           $modes[] = $this->getModeString($mode);
         }
         $pinNode->setAttribute('supports', implode(' ', $modes));
