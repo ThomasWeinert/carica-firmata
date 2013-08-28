@@ -44,6 +44,31 @@ namespace Carica\Firmata\Rest {
       );
     }
 
+    /**
+     * @covers Carica\Firmata\Rest\Pin
+     */
+    public function testWithDigitalPin() {
+      $pin = $this->getPinFixture(
+        array(
+          'pin' => 42,
+          'mode' => Firmata\Board::PIN_MODE_OUTPUT,
+          'digital' => true,
+          'value' => 0x01,
+          'supports' => array(Firmata\Board::PIN_MODE_OUTPUT => 1)
+        )
+      );
+      $handler = new Pin($this->getBoardFixture(array(42 => $pin)));
+      $response = $handler($this->getRequestFixture(), array('pin' => 42));
+
+      $this->assertXmlStringEqualsXmlString(
+        '<?xml version="1.0" encoding="utf-8"?>'.
+        '<board active="yes" firmata="21.42">'.
+          '<pin number="42" supports="output" mode="output" digital="yes" value="1"/>'.
+        '</board>',
+        $response->content->document->saveXml()
+      );
+    }
+
     private function getBoardFixture(array $pins = array()) {
       $board = $this
         ->getMockBuilder('Carica\Firmata\Board')
@@ -78,10 +103,12 @@ namespace Carica\Firmata\Rest {
         ->will(
           $this->returnValueMap(
             array(
-              array('pin', isset($data['pin']) ? 0 : $data['pin']),
-              array('digital', isset($data['digital']) ? 0 : $data['digital']),
-              array('analog', isset($data['analog']) ? 0 : $data['analog']),
-              array('value', isset($data['value']) ? 0 : $data['value']),
+              array('pin', isset($data['pin']) ? $data['pin'] : 0),
+              array('mode', isset($data['mode']) ? $data['mode'] : 0x00),
+              array('digital', isset($data['digital']) ? $data['digital'] : FALSE),
+              array('analog', isset($data['analog']) ? $data['analog'] : 0),
+              array('value', isset($data['value']) ? $data['value'] : 0),
+              array('supports', isset($data['supports']) ? $data['supports'] : array()),
             )
           )
         );
