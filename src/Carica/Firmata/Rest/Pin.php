@@ -19,7 +19,10 @@ namespace Carica\Firmata\Rest {
       Firmata\Board::PIN_MODE_I2C => 'i2c'
     );
 
+    private $_modeMap = NULL;
+
     public function __construct(Firmata\Board $board) {
+      $this->_modeMap = array_flip($this->_modeStrings);
       $this->_board = $board;
     }
 
@@ -57,9 +60,9 @@ namespace Carica\Firmata\Rest {
     }
 
     private function setPinMode(Firmata\Pin $pin, $modeString) {
-      if (FALSE !== ($mode = array_search($modeString, $this->_modeStrings))) {
+      if (isset($this->_modeMap[$modeString])) {
         try {
-          $pin->mode= $mode;
+          $pin->mode = $this->_modeMap[$modeString];
         } catch (Firmata\Exception\UnsupportedMode $e) {
         }
       }
