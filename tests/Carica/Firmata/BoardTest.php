@@ -90,6 +90,23 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @covers Carica\Firmata\Board::queryCapabilities
+     */
+    public function testQueryCapabilities() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with([Board::START_SYSEX, Board::CAPABILITY_QUERY, Board::END_SYSEX]);
+      $board = new Board($stream);
+      $board->queryCapabilities(function() {});
+      $this->assertCount(
+         1,
+         $board->events()->listeners('capability-query')
+      );
+    }
+
+    /**
      * @covers Carica\Firmata\Board::analogRead
      */
     public function testAnalogRead() {
