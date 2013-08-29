@@ -44,6 +44,30 @@ namespace Carica\Firmata {
     /**
      * @covers Carica\Firmata\Board::__get
      */
+    public function testGetPropertyPins() {
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $this->assertInstanceOf('ArrayObject', $board->pins);
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::__get
+     */
+    public function testGetPropertyVersion() {
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $this->assertInstanceOf('Carica\Firmata\Version', $board->version);
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::__get
+     */
+    public function testGetPropertyFirmware() {
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $this->assertInstanceOf('Carica\Firmata\Version', $board->firmware);
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::__get
+     */
     public function testGetPropertyWithUnknownPropertyName() {
       $board = new Board($this->getMock('Carica\Io\Stream'));
       $this->setExpectedException('LogicException');
