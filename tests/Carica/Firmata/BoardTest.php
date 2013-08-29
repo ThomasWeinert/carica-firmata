@@ -141,6 +141,24 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @covers Carica\Firmata\Board::queryAllPinStates
+     */
+    public function testQueryAllPinStates() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with([Board::START_SYSEX, Board::PIN_STATE_QUERY, 0x2A, Board::END_SYSEX]);
+      $pin = $this
+        ->getMockBuilder('Carica\Firmata\Pin')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $board = new Board($stream);
+      $board->pins[42] = $pin;
+      $board->queryAllPinStates();
+    }
+
+    /**
      * @covers Carica\Firmata\Board::analogRead
      */
     public function testAnalogRead() {
