@@ -250,5 +250,22 @@ namespace Carica\Firmata {
       $board->pins[42] = $pin;
       $board->pinMode(42, Board::PIN_MODE_OUTPUT);
     }
+
+    /**
+     * @covers Carica\Firmata\Board::pulseIn
+     */
+    public function testPulseIn() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with("\xF0\x74\x2A\x01\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x0f\x00\x42\x00\x40\x00\xF7");
+      $board = new Board($stream);
+      $board->pulseIn(42, function() {});
+      $this->assertCount(
+         1,
+         $board->events()->listeners('pulse-in-42')
+      );
+    }
   }
 }
