@@ -47,7 +47,7 @@ namespace Carica\Firmata\Rest {
           if (isset($request->query['digital'])) {
             $pin->digital = $request->query['digital'] == 'yes' ? TRUE : FALSE;
           } elseif (isset($request->query['analog'])) {
-            $pin->analog = (int)$request->query['analog'];
+            $pin->analog = (float)$request->query['analog'];
           } elseif (isset($request->query['value'])) {
             $pin->value = (int)$request->query['value'];
           }

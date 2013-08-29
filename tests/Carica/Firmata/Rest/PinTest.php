@@ -94,6 +94,79 @@ namespace Carica\Firmata\Rest {
       );
     }
 
+    /**
+     * @covers Carica\Firmata\Rest\Pin
+     */
+    public function testPinModeChange() {
+      $request = $this->getRequestFixture(array('mode' => 'pwm'));
+      $pin = $this->getPinFixture();
+      $pin
+        ->expects($this->once())
+        ->method('__set')
+        ->with('mode', Firmata\Board::PIN_MODE_PWM);
+      $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
+      $response = $handler($request, array('pin' => 0));
+    }
+
+    /**
+     * @covers Carica\Firmata\Rest\Pin
+     */
+    public function testPinModeInvalidModeIsIgnored() {
+      $request = $this->getRequestFixture(array('mode' => 'invalid_mode'));
+      $pin = $this->getPinFixture();
+      $pin
+        ->expects($this->never())
+        ->method('__set');
+      $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
+      $response = $handler($request, array('pin' => 0));
+    }
+
+    /**
+     * @covers Carica\Firmata\Rest\Pin
+     */
+    public function testPinDigitalChange() {
+      $request = $this->getRequestFixture(array('digital' => 'yes'));
+      $pin = $this->getPinFixture();
+      $pin
+        ->expects($this->once())
+        ->method('__set')
+        ->with('digital', Firmata\Board::DIGITAL_HIGH);
+      $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
+      $response = $handler($request, array('pin' => 0));
+    }
+
+    /**
+     * @covers Carica\Firmata\Rest\Pin
+     */
+    public function testPinAnalogChange() {
+      $request = $this->getRequestFixture(array('analog' => '0.5'));
+      $pin = $this->getPinFixture();
+      $pin
+        ->expects($this->once())
+        ->method('__set')
+        ->with('analog', $this->equalTo(0.5, 0.01));
+      $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
+      $response = $handler($request, array('pin' => 0));
+    }
+
+    /**
+     * @covers Carica\Firmata\Rest\Pin
+     */
+    public function testPinValueChange() {
+      $request = $this->getRequestFixture(array('value' => '128'));
+      $pin = $this->getPinFixture();
+      $pin
+        ->expects($this->once())
+        ->method('__set')
+        ->with('value', 128);
+      $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
+      $response = $handler($request, array('pin' => 0));
+    }
+
+    /************************
+     * Fixtures
+     ***********************/
+
     private function getBoardFixture(array $pins = array()) {
       $board = $this
         ->getMockBuilder('Carica\Firmata\Board')
@@ -140,7 +213,7 @@ namespace Carica\Firmata\Rest {
       return $pin;
     }
 
-    private function getRequestFixture() {
+    private function getRequestFixture($query = array()) {
       $connection = $this
         ->getMockBuilder('Carica\Io\Network\Http\Connection')
         ->disableOriginalConstructor()
@@ -150,9 +223,19 @@ namespace Carica\Firmata\Rest {
         ->disableOriginalConstructor()
         ->getMock();
       $request
-        ->expects($this->once())
+        ->expects($this->any())
         ->method('createResponse')
         ->will($this->returnValue(new Io\Network\Http\Response($connection)));
+      $request
+        ->expects($this->any())
+        ->method('__get')
+        ->will(
+          $this->returnValueMap(
+            array(
+              array('query', $query)
+            )
+          )
+        );
       return $request;
     }
   }
