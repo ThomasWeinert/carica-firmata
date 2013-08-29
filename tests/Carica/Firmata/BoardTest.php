@@ -40,5 +40,28 @@ namespace Carica\Firmata {
       $board = new Board($this->getMock('Carica\Io\Stream'));
       $this->assertInstanceOf('Carica\Firmata\Buffer', $board->buffer());
     }
+
+    /**
+     * @covers Carica\Firmata\Board::analogWrite
+     */
+    public function testAnalogWrite() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with([0xEA, 0x17, 0x00]);
+      $pin = $this
+        ->getMockBuilder('Carica\Firmata\Pin')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $pin
+        ->expects($this->once())
+        ->method('setValue')
+        ->with(23);
+
+      $board = new Board($stream);
+      $board->pins[42] = $pin;
+      $board->analogWrite(42, 23);
+    }
   }
 }
