@@ -22,5 +22,23 @@ namespace Carica\Firmata {
       $board = new Board($this->getMock('Carica\Io\Stream'));
       $this->assertFalse($board->isActive());
     }
+
+    /**
+     * @covers Carica\Firmata\Board::buffer
+     */
+    public function testBufferGetAfterSet() {
+      $buffer = $this->getMock('Carica\Firmata\Buffer');
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board->buffer($buffer);
+      $this->assertSame($buffer, $board->buffer());
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::buffer
+     */
+    public function testBufferGetImplicitCreate() {
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $this->assertInstanceOf('Carica\Firmata\Buffer', $board->buffer());
+    }
   }
 }
