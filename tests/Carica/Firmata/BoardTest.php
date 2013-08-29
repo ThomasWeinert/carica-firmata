@@ -70,7 +70,23 @@ namespace Carica\Firmata {
          1,
          $board->events()->listeners('reportversion')
       );
+    }
 
+    /**
+     * @covers Carica\Firmata\Board::queryFirmware
+     */
+    public function testQueryFirmware() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with([Board::START_SYSEX, Board::QUERY_FIRMWARE, Board::END_SYSEX]);
+      $board = new Board($stream);
+      $board->queryFirmware(function() {});
+      $this->assertCount(
+         1,
+         $board->events()->listeners('queryfirmware')
+      );
     }
 
     /**
