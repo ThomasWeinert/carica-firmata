@@ -86,5 +86,28 @@ namespace Carica\Firmata {
       $board->pins[42] = $pin;
       $board->servoWrite(42, 23);
     }
+
+    /**
+     * @covers Carica\Firmata\Board::pinMode
+     */
+    public function testPinMode() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with([Board::PIN_MODE, 0x2A, Board::PIN_MODE_OUTPUT]);
+      $pin = $this
+        ->getMockBuilder('Carica\Firmata\Pin')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $pin
+        ->expects($this->once())
+        ->method('setMode')
+        ->with(Board::PIN_MODE_OUTPUT);
+
+      $board = new Board($stream);
+      $board->pins[42] = $pin;
+      $board->pinMode(42, Board::PIN_MODE_OUTPUT);
+    }
   }
 }
