@@ -63,5 +63,28 @@ namespace Carica\Firmata {
       $board->pins[42] = $pin;
       $board->analogWrite(42, 23);
     }
+
+    /**
+     * @covers Carica\Firmata\Board::servoWrite
+     */
+    public function testServoWrite() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with([0xEA, 0x17, 0x00]);
+      $pin = $this
+        ->getMockBuilder('Carica\Firmata\Pin')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $pin
+        ->expects($this->once())
+        ->method('setValue')
+        ->with(23);
+
+      $board = new Board($stream);
+      $board->pins[42] = $pin;
+      $board->servoWrite(42, 23);
+    }
   }
 }
