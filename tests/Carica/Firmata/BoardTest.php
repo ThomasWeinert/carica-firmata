@@ -42,6 +42,44 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @covers Carica\Firmata\Board::reset
+     */
+    public function testReset() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with([Board::SYSTEM_RESET]);
+
+      $board = new Board($stream);
+      $board->reset();
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::analogRead
+     */
+    public function testAnalogRead() {
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board->analogRead(42, $callback = function() {});
+      $this->assertCount(
+         1,
+         $board->events()->listeners('analog-read-42')
+      );
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::digitalRead
+     */
+    public function testDigitalRead() {
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board->digitalRead(42, $callback = function() {});
+      $this->assertCount(
+         1,
+         $board->events()->listeners('digital-read-42')
+      );
+    }
+
+    /**
      * @covers Carica\Firmata\Board::analogWrite
      */
     public function testAnalogWrite() {
