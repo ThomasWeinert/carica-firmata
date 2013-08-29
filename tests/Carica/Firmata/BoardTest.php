@@ -56,6 +56,24 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @covers Carica\Firmata\Board::reportVersion
+     */
+    public function testReportVersion() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with([Board::REPORT_VERSION]);
+      $board = new Board($stream);
+      $board->reportVersion(function() {});
+      $this->assertCount(
+         1,
+         $board->events()->listeners('reportversion')
+      );
+
+    }
+
+    /**
      * @covers Carica\Firmata\Board::analogRead
      */
     public function testAnalogRead() {
