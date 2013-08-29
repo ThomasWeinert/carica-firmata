@@ -107,6 +107,23 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @covers Carica\Firmata\Board::queryAnalogMapping
+     */
+    public function testQueryAnalogMapping() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with([Board::START_SYSEX, Board::ANALOG_MAPPING_QUERY, Board::END_SYSEX]);
+      $board = new Board($stream);
+      $board->queryAnalogMapping(function() {});
+      $this->assertCount(
+         1,
+         $board->events()->listeners('analog-mapping-query')
+      );
+    }
+
+    /**
      * @covers Carica\Firmata\Board::analogRead
      */
     public function testAnalogRead() {
