@@ -42,6 +42,15 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @covers Carica\Firmata\Board::__get
+     */
+    public function testGetPropertyWithUnknownPropertyName() {
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $this->setExpectedException('LogicException');
+      $dummy = $board->INVALID_PROPERTY;
+    }
+
+    /**
      * @covers Carica\Firmata\Board::reset
      */
     public function testReset() {
