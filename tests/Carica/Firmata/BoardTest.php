@@ -75,6 +75,39 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @covers Carica\Firmata\Board::activate
+     */
+    public function testActivateStreamCanNotOpenExpectingRejectedPromise() {
+      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events
+        ->expects($this->exactly(3))
+        ->method('on')
+        ->with($this->logicalOr('error', 'read-data', 'response'));
+
+      $buffer = $this->getMock('Carica\Firmata\Buffer');
+      $buffer
+        ->expects($this->any())
+        ->method('events')
+        ->will($this->returnValue($events));
+
+      $stream = $this->getMock('Carica\Io\Stream\Tcp');
+      $stream
+        ->expects($this->any())
+        ->method('events')
+        ->will($this->returnValue($events));
+      $stream
+        ->expects($this->once())
+        ->method('open')
+        ->will($this->returnValue(FALSE));
+
+      $board = new Board($stream);
+      $board->buffer($buffer);
+
+      $promise = $board->activate(function(){});
+      $this->assertInstanceOf('Carica\Io\Deferred\Promise', $promise);
+    }
+
+    /**
      * @covers Carica\Firmata\Board::reset
      */
     public function testReset() {
@@ -360,6 +393,10 @@ namespace Carica\Firmata {
           )
         );
       return $pin;
+    }
+
+    private function getStartupBytes() {
+
     }
   }
 }
