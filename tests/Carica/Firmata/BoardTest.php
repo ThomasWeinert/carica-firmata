@@ -169,6 +169,40 @@ namespace Carica\Firmata {
 
     /**
      * @covers Carica\Firmata\Board::onResponse
+     * @covers Carica\Firmata\Board::onAnalogMappingResponse
+     */
+    public function testOnResponseWithAnalogMappingResponse() {
+      $response = $this
+        ->getMockBuilder('Carica\Firmata\Response\SysEx\AnalogMappingResponse')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $response
+        ->expects($this->any())
+        ->method('__get')
+        ->will(
+          $this->returnValueMap(
+            array(
+              array('command', Board::ANALOG_MAPPING_RESPONSE),
+              array('channels', array(0 => 14))
+            )
+          )
+        );
+      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events
+        ->expects($this->once())
+        ->method('emit')
+        ->with('analog-mapping-query');
+
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board->events($events);
+      $board->onResponse($response);
+      $this->assertAttributeEquals(
+        array(0 => 14), '_channels', $board
+      );
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::onResponse
      * @covers Carica\Firmata\Board::onStringData
      */
     public function testOnResponseWithStringData() {
