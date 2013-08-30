@@ -213,9 +213,14 @@ namespace Carica\Firmata {
      * @param Carica\Firmata\Response $response
      */
     public function onResponse(Response $response) {
-      if (isset($this->_responseHandler[$response->getCommand()])) {
-        $callback = array($this, $this->_responseHandler[$response->getCommand()]);
+      $command = $response->command;
+      if (isset($this->_responseHandler[$command])) {
+        $callback = array($this, $this->_responseHandler[$command]);
         return $callback($response);
+      } else {
+        throw new \UnexpectedValueException(
+          sprintf('Unknown response command: 0x%02o', $command)
+        );
       }
     }
 

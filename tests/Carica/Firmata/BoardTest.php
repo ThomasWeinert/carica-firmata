@@ -108,6 +108,63 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @covers Carica\Firmata\Board::onResponse
+     */
+    public function testOnResponseWithUnknownResponseExpectingException() {
+      $response = $this
+        ->getMockBuilder('Carica\Firmata\Response\SysEx')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $response
+        ->expects($this->any())
+        ->method('__get')
+        ->will(
+          $this->returnValueMap(
+            array(
+              array('command', 0x00)
+            )
+          )
+        );
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $this->setExpectedException(
+        'UnexpectedValueException',
+        'Unknown response command: 0x00'
+      );
+      $board->onResponse($response);
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::onResponse
+     * @covers Carica\Firmata\Board::onStringData
+     */
+    public function testOnResponseWithStringData() {
+      $response = $this
+        ->getMockBuilder('Carica\Firmata\Response\SysEx\String')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $response
+        ->expects($this->any())
+        ->method('__get')
+        ->will(
+          $this->returnValueMap(
+            array(
+              array('command', Board::STRING_DATA),
+              array('text', 'Hello World!')
+            )
+          )
+        );
+      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events
+        ->expects($this->once())
+        ->method('emit')
+        ->with('string', 'Hello World!');
+
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board->events($events);
+      $board->onResponse($response);
+    }
+
+    /**
      * @covers Carica\Firmata\Board::reset
      */
     public function testReset() {
