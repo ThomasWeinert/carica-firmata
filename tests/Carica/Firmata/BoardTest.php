@@ -202,7 +202,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::onResponse
      * @covers Carica\Firmata\Board::onPinStateResponse
      */
-    public function testOnResponseWithSPinStateResponse() {
+    public function testOnResponseWithPinStateResponse() {
       $response = $this
         ->getMockBuilder('Carica\Firmata\Response\SysEx\PinStateResponse')
         ->disableOriginalConstructor()
@@ -225,6 +225,43 @@ namespace Carica\Firmata {
         ->expects($this->once())
         ->method('emit')
         ->with('pin-state-42', Board::PIN_MODE_PWM, 23);
+
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board->events($events);
+      $board->onResponse($response);
+    }
+
+
+    /**
+     * @covers Carica\Firmata\Board::onResponse
+     * @covers Carica\Firmata\Board::onPulseIn
+     */
+    public function testOnResponseWithPulseIn() {
+      $response = $this
+        ->getMockBuilder('Carica\Firmata\Response\SysEx\PulseIn')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $response
+        ->expects($this->any())
+        ->method('__get')
+        ->will(
+          $this->returnValueMap(
+            array(
+              array('command', Board::PULSE_IN),
+              array('pin', 42),
+              array('duration', 23)
+            )
+          )
+        );
+      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events
+        ->expects($this->at(0))
+        ->method('emit')
+        ->with('pulse-in-42', 23);
+      $events
+        ->expects($this->at(1))
+        ->method('emit')
+        ->with('pulse-in', 42, 23);
 
       $board = new Board($this->getMock('Carica\Io\Stream'));
       $board->events($events);
