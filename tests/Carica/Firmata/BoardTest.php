@@ -231,6 +231,37 @@ namespace Carica\Firmata {
       $board->onResponse($response);
     }
 
+    /**
+     * @covers Carica\Firmata\Board::onResponse
+     * @covers Carica\Firmata\Board::onI2CReply
+     */
+    public function testOnResponseWithI2CReply() {
+      $response = $this
+        ->getMockBuilder('Carica\Firmata\Response\SysEx\I2CReply')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $response
+        ->expects($this->any())
+        ->method('__get')
+        ->will(
+          $this->returnValueMap(
+            array(
+              array('command', Board::I2C_REPLY),
+              array('slaveAddress', 42),
+              array('data', 'Hello World!')
+            )
+          )
+        );
+      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events
+        ->expects($this->once())
+        ->method('emit')
+        ->with('I2C-reply-42', 'Hello World!');
+
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board->events($events);
+      $board->onResponse($response);
+    }
 
     /**
      * @covers Carica\Firmata\Board::onResponse
