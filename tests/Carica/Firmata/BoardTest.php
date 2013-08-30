@@ -135,6 +135,40 @@ namespace Carica\Firmata {
 
     /**
      * @covers Carica\Firmata\Board::onResponse
+     * @covers Carica\Firmata\Board::onQueryFirmware
+     */
+    public function testOnResponseWithqueryFirmware() {
+      $response = $this
+        ->getMockBuilder('Carica\Firmata\Response\SysEx\QueryFirmware')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $response
+        ->expects($this->any())
+        ->method('__get')
+        ->will(
+          $this->returnValueMap(
+            array(
+              array('command', Board::QUERY_FIRMWARE),
+              array('major', 42),
+              array('minor', 21),
+              array('name', 'TEST')
+            )
+          )
+        );
+      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events
+        ->expects($this->once())
+        ->method('emit')
+        ->with('queryfirmware');
+
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board->events($events);
+      $board->onResponse($response);
+      $this->assertEquals('TEST 42.21', (string)$board->firmware);
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::onResponse
      * @covers Carica\Firmata\Board::onStringData
      */
     public function testOnResponseWithStringData() {
