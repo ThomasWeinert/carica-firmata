@@ -262,6 +262,40 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @covers Carica\Firmata\Board::digitalWrite
+     */
+    public function testDigitalWrite() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with([0x91, 0x0B, 0x00]);
+      $pin = $this->getPinFixture(
+        ['pin' => 8, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => TRUE]
+      );
+      $pin
+        ->expects($this->once())
+        ->method('setDigital')
+        ->with(Board::DIGITAL_HIGH);
+
+      $board = new Board($stream);
+      $board->pins[8] = $pin;
+      $board->pins[9] = $this->getPinFixture(
+        ['pin' => 9, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => TRUE]
+      );
+      $board->pins[10] = $this->getPinFixture(
+        ['pin' => 10, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => FALSE]
+      );
+      $board->pins[11] = $this->getPinFixture(
+        ['pin' => 11, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => TRUE]
+      );
+      $board->pins[24] = $this->getPinFixture(
+        ['pin' => 24, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => TRUE]
+      );
+      $board->digitalWrite(8, Board::DIGITAL_HIGH);
+    }
+
+    /**
      * @covers Carica\Firmata\Board::pinMode
      */
     public function testPinMode() {
@@ -299,6 +333,33 @@ namespace Carica\Firmata {
          1,
          $board->events()->listeners('pulse-in-42')
       );
+    }
+
+    /****************************
+     * Fixtures
+     ***************************/
+
+    private function getPinFixture($data) {
+      $pin = $this
+        ->getMockBuilder('Carica\Firmata\Pin')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $pin
+        ->expects($this->any())
+        ->method('__get')
+        ->will(
+          $this->returnValueMap(
+            array(
+              array('pin', isset($data['pin']) ? $data['pin'] : 0),
+              array('mode', isset($data['mode']) ? $data['mode'] : 0x00),
+              array('digital', isset($data['digital']) ? $data['digital'] : FALSE),
+              array('analog', isset($data['analog']) ? $data['analog'] : 0),
+              array('value', isset($data['value']) ? $data['value'] : 0),
+              array('supports', isset($data['supports']) ? $data['supports'] : array()),
+            )
+          )
+        );
+      return $pin;
     }
   }
 }
