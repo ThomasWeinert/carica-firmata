@@ -169,6 +169,39 @@ namespace Carica\Firmata {
 
     /**
      * @covers Carica\Firmata\Board::onResponse
+     * @covers Carica\Firmata\Board::onCapabilityResponse
+     */
+    public function testOnResponseWithCapabilityResponse() {
+      $response = $this
+        ->getMockBuilder('Carica\Firmata\Response\SysEx\CapabilityResponse')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $response
+        ->expects($this->any())
+        ->method('__get')
+        ->will(
+          $this->returnValueMap(
+            array(
+              array('command', Board::CAPABILITY_RESPONSE),
+              array('pins', array(1 => array(Board::PIN_MODE_PWM => 255)))
+            )
+          )
+        );
+      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events
+        ->expects($this->once())
+        ->method('emit')
+        ->with('capability-query');
+
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board->events($events);
+      $board->onResponse($response);
+      $this->assertTrue(isset($board->pins[1]));
+      $this->assertTrue($board->pins[1]->supports(Board::PIN_MODE_PWM));
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::onResponse
      * @covers Carica\Firmata\Board::onAnalogMappingResponse
      */
     public function testOnResponseWithAnalogMappingResponse() {
