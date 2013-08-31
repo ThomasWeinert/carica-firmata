@@ -591,6 +591,33 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @covers Carica\Firmata\Board::sendI2CReadRequest
+     */
+    public function testSendI2CReadRequest() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with(
+          [
+            Board::START_SYSEX,
+            Board::I2C_REQUEST,
+            0x02,
+            0x08,
+            0x07,
+            0x00,
+            Board::END_SYSEX
+          ]
+        );
+      $board = new Board($stream);
+      $board->sendI2CReadRequest(2, 7, function() {});
+      $this->assertCount(
+         1,
+         $board->events()->listeners('I2C-reply-2')
+      );
+    }
+
+    /**
      * @covers Carica\Firmata\Board::pulseIn
      */
     public function testPulseIn() {

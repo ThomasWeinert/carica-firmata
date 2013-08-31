@@ -527,7 +527,7 @@ namespace Carica\Firmata {
      * @param callable $callback
      */
     public function sendI2CReadRequest($slaveAddress, $byteCount, Callable $callback) {
-      $request = new Request\I2C\Read($this, $slaveAddress, $data);
+      $request = new Request\I2C\Read($this, $slaveAddress, $byteCount);
       $request->send();
       $this->events()->once('I2C-reply-'.$slaveAddress, $callback);
     }
