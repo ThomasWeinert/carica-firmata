@@ -500,8 +500,8 @@ namespace Carica\Firmata {
            array(
              self::START_SYSEX,
              self::I2C_CONFIG,
-             delay >> 0xFF,
-             (delay >> 8) & 0XFF,
+             $delay >> 0xFF,
+             ($delay >> 8) & 0xFF,
              self::END_SYSEX
            )
         );

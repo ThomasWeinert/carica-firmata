@@ -578,6 +578,27 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @covers Carica\Firmata\Board::sendI2CConfig
+     */
+    public function testSendI2CConfig() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with(
+          [
+             Board::START_SYSEX,
+             Board::I2C_CONFIG,
+             0x00,
+             0x27,
+             board::END_SYSEX
+          ]
+        );
+      $board = new Board($stream);
+      $board->sendI2CConfig(10000);
+    }
+
+    /**
      * @covers Carica\Firmata\Board::sendI2CWriteRequest
      */
     public function testSendI2CWriteRequest() {
