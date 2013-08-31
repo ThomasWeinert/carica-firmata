@@ -108,6 +108,49 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @covers Carica\Firmata\Board
+     */
+    public function testActivateWithSimpleStartUp() {
+      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events
+        ->expects($this->exactly(2))
+        ->method('on')
+        ->with($this->logicalOr('error', 'read-data'));
+
+      $stream = $this->getMock('Carica\Io\Stream\Tcp');
+      $stream
+        ->expects($this->any())
+        ->method('events')
+        ->will($this->returnValue($events));
+      $stream
+        ->expects($this->once())
+        ->method('open')
+        ->will($this->returnValue(TRUE));
+
+      $board = new Board($stream);
+      $promise = $board->activate();
+      $board->buffer()->addData(
+        "\xF9\x03\x02". // Version
+        "\xF0\x79". // Firmware
+        "\x02\x03".  // Firmware version
+        "\x53\x00\x61\x00\x6D\x00\x70\x00\x6C\x00\x65\x00". // Firmware string
+        "\xF7".
+        "\xF0\x6C". // Capabilities Response
+        "\x00\x01\x01\x01\x03\x08\x04\x0e\x7f". // pin 0
+        "\x00\x01\x01\x01\x02\x0a\x06\x01\x7f". // pin 1
+        "\xF7".
+        "\xF0\x6A". // Analog Mapping Response
+        "\x7F\x00".
+        "\xF7"
+      );
+      $this->assertInstanceOf('Carica\Io\Deferred\Promise', $promise);
+      $this->assertEquals(\Carica\Io\Deferred::STATE_RESOLVED, $promise->state());
+      $this->assertEquals('3.2', (string)$board->version);
+      $this->assertEquals('Sample 2.3', (string)$board->firmware);
+      $this->assertCount(2, $board->pins);
+    }
+
+    /**
      * @covers Carica\Firmata\Board::onResponse
      */
     public function testOnResponseWithUnknownResponseExpectingException() {
