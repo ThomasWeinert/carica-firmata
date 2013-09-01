@@ -56,7 +56,7 @@ namespace Carica\Firmata {
     const I2C_MODE_STOP_READING = 3;
 
     /**
-     * @var array
+     * @var Carica\Firmata\Pins
      */
     private $_pins = NULL;
 
@@ -105,7 +105,6 @@ namespace Carica\Firmata {
      */
     public function __construct(Io\Stream $stream) {
       $this->_stream = $stream;
-      $this->_pins = new \ArrayObject();
     }
 
     /**
@@ -138,6 +137,21 @@ namespace Carica\Firmata {
         $this->_buffer = new Buffer();
       }
       return $this->_buffer;
+    }
+
+    /**
+     * Pin list subobject
+     *
+     * @param Carica\Firmata\Pins $pins
+     */
+    public function pins(Pins $pins = NULL) {
+      if (isset($pins)) {
+        $this->_pins = $pins;
+      } elseif (NULL === $this->_pins) {
+        // create an empty pins objects
+        $this->_pins = new Pins($this, []);
+      }
+      return $this->_pins;
     }
 
     /**
@@ -183,7 +197,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * Provide some read only properties
+     * Provide some properties
      *
      * @param string $name
      * @throws LogicException
@@ -196,7 +210,26 @@ namespace Carica\Firmata {
       case 'firmware' :
         return isset($this->_firmware) ? $this->_firmware : new Version(0,0);
       case 'pins' :
-        return $this->_pins;
+        return $this->pins();
+      }
+      throw new \LogicException(sprintf('Unknown property %s::$%s', __CLASS__, $name));
+    }
+
+    /**
+     * Provide properties
+     * @param string $name
+     * @param mixed $value
+     * @throws \LogicException
+     */
+    public function __set($name, $value) {
+      switch ($name) {
+      case 'version' :
+      case 'firmware' :
+        throw new \LogicException(
+          sprintf('Property %s::$%s is not writeable.', __CLASS__, $name)
+        );
+      case 'pins' :
+        return $this->pins($value);
       }
       throw new \LogicException(sprintf('Unknown property %s::$%s', __CLASS__, $name));
     }
@@ -250,7 +283,7 @@ namespace Carica\Firmata {
      * @param Response\Sysex\CapabilityResponse $response
      */
     private function onCapabilityResponse(Response\Sysex\CapabilityResponse $response) {
-      $this->_pins = new Pins($this, $response->pins);
+      $this->pins(new Pins($this, $response->pins));
       $this->events()->emit('capability-query');
     }
 
@@ -283,10 +316,11 @@ namespace Carica\Firmata {
      * @param Response\Midi\DigitalMessage $response
      */
     private function onDigitalMessage(Response\Midi\Message $response) {
+      $firstPin = 8 * $response->port;
       for ($i = 0; $i < 8; $i++) {
-        if (isset($this->_pins[8 * $response->port + $i])) {
-          $pinNumber = 8 * $response->port + $i;
-          $pin = $this->_pins[$pinNumber];
+        $pinNumber = $firstPin + $i;
+        if (isset($this->pins[$pinNumber])) {
+          $pin = $this->pins[$pinNumber];
           if ($pin->mode == self::PIN_MODE_INPUT) {
             $value = ($response->value >> ($i & 0x07)) & 0x01;
           } else {
@@ -428,7 +462,7 @@ namespace Carica\Firmata {
      * @param integer $value 0-255
      */
     public function analogWrite($pin, $value) {
-      $this->_pins[$pin]->setValue($value);
+      $this->pins[$pin]->setValue($value);
       $this->stream()->write(
         [self::ANALOG_MESSAGE | $pin, $value & 0x7F, ($value >> 7) & 0x7F]
       );
@@ -451,12 +485,12 @@ namespace Carica\Firmata {
      * @param integer $value 0-1
      */
     public function digitalWrite($pin, $value) {
-      $this->_pins[$pin]->setDigital($value == self::DIGITAL_HIGH);
+      $this->pins[$pin]->setDigital($value == self::DIGITAL_HIGH);
       $port = floor($pin / 8);
       $portValue = 0;
       for ($i = 0; $i < 8; $i++) {
         $index = 8 * $port + $i;
-        if (isset($this->_pins[$index]) && $this->_pins[$index]->digital) {
+        if (isset($this->pins[$index]) && $this->pins[$index]->digital) {
           $portValue |= (1 << $i);
         }
       }

@@ -43,10 +43,26 @@ namespace Carica\Firmata {
 
     /**
      * @covers Carica\Firmata\Board::__get
+     * @covers Carica\Firmata\Board::pins
      */
-    public function testGetPropertyPins() {
+    public function testGetPropertyPinsImplicitCreate() {
       $board = new Board($this->getMock('Carica\Io\Stream'));
-      $this->assertInstanceOf('ArrayObject', $board->pins);
+      $this->assertInstanceOf('Carica\Firmata\Pins', $board->pins);
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::__get
+     * @covers Carica\Firmata\Board::__set
+     * @covers Carica\Firmata\Board::pins
+     */
+    public function testGetPropertyPinsAfterSet() {
+      $pins = $this
+        ->getMockBuilder('Carica\Firmata\Pins')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board->pins = $pins;
+      $this->assertSame($pins, $board->pins);
     }
 
     /**
@@ -72,6 +88,33 @@ namespace Carica\Firmata {
       $board = new Board($this->getMock('Carica\Io\Stream'));
       $this->setExpectedException('LogicException');
       $dummy = $board->INVALID_PROPERTY;
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::__set
+     */
+    public function testSetPropertyVersionExpectingException() {
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $this->setExpectedException('LogicException');
+      $board->version = 'trigger';
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::__set
+     */
+    public function testSetPropertyFirmwareExpectingException() {
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $this->setExpectedException('LogicException');
+      $board->firmware = 'trigger';
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::__set
+     */
+    public function testSetPropertyWithUnknownPropertyName() {
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $this->setExpectedException('LogicException');
+      $board->INVALID_PROPERTY = 'trigger';
     }
 
     /**
@@ -364,6 +407,80 @@ namespace Carica\Firmata {
 
     /**
      * @covers Carica\Firmata\Board::onResponse
+     * @covers Carica\Firmata\Board::onDigitalMessage
+     */
+    public function testOnResponseWithDigitalMessage() {
+      $response = $this
+        ->getMockBuilder('Carica\Firmata\Response\Midi\Message')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $response
+        ->expects($this->any())
+        ->method('__get')
+        ->will(
+          $this->returnValueMap(
+            array(
+              array('command', Board::DIGITAL_MESSAGE),
+              array('port', 2),
+              array('value', 0x80)
+            )
+          )
+        );
+      $pins = $this
+        ->getMockBuilder('Carica\Firmata\Pins')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $pins
+        ->expects($this->any())
+        ->method('offsetExists')
+        ->will(
+          $this->returnCallback(
+            function ($pin) {
+              return in_array($pin, [17, 20]);
+            }
+          )
+        );
+      $pins
+        ->expects($this->any())
+        ->method('offsetGet')
+        ->will(
+          $this->returnValueMap(
+            [
+              [
+                17,
+                $this->getPinFixture(
+                  ['mode' => Board::PIN_MODE_INPUT, 'value' => Board::DIGITAL_HIGH]
+                )
+              ],
+              [
+                20,
+                $this->getPinFixture(
+                  ['mode' => Board::PIN_MODE_OUTPUT, 'value' => Board::DIGITAL_HIGH]
+                )
+              ]
+            ]
+          )
+        );
+
+      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events
+        ->expects($this->at(0))
+        ->method('emit')
+        ->with('digital-read-17', Board::DIGITAL_LOW);
+      $events
+        ->expects($this->at(1))
+        ->method('emit')
+        ->with('digital-read', ['pin' => 17, 'value' => Board::DIGITAL_LOW]);
+
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board->events($events);
+      $board->pins = $pins;
+
+      $board->onResponse($response);
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::onResponse
      * @covers Carica\Firmata\Board::onStringData
      */
     public function testOnResponseWithStringData() {
@@ -602,12 +719,12 @@ namespace Carica\Firmata {
         ->expects($this->once())
         ->method('write')
         ->with([Board::START_SYSEX, Board::PIN_STATE_QUERY, 0x2A, Board::END_SYSEX]);
-      $pin = $this
-        ->getMockBuilder('Carica\Firmata\Pin')
-        ->disableOriginalConstructor()
-        ->getMock();
       $board = new Board($stream);
-      $board->pins[42] = $pin;
+      $board->pins = $this->getPinsFixture(
+        [
+          42 => $this->getPinFixture()
+        ]
+      );
       $board->queryAllPinStates();
     }
 
@@ -654,7 +771,7 @@ namespace Carica\Firmata {
         ->with(23);
 
       $board = new Board($stream);
-      $board->pins[42] = $pin;
+      $board->pins = $this->getPinsFixture([42 => $pin]);
       $board->analogWrite(42, 23);
     }
 
@@ -677,7 +794,7 @@ namespace Carica\Firmata {
         ->with(23);
 
       $board = new Board($stream);
-      $board->pins[42] = $pin;
+      $board->pins = $this->getPinsFixture([42 => $pin]);
       $board->servoWrite(42, 23);
     }
 
@@ -699,18 +816,22 @@ namespace Carica\Firmata {
         ->with(Board::DIGITAL_HIGH);
 
       $board = new Board($stream);
-      $board->pins[8] = $pin;
-      $board->pins[9] = $this->getPinFixture(
-        ['pin' => 9, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => TRUE]
-      );
-      $board->pins[10] = $this->getPinFixture(
-        ['pin' => 10, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => FALSE]
-      );
-      $board->pins[11] = $this->getPinFixture(
-        ['pin' => 11, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => TRUE]
-      );
-      $board->pins[24] = $this->getPinFixture(
-        ['pin' => 24, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => TRUE]
+      $board->pins = $this->getPinsFixture(
+        [
+          8 => $pin,
+          9 => $this->getPinFixture(
+            ['pin' => 9, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => TRUE]
+          ),
+          10 => $this->getPinFixture(
+            ['pin' => 10, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => FALSE]
+          ),
+          11 => $this->getPinFixture(
+            ['pin' => 11, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => TRUE]
+          ),
+          24 => $this->getPinFixture(
+            ['pin' => 24, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => TRUE]
+          )
+        ]
       );
       $board->digitalWrite(8, Board::DIGITAL_HIGH);
     }
@@ -734,7 +855,7 @@ namespace Carica\Firmata {
         ->with(Board::PIN_MODE_OUTPUT);
 
       $board = new Board($stream);
-      $board->pins[42] = $pin;
+      $board->pins = $this->getPinsFixture([42 => $pin]);
       $board->pinMode(42, Board::PIN_MODE_OUTPUT);
     }
 
@@ -820,7 +941,7 @@ namespace Carica\Firmata {
      * Fixtures
      ***************************/
 
-    private function getPinFixture($data) {
+    private function getPinFixture($data = []) {
       $pin = $this
         ->getMockBuilder('Carica\Firmata\Pin')
         ->disableOriginalConstructor()
@@ -843,8 +964,36 @@ namespace Carica\Firmata {
       return $pin;
     }
 
-    private function getStartupBytes() {
-
+    private function getPinsFixture(array $pins = []) {
+      $result = $this
+        ->getMockBuilder('Carica\Firmata\Pins')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $result
+        ->expects($this->any())
+        ->method('offsetExists')
+        ->will(
+          $this->returnCallback(
+            function($pinNumber) use ($pins) { return isset($pins[$pinNumber]); }
+          )
+        );
+      $result
+        ->expects($this->any())
+        ->method('offsetGet')
+        ->will(
+          $this->returnCallback(
+            function($pinNumber) use ($pins) { return $pins[$pinNumber]; }
+          )
+        );
+      $result
+        ->expects($this->any())
+        ->method('getIterator')
+        ->will(
+          $this->returnValue(
+            new \ArrayIterator($pins)
+          )
+        );
+      return $result;
     }
   }
 }
