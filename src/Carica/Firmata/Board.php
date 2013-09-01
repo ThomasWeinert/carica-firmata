@@ -29,6 +29,7 @@ namespace Carica\Firmata {
     const CAPABILITY_RESPONSE = 0x6C;
     const PIN_STATE_QUERY = 0x6D;
     const PIN_STATE_RESPONSE = 0x6E;
+    const EXTENDED_ANALOG = 0x6F;
     const ANALOG_MAPPING_QUERY = 0x69;
     const ANALOG_MAPPING_RESPONSE = 0x6A;
     const I2C_REQUEST = 0x76;
@@ -463,9 +464,18 @@ namespace Carica\Firmata {
      */
     public function analogWrite($pin, $value) {
       $this->pins[$pin]->setValue($value);
-      $this->stream()->write(
-        [self::ANALOG_MESSAGE | $pin, $value & 0x7F, ($value >> 7) & 0x7F]
-      );
+      if ($pin > 15 || $value > 255) {
+        $bytes = [self::START_SYSEX, self::EXTENDED_ANALOG, $pin];
+        do {
+          $bytes[] = $value & 0x7F;
+          $value = $value >> 7;
+        } while ($value > 0);
+        $bytes[] = self::END_SYSEX;
+      } else {
+        $bytes = [self::ANALOG_MESSAGE | $pin, $value & 0x7F, ($value >> 7) & 0x7F];
+
+      }
+      $this->stream()->write($bytes);
     }
 
     /**

@@ -760,7 +760,7 @@ namespace Carica\Firmata {
       $stream
         ->expects($this->once())
         ->method('write')
-        ->with([0xEA, 0x17, 0x00]);
+        ->with([0xE3, 0x17, 0x00]);
       $pin = $this
         ->getMockBuilder('Carica\Firmata\Pin')
         ->disableOriginalConstructor()
@@ -771,8 +771,72 @@ namespace Carica\Firmata {
         ->with(23);
 
       $board = new Board($stream);
+      $board->pins = $this->getPinsFixture([3 => $pin]);
+      $board->analogWrite(3, 23);
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::analogWrite
+     */
+    public function testAnalogWriteWithHighPinNumber() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with(
+          [
+            Board::START_SYSEX,
+            Board::EXTENDED_ANALOG,
+            0x2A,
+            0x00,
+            Board::END_SYSEX
+          ]
+        );
+      $pin = $this
+        ->getMockBuilder('Carica\Firmata\Pin')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $pin
+        ->expects($this->once())
+        ->method('setValue')
+        ->with(0);
+
+      $board = new Board($stream);
       $board->pins = $this->getPinsFixture([42 => $pin]);
-      $board->analogWrite(42, 23);
+      $board->analogWrite(42, 0);
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::analogWrite
+     */
+    public function testAnalogWriteWithLargeValue() {
+      $stream = $this->getMock('Carica\Io\Stream');
+      $stream
+        ->expects($this->once())
+        ->method('write')
+        ->with(
+          [
+            Board::START_SYSEX,
+            Board::EXTENDED_ANALOG,
+            0x03,
+            0x20,
+            0x0D,
+            0x06,
+            Board::END_SYSEX
+          ]
+        );
+      $pin = $this
+        ->getMockBuilder('Carica\Firmata\Pin')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $pin
+        ->expects($this->once())
+        ->method('setValue')
+        ->with(100000);
+
+      $board = new Board($stream);
+      $board->pins = $this->getPinsFixture([3 => $pin]);
+      $board->analogWrite(3, 100000);
     }
 
     /**
@@ -783,7 +847,7 @@ namespace Carica\Firmata {
       $stream
         ->expects($this->once())
         ->method('write')
-        ->with([0xEA, 0x17, 0x00]);
+        ->with([0xE3, 0x17, 0x00]);
       $pin = $this
         ->getMockBuilder('Carica\Firmata\Pin')
         ->disableOriginalConstructor()
@@ -794,8 +858,8 @@ namespace Carica\Firmata {
         ->with(23);
 
       $board = new Board($stream);
-      $board->pins = $this->getPinsFixture([42 => $pin]);
-      $board->servoWrite(42, 23);
+      $board->pins = $this->getPinsFixture([3 => $pin]);
+      $board->servoWrite(3, 23);
     }
 
     /**
