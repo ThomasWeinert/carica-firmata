@@ -77,7 +77,7 @@ namespace Carica\Firmata {
     /**
      * @covers Carica\Firmata\Board::activate
      */
-    public function testActivateStreamCanNotOpenExpectingRejectedPromise() {
+    public function testActivateStreamOpenReturnsFalse() {
       $events = $this->getMock('Carica\Io\Event\Emitter');
       $events
         ->expects($this->exactly(3))
@@ -105,6 +105,35 @@ namespace Carica\Firmata {
 
       $promise = $board->activate(function(){});
       $this->assertInstanceOf('Carica\Io\Deferred\Promise', $promise);
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::activate
+     */
+    public function testActivateStreamErrorRejectsPromise() {
+      $events = new \Carica\Io\Event\Emitter();
+
+      $stream = $this->getMock('Carica\Io\Stream\Tcp');
+      $stream
+        ->expects($this->any())
+        ->method('events')
+        ->will($this->returnValue($events));
+      $stream
+        ->expects($this->once())
+        ->method('open')
+        ->will($this->returnValue(FALSE));
+
+      $board = new Board($stream);
+
+      $result = '';
+      $promise = $board->activate();
+      $promise->fail(
+        function ($message) use (&$result) {
+          $result = $message;
+        }
+      );
+      $events->emit('error', 'STREAM_ERROR');
+      $this->assertEquals('STREAM_ERROR', $result);
     }
 
     /**
