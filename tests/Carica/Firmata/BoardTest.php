@@ -298,12 +298,68 @@ namespace Carica\Firmata {
         ->method('emit')
         ->with('analog-mapping-query');
 
+      $pins = $this
+        ->getMockBuilder('Carica\Firmata\Pins')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $pins
+        ->expects($this->once())
+        ->method('setAnalogMapping')
+        ->with([0 => 14]);
+
       $board = new Board($this->getMock('Carica\Io\Stream'));
       $board->events($events);
+      $board->pins = $pins;
+
       $board->onResponse($response);
-      $this->assertAttributeEquals(
-        array(0 => 14), '_channels', $board
-      );
+    }
+
+    /**
+     * @covers Carica\Firmata\Board::onResponse
+     * @covers Carica\Firmata\Board::onAnalogMessage
+     */
+    public function testOnResponseWithAnalogMessage() {
+      $response = $this
+        ->getMockBuilder('Carica\Firmata\Response\Midi\Message')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $response
+        ->expects($this->any())
+        ->method('__get')
+        ->will(
+          $this->returnValueMap(
+            array(
+              array('command', Board::ANALOG_MESSAGE),
+              array('port', 21),
+              array('value', 23)
+            )
+          )
+        );
+      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events
+        ->expects($this->at(0))
+        ->method('emit')
+        ->with('analog-read-42', 23);
+      $events
+        ->expects($this->at(1))
+        ->method('emit')
+        ->with('analog-read', ['pin' => 42, 'value' => 23]);
+
+      $pins = $this
+        ->getMockBuilder('Carica\Firmata\Pins')
+        ->disableOriginalConstructor()
+        ->getMock();
+      $pins
+        ->expects($this->once())
+        ->method('getPinByChannel')
+        ->with(21)
+        ->will($this->returnValue(42));
+
+      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board->events($events);
+      $board->pins = $pins;
+
+      $board->onResponse($response);
     }
 
     /**

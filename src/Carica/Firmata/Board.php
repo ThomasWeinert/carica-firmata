@@ -61,11 +61,6 @@ namespace Carica\Firmata {
     private $_pins = NULL;
 
     /**
-     * @var array
-     */
-    private $_channels = array();
-
-    /**
      * @var Carica\Io\Stream
      */
     private $_stream = NULL;
@@ -265,7 +260,7 @@ namespace Carica\Firmata {
      * @param Response\Sysex\AnalogMappingResponse $response
      */
     private function onAnalogMappingResponse(Response\Sysex\AnalogMappingResponse $response) {
-      $this->_channels = $response->channels;
+      $this->pins->setAnalogMapping($response->channels);
       $this->events()->emit('analog-mapping-query');
     }
 
@@ -276,11 +271,9 @@ namespace Carica\Firmata {
      * @param Response\Midi\AnalogMessage $response
      */
     private function onAnalogMessage(Response\Midi\Message $response) {
-      if (isset($this->_channels[$response->port]) &&
-          isset($this->_pins[$this->_channels[$response->port]])) {
-        $pin = $this->_channels[$response->port];
-        $this->events()->emit('analog-read-'.$pin, $response->value);
-        $this->events()->emit('analog-read', ['pin' => $pin, 'value' => $response->value]);
+      if (0 <= ($pinNumber = $this->pins->getPinByChannel($response->port))) {
+        $this->events()->emit('analog-read-'.$pinNumber, $response->value);
+        $this->events()->emit('analog-read', ['pin' => $pinNumber, 'value' => $response->value]);
       }
     }
 

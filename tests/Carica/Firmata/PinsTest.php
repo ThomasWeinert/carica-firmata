@@ -18,6 +18,32 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @covers Carica\Firmata\Pins::setAnalogMapping
+     * @covers Carica\Firmata\Pins::getPinByChannel
+     */
+    public function testAnalogMappingWithValidChannel() {
+      $pins = new Pins(
+        $this->getBoardFixture(),
+        array(42 => array(Board::PIN_MODE_ANALOG))
+      );
+      $pins->setAnalogMapping(array(21 => 42));
+      $this->assertEquals(42, $pins->getPinByChannel(21));
+    }
+
+    /**
+     * @covers Carica\Firmata\Pins::setAnalogMapping
+     * @covers Carica\Firmata\Pins::getPinByChannel
+     */
+    public function testAnalogMappingWithInvalidChannelExpectingNegativeOne() {
+      $pins = new Pins(
+        $this->getBoardFixture(),
+        array(42 => array(Board::PIN_MODE_ANALOG))
+      );
+      $pins->setAnalogMapping(array(21 => 42));
+      $this->assertEquals(-1, $pins->getPinByChannel(23));
+    }
+
+    /**
      * @covers Carica\Firmata\Pins::getIterator
      */
     public function testIterator() {
