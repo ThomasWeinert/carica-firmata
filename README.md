@@ -14,7 +14,7 @@ Basics
 
 The repository provides a library to control an Arduino using the Firmata server sketch.
 
-It is based on the [Javascript implementation](https://github.com/jgautier/firmata) by Julian Gautier.
+It was originally based on the [Javascript implementation](https://github.com/jgautier/firmata) by Julian Gautier.
 
 Dependencies
 ------------
@@ -29,3 +29,14 @@ Installation
 Carica Firmata is avaiable on [Packagist](https://packagist.org/packages/carica/firmata). Use Composer to add it as an
 dependency into your own projects.
 
+Carica Pin
+----------
+
+Carica Firmata provides an OOP abstraction for the pins on an Arduino.
+Values are stored and only send to the board if changed. The values can be changed using different properties.
+
+* $pin->value  is the original, internal value, the maximum value depends on the resolution of the mode.
+* $pin->digital is a boolean value and sets the pin to low/high 
+* $pin->analog is a float between 0 and 1, the need value is calculated internally using the resolution of the current mode.
+
+It is suggested to use the digital/analog properties to support different resolutions.
