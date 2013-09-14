@@ -5,17 +5,19 @@ namespace Carica\Firmata {
   /**
    * Represents a single pin on the board.
    *
-   * @property-read Carica\Firmata\Board $board
-   * @property-read integer $pin
-   * @property-read array $supports
-   * @property integer $value Get/set the pin value using an analog integer value
-   * @property integer $analog Get/set the pin value using a float between 0 and 1
-   * @property boolean $digital Get/set the pin value using an boolean value
+   * @property-read Board $board
+   * @property-read int $pin pin index
+   * @property-read array $supports array of pin modes and maimum values
+   * @property-read int $maximum Maximum value of the current mode
+   * @property int $mode Get/set the pin mode
+   * @property int $value Get/set the pin value using an analog integer value
+   * @property int $analog Get/set the pin value using a float between 0 and 1
+   * @property bool $digital Get/set the pin value using an boolean value
    */
   class Pin {
 
     /**
-     * @var Carica\Firmata\Board
+     * @var Board
      */
     private $_board = NULL;
     /**
@@ -189,7 +191,8 @@ namespace Carica\Firmata {
      * Setter method for the mode property.
      *
      * @param integer $mode
-     * @throws \OutOfBoundsException
+     *
+     * @throws Exception\UnsupportedMode
      */
     public function setMode($mode) {
       $mode = (int)$mode;
@@ -230,7 +233,10 @@ namespace Carica\Firmata {
 
     /**
      * Setter method for the analog property. Allows to set change the value on the pin.
-     * @param float $value between 0 and 1
+     *
+     * @param $percent
+     *
+     * @internal param float $value between 0 and 1
      */
     public function setAnalog($percent) {
       $resolution = $this->maximum;

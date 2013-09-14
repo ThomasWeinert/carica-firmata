@@ -10,7 +10,7 @@ namespace Carica\Firmata {
    *
    * @property-read array $version
    * @property-read array $firmware
-   * @property-read array $pins
+   * @property-read Pins $pins
    */
   class Board {
 
@@ -57,12 +57,12 @@ namespace Carica\Firmata {
     const I2C_MODE_STOP_READING = 3;
 
     /**
-     * @var Carica\Firmata\Pins
+     * @var \Carica\Firmata\Pins
      */
     private $_pins = NULL;
 
     /**
-     * @var Carica\Io\Stream
+     * @var \Carica\Io\Stream
      */
     private $_stream = NULL;
     /**
@@ -72,13 +72,13 @@ namespace Carica\Firmata {
 
     /**
      * Firmata version information
-     * @var Carica\Firmata\Version
+     * @var Version
      */
     private $_version = NULL;
 
     /**
      * Firmware version information
-     * @var Carica\Firmata\Version
+     * @var Version
      */
     private $_firmware= NULL;
 
@@ -102,7 +102,7 @@ namespace Carica\Firmata {
     /**
      * Create board and assign stream object
      *
-     * @param Carica\Io\Stream $stream
+     * @param Io\Stream $stream
      */
     public function __construct(Io\Stream $stream) {
       $this->_stream = $stream;
@@ -120,7 +120,7 @@ namespace Carica\Firmata {
     /**
      * Getter for the port/stream object
      *
-     * @return Carica\Io\Stream
+     * @return Io\Stream
      */
     public function stream() {
       return $this->_stream;
@@ -143,7 +143,7 @@ namespace Carica\Firmata {
     /**
      * Pin list subobject
      *
-     * @param Carica\Firmata\Pins $pins
+     * @param Pins $pins
      */
     public function pins(Pins $pins = NULL) {
       if (isset($pins)) {
@@ -159,7 +159,7 @@ namespace Carica\Firmata {
      * Activate the board, assign the needed callbacks
      *
      * @param Callable|NULL $callback
-     * @return Carica\Io\Deferred\Promise
+     * @return Io\Deferred\Promise
      */
     public function activate(Callable $callback = NULL) {
       $defer = new \Carica\Io\Deferred();
@@ -201,7 +201,7 @@ namespace Carica\Firmata {
      * Provide some properties
      *
      * @param string $name
-     * @throws LogicException
+     * @throws \LogicException
      * @return mixed
      */
     public function __get($name) {
@@ -239,13 +239,15 @@ namespace Carica\Firmata {
      * Callback for the buffer, received a response from the board. Call a more specific
      * private event handler based on the $_responseHandler mapping array
      *
-     * @param Carica\Firmata\Response $response
+     * @param Response $response
      */
     public function onResponse(Response $response) {
       $command = $response->command;
       if (isset($this->_responseHandler[$command])) {
-        $callback = array($this, $this->_responseHandler[$command]);
-        return $callback($response);
+        return call_user_func(
+          array($this, $this->_responseHandler[$command]),
+          $response
+        );
       } else {
         throw new \UnexpectedValueException(
           sprintf('Unknown response command: 0x%02o', $command)
@@ -256,7 +258,7 @@ namespace Carica\Firmata {
     /**
      * A version was reported, store it and request value reading
      *
-     * @param Carica\Firmata\Response\Midi\ReportVersion $response
+     * @param Response\Midi\ReportVersion $response
      */
     private function onReportVersion(Response\Midi\ReportVersion $response) {
       $this->_version = new Version($response->major, $response->minor);
@@ -302,7 +304,7 @@ namespace Carica\Firmata {
     /**
      * Got an analog message, change pin value and emit events
      *
-     * @param Response\Midi\AnalogMessage $response
+     * @param Response\Midi\Message $response
      */
     private function onAnalogMessage(Response\Midi\Message $response) {
       if (0 <= ($pinNumber = $this->pins->getPinByChannel($response->port))) {
@@ -314,7 +316,7 @@ namespace Carica\Firmata {
     /**
      * Got a digital message, change pin value and emit events
      *
-     * @param Response\Midi\DigitalMessage $response
+     * @param Response\Midi\Message $response
      */
     private function onDigitalMessage(Response\Midi\Message $response) {
       $firstPin = 8 * $response->port;
@@ -459,8 +461,8 @@ namespace Carica\Firmata {
     /**
      * Write an analog value for a pin
      *
-     * @param integer $pin 0-16
-     * @param integer $value 0-255
+     * @param integer $pin
+     * @param integer $value
      */
     public function analogWrite($pin, $value) {
       $this->pins[$pin]->setValue($value);

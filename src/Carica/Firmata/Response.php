@@ -2,6 +2,12 @@
 
 namespace Carica\Firmata {
 
+  /**
+   * An response send by the arduino board, this is an abstract superclass, all
+   * responses have an command and data, the command is handles here.
+   *
+   * @property integer $command
+   */
   abstract class Response {
 
     private $_command = 0x00;

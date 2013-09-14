@@ -4,6 +4,11 @@ namespace Carica\Firmata\Response\Sysex {
 
   use Carica\Firmata;
 
+  /**
+   * Class String
+   *
+   * @property string $text
+   */
   class String extends Firmata\Response\Sysex {
 
     private $_text = '';

@@ -4,6 +4,13 @@ namespace Carica\Firmata\Response\Sysex {
 
   use Carica\Firmata;
 
+  /**
+   * Class QueryFirmware
+   *
+   * @property string $name
+   * @property integer $major
+   * @property integer $minor
+   */
   class QueryFirmware extends Firmata\Response\Sysex {
 
     private $_name = '';

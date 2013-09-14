@@ -4,6 +4,12 @@ namespace Carica\Firmata\Response\Sysex {
 
   use Carica\Firmata;
 
+  /**
+   * Class PulseIn
+   *
+   * @property integer $pin pin index
+   * @property integer $duration pulse duration in microsecond
+   */
   class PulseIn extends Firmata\Response\Sysex {
 
     private $_pin = 0;

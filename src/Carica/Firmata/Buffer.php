@@ -10,7 +10,7 @@ namespace Carica\Firmata {
 
     private $_bytes = array();
     private $_versionReceived = FALSE;
-    private $_lastReponse = NULL;
+    private $_lastResponse = NULL;
 
     private $_classes = array(
       Board::REPORT_VERSION => 'Midi\ReportVersion',

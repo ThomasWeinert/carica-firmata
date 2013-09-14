@@ -7,6 +7,10 @@ namespace Carica\Firmata {
     private $_pins = array();
     private $_channels = array();
 
+    /**
+     * @param Board $board
+     * @param array $pinCapabilities
+     */
     public function __construct(Board $board, array $pinCapabilities) {
       foreach ($pinCapabilities as $pin => $supportedModes) {
         if (!empty($supportedModes)) {
@@ -37,10 +41,21 @@ namespace Carica\Firmata {
       }
     }
 
+    /**
+     * @param integer $offset
+     *
+     * @return bool
+     */
     public function offsetExists($offset) {
       return array_key_exists((int)$offset, $this->_pins);
     }
 
+    /**
+     * @param integer $offset
+     *
+     * @return Pin
+     * @throws Exception\NonExistingPin
+     */
     public function offsetGet($offset) {
       if ($this->offsetExists($offset)) {
         return $this->_pins[(int)$offset];
@@ -48,18 +63,35 @@ namespace Carica\Firmata {
       throw new Exception\NonExistingPin($offset);
     }
 
+    /**
+     * @param integer $offset
+     * @param Pin $value
+     *
+     * @throws \LogicException
+     */
     public function offsetSet($offset, $value) {
       throw new \LogicException('Pins are not replaceable.');
     }
 
+    /**
+     * @param integer $offset
+     *
+     * @throws \LogicException
+     */
     public function offsetUnset($offset) {
       throw new \LogicException('Pins are not removeable.');
     }
 
+    /**
+     * @return int
+     */
     public function count() {
       return count($this->_pins);
     }
 
+    /**
+     * @return \Iterator
+     */
     public function getIterator(){
       return new \ArrayIterator($this->_pins);
     }

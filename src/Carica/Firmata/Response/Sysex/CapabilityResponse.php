@@ -7,9 +7,9 @@ namespace Carica\Firmata\Response\Sysex {
   /**
    * The $pins property reports the supportes modes for each value. The key of the array for
    * each pin is the mode, the element contains the maxmimum value.
-   * 
+   *
    * array(pin_number => array(mode => maximum))
-   * 
+   *
    * @property array(integer=>array(integer=>integer)) $pins
    */
   class CapabilityResponse extends Firmata\Response\Sysex {
@@ -38,7 +38,7 @@ namespace Carica\Firmata\Response\Sysex {
             /*
              * Servo reports an resolution of 14 bits (maxmimum value 16383), but
              * uses mostly degrees to set the position, so we use 1 as a full circle of
-             * 360 degrees 
+             * 360 degrees
              */
             $this->_pins[$pin][$mode] = 359;
           } else {

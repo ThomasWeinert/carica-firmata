@@ -11,7 +11,7 @@ $route->match('/pins/{pin}', new Firmata\Rest\Pin($board));
 $route->startsWith('/files', new Http\Route\File(__DIR__));
 $route->match(
   '/',
-  function ($request) {
+  function (Http\Request $request) {
     $response = $request->createResponse();
     $response->content = new Http\Response\Content\File(
       __DIR__.'/index.html', 'text/html', 'utf-8'

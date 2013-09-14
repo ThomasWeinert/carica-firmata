@@ -4,6 +4,12 @@ namespace Carica\Firmata\Response\Midi {
 
   use Carica\Firmata;
 
+  /**
+   * Class Message
+   *
+   * @property integer $port
+   * @property integer $value
+   */
   class Message extends Firmata\Response\Midi {
 
     private $_port = 0;
