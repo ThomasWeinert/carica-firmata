@@ -83,23 +83,6 @@ namespace Carica\Firmata {
     private $_firmware= NULL;
 
     /**
-     * Map command responses to private event handlers
-     * @var array(integer=>string)
-     */
-    private $_responseHandler = array(
-      self::REPORT_VERSION => 'onReportVersion',
-      self::ANALOG_MESSAGE => 'onAnalogMessage',
-      self::DIGITAL_MESSAGE => 'onDigitalMessage',
-      self::STRING_DATA => 'onStringData',
-      self::PULSE_IN => 'onPulseIn',
-      self::QUERY_FIRMWARE => 'onQueryFirmware',
-      self::CAPABILITY_RESPONSE => 'onCapabilityResponse',
-      self::PIN_STATE_RESPONSE => 'onPinStateResponse',
-      self::ANALOG_MAPPING_RESPONSE => 'onAnalogMappingResponse',
-      self::I2C_REPLY => 'onI2CReply'
-    );
-
-    /**
      * Create board and assign stream object
      *
      * @param Io\Stream $stream
@@ -162,7 +145,7 @@ namespace Carica\Firmata {
      * @return Io\Deferred\Promise
      */
     public function activate(Callable $callback = NULL) {
-      $defer = new \Carica\Io\Deferred();
+      $defer = new Io\Deferred();
       if (isset($callback)) {
         $defer->always($callback);
       }
@@ -242,17 +225,41 @@ namespace Carica\Firmata {
      * @param Response $response
      */
     public function onResponse(Response $response) {
-      $command = $response->command;
-      if (isset($this->_responseHandler[$command])) {
-        return call_user_func(
-          array($this, $this->_responseHandler[$command]),
-          $response
-        );
-      } else {
-        throw new \UnexpectedValueException(
-          sprintf('Unknown response command: 0x%02o', $command)
-        );
+      switch ($response->command) {
+      case self::REPORT_VERSION :
+        $this->onReportVersion($response);
+        return;
+      case self::ANALOG_MESSAGE :
+        $this->onAnalogMessage($response);
+        return;
+      case self::DIGITAL_MESSAGE :
+        $this->onDigitalMessage($response);
+        return;
+      case self::STRING_DATA :
+        $this->onStringData($response);
+        return;
+      case self::PULSE_IN :
+        $this->onPulseIn($response);
+        return;
+      case self::QUERY_FIRMWARE :
+        $this->onQueryFirmware($response);
+        return;
+      case self::CAPABILITY_RESPONSE :
+        $this->onCapabilityResponse($response);
+        return;
+      case self::PIN_STATE_RESPONSE :
+        $this->onPinStateResponse($response);
+        return;
+      case self::ANALOG_MAPPING_RESPONSE :
+        $this->onAnalogMappingResponse($response);
+        return;
+      case self::I2C_REPLY :
+        $this->onI2CReply($response);
+        return;
       }
+      throw new \UnexpectedValueException(
+        sprintf('Unknown response command: 0x%02o', $response->command)
+      );
     }
 
     /**
