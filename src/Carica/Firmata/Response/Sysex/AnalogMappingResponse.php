@@ -4,6 +4,14 @@ namespace Carica\Firmata\Response\Sysex {
 
   use Carica\Firmata;
 
+  /**
+   * Class AnalogMappingResponse, the reponse provides the mappings in both
+   * ways. $hannels prives analog channel to pin index number, $pins the
+   *  opposite direction.
+   *
+   * @property array $pins
+   * @property array $channels
+   */
   class AnalogMappingResponse extends Firmata\Response\Sysex {
 
     private $_pins = array();
