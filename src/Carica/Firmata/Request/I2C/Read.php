@@ -6,7 +6,7 @@ namespace Carica\Firmata\Request\I2C {
 
   class Read extends Firmata\Request {
 
-    private $_slaveAdress = 0;
+    private $_slaveAddress = 0;
     private $_length = '';
 
     public function __construct(
