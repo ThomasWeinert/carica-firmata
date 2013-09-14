@@ -30,7 +30,7 @@ namespace Carica\Firmata\Rest {
      * @param array $parameters
      * @return Http\Response
      */
-    public function handle(Http\Request $request, array $parameters) {
+    public function handle(Http\Request $request) {
       $response = $request->createResponse();
       $response->content = new Http\Response\Content\Xml;
       $dom = $response->content->document;
