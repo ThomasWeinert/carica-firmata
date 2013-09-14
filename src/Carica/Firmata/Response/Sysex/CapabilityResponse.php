@@ -10,7 +10,7 @@ namespace Carica\Firmata\Response\Sysex {
    *
    * array(pin_number => array(mode => maximum))
    *
-   * @property array(integer=>array(integer=>integer)) $pins
+   * @property array $pins
    */
   class CapabilityResponse extends Firmata\Response\Sysex {
 

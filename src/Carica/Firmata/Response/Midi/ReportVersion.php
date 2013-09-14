@@ -4,6 +4,12 @@ namespace Carica\Firmata\Response\Midi {
 
   use Carica\Firmata;
 
+  /**
+   * Class ReportVersion
+   *
+   * @property integer $major
+   * @property integer $minor
+   */
   class ReportVersion extends Firmata\Response\Midi {
 
     private $_major = 0;

@@ -113,6 +113,7 @@ namespace Carica\Firmata {
      * Buffer for recieved data
      *
      * @param Buffer $buffer
+     * @return Buffer
      */
     public function buffer(Buffer $buffer = NULL) {
       if (isset($buffer)) {
@@ -127,6 +128,7 @@ namespace Carica\Firmata {
      * Pin list subobject
      *
      * @param Pins $pins
+     * @return Pins
      */
     public function pins(Pins $pins = NULL) {
       if (isset($pins)) {
@@ -201,8 +203,10 @@ namespace Carica\Firmata {
 
     /**
      * Provide properties
+     *
      * @param string $name
      * @param mixed $value
+     *
      * @throws \LogicException
      */
     public function __set($name, $value) {
@@ -213,7 +217,7 @@ namespace Carica\Firmata {
           sprintf('Property %s::$%s is not writeable.', __CLASS__, $name)
         );
       case 'pins' :
-        return $this->pins($value);
+        $this->pins($value);
       }
       throw new \LogicException(sprintf('Unknown property %s::$%s', __CLASS__, $name));
     }
@@ -223,6 +227,8 @@ namespace Carica\Firmata {
      * private event handler based on the $_responseHandler mapping array
      *
      * @param Response $response
+     *
+     * @throws \UnexpectedValueException
      */
     public function onResponse(Response $response) {
       switch ($response->command) {
@@ -447,18 +453,22 @@ namespace Carica\Firmata {
         $this->stream()->write([self::START_SYSEX, self::PIN_STATE_QUERY, $index, self::END_SYSEX]);
       }
     }
+
     /**
      * Add a callback for analog read events on a pin
      *
      * @param integer $pin 0-16
+     * @param Callable $callback
      */
-    public function analogRead($pin, $callback) {
+    public function analogRead($pin, Callable $callback) {
       $this->events()->on('analog-read-'.$pin, $callback);
     }
 
     /**
      * Add a callback for diagital read events on a pin
+     *
      * @param integer $pin 0-16
+     * @param callable $callback
      */
     public function digitalRead($pin, Callable $callback) {
       $this->events()->on('digital-read-'.$pin, $callback);
@@ -588,7 +598,9 @@ namespace Carica\Firmata {
      * @param integer $pulseLength
      * @param integer $timeout
      */
-    public function pulseIn($pin, $callback, $value = self::DIGITAL_HIGH, $pulseLength = 5, $timeout = 1000000) {
+    public function pulseIn(
+      $pin, $callback, $value = self::DIGITAL_HIGH, $pulseLength = 5, $timeout = 1000000
+    ) {
       $this->events()->once('pulse-in-'.$pin, $callback);
       $request = new Request\PulseIn($this, $pin, $value, $pulseLength, $timeout);
       $request->send();

@@ -15,9 +15,8 @@ namespace Carica\Firmata\Rest {
     }
 
     /**
+     * Make the class Callable
      *
-     * @param Http\Request $request
-     * @param array $parameters
      * @return Http\Response
      */
     public function __invoke() {
@@ -25,9 +24,11 @@ namespace Carica\Firmata\Rest {
     }
 
     /**
+     * Create a XML response for the all pins on the board.
      *
      * @param Http\Request $request
-     * @param array $parameters
+     *
+     * @internal param array $parameters
      * @return Http\Response
      */
     public function handle(Http\Request $request) {
@@ -47,6 +48,13 @@ namespace Carica\Firmata\Rest {
       return $response;
     }
 
+    /**
+     * Getter/Setter for a single pin handler
+     *
+     * @param Pin $handler
+     *
+     * @return Pin
+     */
     public function pinHandler(Pin $handler = NULL) {
       if (isset($handler)) {
         $this->_pinHandler = $handler;
