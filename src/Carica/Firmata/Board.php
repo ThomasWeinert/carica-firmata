@@ -12,7 +12,8 @@ namespace Carica\Firmata {
    * @property-read array $firmware
    * @property-read Pins $pins
    */
-  class Board {
+  class Board
+    implements Event\HasEmitter {
 
     use Event\Emitter\Aggregation;
 
@@ -216,8 +217,10 @@ namespace Carica\Firmata {
         throw new \LogicException(
           sprintf('Property %s::$%s is not writeable.', __CLASS__, $name)
         );
+        return;
       case 'pins' :
         $this->pins($value);
+        return;
       }
       throw new \LogicException(sprintf('Unknown property %s::$%s', __CLASS__, $name));
     }

@@ -4,7 +4,8 @@ namespace Carica\Firmata {
 
   use Carica\Io;
 
-  class Buffer {
+  class Buffer
+    implements Io\Event\HasEmitter {
 
     use Io\Event\Emitter\Aggregation;
 
