@@ -2,9 +2,22 @@
 
 namespace Carica\Firmata {
 
+  /**
+   * Pins provides an encapsulation for the list of Pin object, allowing to
+   * access to the pins using array and iterator syntax
+   */
   class Pins implements \ArrayAccess, \Countable, \IteratorAggregate {
 
+    /**
+     * List of Pin objects
+     * @var array(integer=>Pin)
+     */
     private $_pins = array();
+
+    /**
+     * Mapping: analog channel to pin index
+     * @var array(integer=>integer)
+     */
     private $_channels = array();
 
     /**
