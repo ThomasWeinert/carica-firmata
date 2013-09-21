@@ -2,6 +2,8 @@
 
 namespace Carica\Firmata {
 
+  use Carica\Io;
+
   /**
    * Represents a single pin on the board.
    *
@@ -14,7 +16,10 @@ namespace Carica\Firmata {
    * @property int $analog Get/set the pin value using a float between 0 and 1
    * @property bool $digital Get/set the pin value using an boolean value
    */
-  class Pin {
+  class Pin
+    implements Io\Event\HasEmitter {
+
+    use Io\Event\Emitter\Aggregation;
 
     /**
      * @var Board
@@ -97,8 +102,19 @@ namespace Carica\Firmata {
      * @param integer $value
      */
     private function onUpdatePinState($mode, $value) {
-      $this->_mode = $mode;
-      $this->_value = $value;
+      $this->_modeInitialized = TRUE;
+      $this->_valueInitialized = TRUE;
+      if ($this->_mode != $mode || $this->_value != $value) {
+        if ($this->_mode != $mode) {
+          $this->_mode = $mode;
+          $this->emitEvent('change-mode', $this);
+        }
+        if ($this->_value != $value) {
+          $this->_value = $value;
+          $this->emitEvent('change-value', $this);
+        }
+        $this->emitEvent('change', $this);
+      }
     }
 
     /**
@@ -107,7 +123,12 @@ namespace Carica\Firmata {
      * @param integer $value
      */
     private function onUpdateValue($value) {
-      $this->_value = $value;
+      $this->_valueInitialized = TRUE;
+      if ($this->_value != $value) {
+        $this->_value = $value;
+        $this->emitEvent('change-value', $this);
+        $this->emitEvent('change', $this);
+      }
     }
 
     /**
@@ -205,6 +226,8 @@ namespace Carica\Firmata {
       $this->_mode = $mode;
       $this->_modeInitialized = TRUE;
       $this->_board->pinMode($this->_pin, $mode);
+      $this->emitEvent('change-mode', $this);
+      $this->emitEvent('change', $this);
     }
 
     /**
@@ -221,6 +244,8 @@ namespace Carica\Firmata {
       $this->_value = $value;
       $this->_valueInitialized = TRUE;
       $this->_board->digitalWrite($this->_pin, $value);
+      $this->emitEvent('change-value', $this);
+      $this->emitEvent('change', $this);
     }
 
     /**
@@ -261,6 +286,8 @@ namespace Carica\Firmata {
       $this->_value = $value;
       $this->_valueInitialized = TRUE;
       $this->_board->analogWrite($this->_pin, $value);
+      $this->emitEvent('change-value', $this);
+      $this->emitEvent('change', $this);
     }
 
     /**

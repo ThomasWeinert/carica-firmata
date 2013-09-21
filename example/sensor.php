@@ -10,24 +10,28 @@ $board
   ->activate()
   ->done(
     function () use ($board, $loop) {
-      echo "Firmata ".$board->version." active\n";
+      echo "Started:\n";
 
-      $sensorPin = 16;
-      $ledPin = 13;
+      // get the sensor pin
+      $sensor = $board->pins[16];
+      // get an led pin
+      $led = $board->pins[13];
 
-      $board->pins[$sensorPin]->mode = Firmata\Board::PIN_MODE_ANALOG;
-      $board->pins[$ledPin]->mode = Firmata\Board::PIN_MODE_OUTPUT;
+      // mode for the sensor pin is analog input
+      $sensor->mode = Firmata\Board::PIN_MODE_ANALOG;
+      // mode for the led pin is digital output
+      $led->mode = Firmata\Board::PIN_MODE_OUTPUT;
 
-      echo "Sensor: $sensorPin\n";
-      echo "Led: $ledPin\n";
-
-      $board->analogRead(
-        $sensorPin,
-        function($value) use ($board, $ledPin) {
-          $barLength = round($value * 0.07);
-          echo str_pad($value, 4, 0, STR_PAD_LEFT), ' ';
-          echo str_repeat('=', $barLength), "\n";
-          $board->pins[$ledPin]->digital = $value > 600;
+      // if the sensor value changes
+      $sensor->events()->on(
+        'change-value',
+        function (Firmata\Pin $sensor) use ($led) {
+          // output the actual sensor value a 4 digit string
+          echo str_pad($sensor->value, 4, 0, STR_PAD_LEFT), ' ';
+          // output a bar using the analog value (float between 0 and 1)
+          echo str_repeat('=', round($sensor->analog * 70)), "\n";
+          // switch the led to on if the analog value is greater 70 percent
+          $led->digital = $sensor->value > 0.7;
         }
       );
     }
