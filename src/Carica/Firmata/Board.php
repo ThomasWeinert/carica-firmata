@@ -217,7 +217,6 @@ namespace Carica\Firmata {
         throw new \LogicException(
           sprintf('Property %s::$%s is not writeable.', __CLASS__, $name)
         );
-        return;
       case 'pins' :
         $this->pins($value);
         return;
