@@ -12,9 +12,15 @@ $board
     function () use ($board, $loop) {
       echo "Started:\n";
 
-      // get the sensor pin
+      /**
+       * Fetch the sensor pin
+       * @var Firmata\Pin $sensor
+       */
       $sensor = $board->pins[16];
-      // get an led pin
+      /**
+       * Fetch an led pin
+       * @var Firmata\Pin $sensor
+       */
       $led = $board->pins[13];
 
       // mode for the sensor pin is analog input
