@@ -8,17 +8,8 @@ use Carica\Io\Network\Http;
 $route = new Carica\Io\Network\Http\Route();
 $route->match('/pins', new Firmata\Rest\Pins($board));
 $route->match('/pins/{pin}', new Firmata\Rest\Pin($board));
-$route->startsWith('/files', new Http\Route\File(__DIR__));
-$route->match(
-  '/',
-  function (Http\Request $request) {
-    $response = $request->createResponse();
-    $response->content = new Http\Response\Content\File(
-      __DIR__.'/index.html', 'text/html', 'utf-8'
-    );
-    return $response;
-  }
-);
+$route->startsWith('/files', new Http\Route\Directory(__DIR__));
+$route->match('/', new Http\Route\File(__DIR__.'/index.html'));
 
 $board
   ->activate()

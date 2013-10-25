@@ -30,23 +30,13 @@ $route->match(
     return $response;
   }
 );
-$route->startsWith('/files', new Http\Route\File(__DIR__));
-$route->match(
-  '/',
-  function (Http\Request $request) {
-    $response = $request->createResponse();
-    $response->content = new Http\Response\Content\File(
-      __DIR__.'/index.html', 'text/html; charset=utf-8'
-    );
-    return $response;
-  }
-);
+$route->startsWith('/files', new Http\Route\Directory(__DIR__));
+$route->match('/', new Http\Route\File(__DIR__.'/index.html'));
 
 $board
   ->activate()
   ->done(
     function () use ($board, $route) {
-      var_dump($board->pins[21]);
       $board->pins[20]->mode = Carica\Firmata\Board::PIN_MODE_PWM;
       $board->pins[21]->mode = Carica\Firmata\Board::PIN_MODE_PWM;
       $board->pins[22]->mode = Carica\Firmata\Board::PIN_MODE_PWM;
