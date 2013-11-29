@@ -45,6 +45,9 @@ namespace Carica\Firmata\Response\Sysex {
             /*
              * The resolution of the pins is reported as a bit count
              */
+            if ($pin == 16) {
+              var_dump($bytes[$i], $bytes[$i+1], pow(2, (int)$bytes[$i + 1]));
+            }
             $this->_pins[$pin][$mode] = pow(2, (int)$bytes[$i + 1]) - 1;
           }
         }
