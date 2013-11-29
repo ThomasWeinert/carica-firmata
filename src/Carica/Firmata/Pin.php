@@ -67,7 +67,8 @@ namespace Carica\Firmata {
       $this->_board = $board;
       $this->_pin = (int)$pin;
       $this->_supports = $supports;
-      $this->_mode = reset(array_keys($supports));
+      $modes = array_keys($supports);
+      $this->_mode = isset($modes[0]) ? $modes[0] : Board::PIN_MODE_UNKNOWN;
       $this->attachEvents();
     }
 
@@ -253,7 +254,7 @@ namespace Carica\Firmata {
      * @return float between 0 and 1
      */
     public function getAnalog() {
-      return $this->_value / $this->_supports[$this->_mode];
+      return ($this->maximum > 0) ? $this->_value / $this->maximum : 0;
     }
 
     /**
