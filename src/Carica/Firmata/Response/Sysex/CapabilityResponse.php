@@ -34,6 +34,10 @@ namespace Carica\Firmata\Response\Sysex {
           continue;
         } else {
           $mode = $bytes[$i];
+          /*
+           * The resolution of the pins is reported as a bit count
+           */
+          $maximum = pow(2, (int)$bytes[$i + 1]) - 1;
           if ($mode == Firmata\Board::PIN_MODE_SERVO) {
             /*
              * Servo reports an resolution of 14 bits (maxmimum value 16383), but
@@ -41,11 +45,13 @@ namespace Carica\Firmata\Response\Sysex {
              * 360 degrees
              */
             $this->_pins[$pin][$mode] = 359;
-          } else {
-            /*
-             * The resolution of the pins is reported as a bit count
+          } elseif ($mode == Firmata\Board::PIN_MODE_ANALOG && $maximum == 0) {
+            /**
+             * Use 10bit as a default for analog pins
              */
-            $this->_pins[$pin][$mode] = pow(2, (int)$bytes[$i + 1]) - 1;
+            $this->_pins[$pin][$mode] = 1023;
+          } else {
+            $this->_pins[$pin][$mode] = $maximum;
           }
         }
         $i += 2;
