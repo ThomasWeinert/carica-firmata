@@ -20,20 +20,20 @@
   </head>
   <body>
     <div class="wheel">
-    
+
     </div>
-    <script 
+    <script
       type="text/javascript"
-      src="http://code.jquery.com/jquery-1.9.1.js">
+      src="./files/jquery-1.10.2.min.js">
     </script>
-    <script 
+    <script
       type="text/javascript"
       src="./files/raphael-min.js">
     </script>
-    <script 
+    <script
       type="text/javascript"
       src="./files/colorwheel.js">
-    </script>   
+    </script>
     <script type="text/javascript">
       jQuery(
         function() {
@@ -46,7 +46,7 @@
                 waiting = false;
                 jQuery
                   .get(
-                    './rgb', 
+                    './rgb',
                     {
                       r : parseInt(color.r), g : parseInt(color.g), b : parseInt(color.b)
                     }
@@ -57,10 +57,10 @@
                     }
                   );
               }
-            }  
+            }
           );
         }
       );
-    </script> 
+    </script>
   </body>
 </html>
