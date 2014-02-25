@@ -6,13 +6,18 @@
   "homepage": "https://bitbucket.org/ThomasWeinert/carica-firmata/",
   "license": "MIT",
   "authors": [
-    {"name": "Thomas Weinert", "email": "thomas@weinert.info"}
+    {
+      "name": "Thomas Weinert",
+      "email": "thomas@weinert.info"
+    }
   ],
   "require": {
     "php": ">=5.4",
     "carica/io": "dev-master"
   },
   "autoload": {
-    "psr-0": { "Carica\\Firmata": "src" }
+    "psr-4": {
+      "Carica\\Firmata\\": "src\\"
+    }
   }
 }

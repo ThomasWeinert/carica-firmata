@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "015932ae63101c0991f9368fa7bfdd20",
+    "hash": "a29b687264f552c7f3f84ff161ce50e7",
     "packages": [
         {
             "name": "carica/io",
