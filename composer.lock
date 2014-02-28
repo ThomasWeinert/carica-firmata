@@ -3,20 +3,20 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "a29b687264f552c7f3f84ff161ce50e7",
+    "hash": "a89f34f78208c9ead21214cf1e1624fc",
     "packages": [
         {
             "name": "carica/io",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://bitbucket.org/ThomasWeinert/carica-io.git",
-                "reference": "cb64e4bb49175dad53e3325857f59f6128a7807b"
+                "url": "https://github.com/ThomasWeinert/carica-io.git",
+                "reference": "89090f85d68eccab9aaea56de7c5412eb9ef11f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://bitbucket.org/ThomasWeinert/carica-io/get/cb64e4bb49175dad53e3325857f59f6128a7807b.zip",
-                "reference": "cb64e4bb49175dad53e3325857f59f6128a7807b",
+                "url": "https://api.github.com/repos/ThomasWeinert/carica-io/zipball/89090f85d68eccab9aaea56de7c5412eb9ef11f2",
+                "reference": "89090f85d68eccab9aaea56de7c5412eb9ef11f2",
                 "shasum": ""
             },
             "require": {
@@ -24,8 +24,8 @@
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "Carica\\Io": "src"
+                "psr-4": {
+                    "Carica\\Io\\": "src\\"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -39,12 +39,12 @@
                 }
             ],
             "description": "Non blocking I/O for PHP",
-            "homepage": "https://bitbucket.org/ThomasWeinert/carica-io/",
+            "homepage": "https://github.com/ThomasWeinert/carica-io",
             "keywords": [
                 "asynchronous-io",
                 "non-blocking-io"
             ],
-            "time": "2013-11-28 23:46:30"
+            "time": "2014-02-28 22:22:52"
         }
     ],
     "packages-dev": [
