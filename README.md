@@ -1,6 +1,8 @@
 Carica Firmata
 ==============
 
+[![Build Status](https://travis-ci.org/ThomasWeinert/carica-firmata.png?branch=master)](https://travis-ci.org/ThomasWeinert/carica-firmata)
+
 License: [The MIT License](http://www.opensource.org/licenses/mit-license.php)
 
 Copyright: 2013 Thomas Weinert <thomas@weinert.info>
