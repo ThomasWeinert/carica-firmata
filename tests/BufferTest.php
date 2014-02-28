@@ -23,7 +23,8 @@ namespace Carica\Firmata {
       $buffer = new Buffer();
       $buffer->addData("\xF9\x00\x00");
       $response = $buffer->getLastResponse();
-      $this->assertInstanceOf('Carica\Firmata\Response\Midi\ReportVersion', $response);
+      $this->assertInstanceOf(
+        'Carica\\Firmata\\Response\\Midi\\ReportVersion', $response);
     }
 
     /**
@@ -33,7 +34,7 @@ namespace Carica\Firmata {
       $buffer = new Buffer();
       $buffer->addData("\xF9\x00\x00\xF0\x71F\x00o\x00o\x00\xF7");
       $response = $buffer->getLastResponse();
-      $this->assertInstanceOf('Carica\Firmata\Response\SysEx\String', $response);
+      $this->assertInstanceOf('Carica\\Firmata\\Response\\SysEx\\String', $response);
       $this->assertEquals('Foo', $response->text);
     }
 
@@ -46,7 +47,7 @@ namespace Carica\Firmata {
       $buffer->addData("\xF0\x71F\x00o");
       $buffer->addData("\x00o\x00\xF7");
       $response = $buffer->getLastResponse();
-      $this->assertInstanceOf('Carica\Firmata\Response\SysEx\String', $response);
+      $this->assertInstanceOf('Carica\\Firmata\\Response\\SysEx\\String', $response);
       $this->assertEquals('Foo', $response->text);
     }
 
@@ -58,7 +59,7 @@ namespace Carica\Firmata {
       $buffer->addData("\xF9\x00\x00\x00\x00\x00\x00\x00\x00");
       $buffer->addData("\xF0\x71F\x00o\x00o\x00\xF7");
       $response = $buffer->getLastResponse();
-      $this->assertInstanceOf('Carica\Firmata\Response\SysEx\String', $response);
+      $this->assertInstanceOf('Carica\\Firmata\\Response\\SysEx\\String', $response);
     }
 
     /**

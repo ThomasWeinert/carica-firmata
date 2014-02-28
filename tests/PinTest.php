@@ -255,7 +255,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Pin
      */
     public function testEventPinState() {
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $pin = new Pin($board, 12, array(Board::PIN_MODE_OUTPUT => 1, Board::PIN_MODE_ANALOG => 1023));
       $board->events()->emit('pin-state-12', Board::PIN_MODE_ANALOG, 255);
       $this->assertEquals(Board::PIN_MODE_ANALOG, $pin->mode);
@@ -266,7 +266,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Pin
      */
     public function testEventAnalogRead() {
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $pin = new Pin($board, 12, array(Board::PIN_MODE_ANALOG => 1023));
       $board->events()->emit('analog-read-12', 512);
       $this->assertEquals(0.5, $pin->analog, '', 0.01);
@@ -276,7 +276,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Pin
      */
     public function testEventDigitalRead() {
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $pin = new Pin($board, 12, array(Board::PIN_MODE_ANALOG => 1023));
       $board->events()->emit('digital-read-12', TRUE);
       $this->assertTrue($pin->digital);
@@ -310,13 +310,13 @@ namespace Carica\Firmata {
 
     private function getBoardFixture() {
       $board = $this
-        ->getMockBuilder('Carica\Firmata\Board')
+        ->getMockBuilder('Carica\\Firmata\\Board')
         ->disableOriginalConstructor()
         ->getMock();
       $board
         ->expects($this->any())
         ->method('events')
-        ->will($this->returnValue($this->getMock('Carica\Io\Event\Emitter')));
+        ->will($this->returnValue($this->getMock('Carica\\Io\\Event\\Emitter')));
       return $board;
     }
 

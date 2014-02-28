@@ -31,13 +31,13 @@ namespace Carica\Firmata\Request\I2C {
     }
 
     public function getBoardWithStreamFixture($data) {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
         ->with($data);
       $board = $this
-        ->getMockBuilder('Carica\Firmata\Board')
+        ->getMockBuilder('Carica\\Firmata\\Board')
         ->disableOriginalConstructor()
         ->getMock();
       $board

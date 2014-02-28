@@ -11,7 +11,7 @@ namespace Carica\Firmata {
      */
     public function testConstrutor() {
       $board = $this
-        ->getMockBuilder('Carica\Firmata\Board')
+        ->getMockBuilder('Carica\\Firmata\\Board')
         ->disableOriginalConstructor()
         ->getMock();
       $request = new Request_TestProxy($board);

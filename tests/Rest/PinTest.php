@@ -14,7 +14,7 @@ namespace Carica\Firmata\Rest {
      */
     public function testWithInactiveBoard() {
       $board = $this
-        ->getMockBuilder('Carica\Firmata\Board')
+        ->getMockBuilder('Carica\\Firmata\\Board')
         ->disableOriginalConstructor()
         ->getMock();
       $board
@@ -169,7 +169,7 @@ namespace Carica\Firmata\Rest {
 
     private function getBoardFixture(array $pins = array()) {
       $board = $this
-        ->getMockBuilder('Carica\Firmata\Board')
+        ->getMockBuilder('Carica\\Firmata\\Board')
         ->disableOriginalConstructor()
         ->getMock();
       $board
@@ -192,7 +192,7 @@ namespace Carica\Firmata\Rest {
 
     private function getPinFixture($data = array()) {
       $pin = $this
-        ->getMockBuilder('Carica\Firmata\Pin')
+        ->getMockBuilder('Carica\\Firmata\\Pin')
         ->disableOriginalConstructor()
         ->getMock();
       $pin
@@ -215,11 +215,11 @@ namespace Carica\Firmata\Rest {
 
     private function getRequestFixture($query = array()) {
       $connection = $this
-        ->getMockBuilder('Carica\Io\Network\Http\Connection')
+        ->getMockBuilder('Carica\\Io\\Network\\Http\\Connection')
         ->disableOriginalConstructor()
         ->getMock();
       $request = $this
-        ->getMockBuilder('Carica\Io\Network\Http\Request')
+        ->getMockBuilder('Carica\\Io\\Network\\Http\\Request')
         ->disableOriginalConstructor()
         ->getMock();
       $request

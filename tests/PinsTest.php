@@ -112,7 +112,7 @@ namespace Carica\Firmata {
         $board = $this->getBoardFixture(),
         array(42 => array(Board::PIN_MODE_OUTPUT))
       );
-      $this->assertInstanceOf('Carica\Firmata\Pin', $pins[42]);
+      $this->assertInstanceOf('Carica\\Firmata\\Pin', $pins[42]);
     }
 
     /**
@@ -123,7 +123,7 @@ namespace Carica\Firmata {
         $this->getBoardFixture(), array()
       );
       $this->setExpectedException(
-        'Carica\Firmata\Exception\NonExistingPin'
+        'Carica\\Firmata\\Exception\\NonExistingPin'
       );
       $pins[42];
     }
@@ -160,7 +160,7 @@ namespace Carica\Firmata {
 
     private function getBoardFixture() {
       $board = $this
-        ->getMockBuilder('Carica\Firmata\Board')
+        ->getMockBuilder('Carica\\Firmata\\Board')
         ->disableOriginalConstructor()
         ->getMock();
       return $board;

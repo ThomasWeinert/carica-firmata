@@ -11,7 +11,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::stream
      */
     public function testConstructor() {
-      $board = new Board($stream = $this->getMock('Carica\Io\Stream'));
+      $board = new Board($stream = $this->getMock('Carica\\Io\\Stream'));
       $this->assertSame($stream, $board->stream());
     }
 
@@ -19,7 +19,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::isActive
      */
     public function testIsActiveExpectingFalse() {
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $this->assertFalse($board->isActive());
     }
 
@@ -27,8 +27,8 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::buffer
      */
     public function testBufferGetAfterSet() {
-      $buffer = $this->getMock('Carica\Firmata\Buffer');
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $buffer = $this->getMock('Carica\\Firmata\\Buffer');
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $board->buffer($buffer);
       $this->assertSame($buffer, $board->buffer());
     }
@@ -37,8 +37,8 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::buffer
      */
     public function testBufferGetImplicitCreate() {
-      $board = new Board($this->getMock('Carica\Io\Stream'));
-      $this->assertInstanceOf('Carica\Firmata\Buffer', $board->buffer());
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
+      $this->assertInstanceOf('Carica\\Firmata\\Buffer', $board->buffer());
     }
 
     /**
@@ -46,8 +46,8 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::pins
      */
     public function testGetPropertyPinsImplicitCreate() {
-      $board = new Board($this->getMock('Carica\Io\Stream'));
-      $this->assertInstanceOf('Carica\Firmata\Pins', $board->pins);
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
+      $this->assertInstanceOf('Carica\\Firmata\\Pins', $board->pins);
     }
 
     /**
@@ -57,10 +57,10 @@ namespace Carica\Firmata {
      */
     public function testGetPropertyPinsAfterSet() {
       $pins = $this
-        ->getMockBuilder('Carica\Firmata\Pins')
+        ->getMockBuilder('Carica\\Firmata\\Pins')
         ->disableOriginalConstructor()
         ->getMock();
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $board->pins = $pins;
       $this->assertSame($pins, $board->pins);
     }
@@ -69,23 +69,23 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::__get
      */
     public function testGetPropertyVersion() {
-      $board = new Board($this->getMock('Carica\Io\Stream'));
-      $this->assertInstanceOf('Carica\Firmata\Version', $board->version);
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
+      $this->assertInstanceOf('Carica\\Firmata\\Version', $board->version);
     }
 
     /**
      * @covers Carica\Firmata\Board::__get
      */
     public function testGetPropertyFirmware() {
-      $board = new Board($this->getMock('Carica\Io\Stream'));
-      $this->assertInstanceOf('Carica\Firmata\Version', $board->firmware);
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
+      $this->assertInstanceOf('Carica\\Firmata\\Version', $board->firmware);
     }
 
     /**
      * @covers Carica\Firmata\Board::__get
      */
     public function testGetPropertyWithUnknownPropertyName() {
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $this->setExpectedException('LogicException');
       $dummy = $board->INVALID_PROPERTY;
     }
@@ -94,7 +94,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::__set
      */
     public function testSetPropertyVersionExpectingException() {
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $this->setExpectedException('LogicException');
       $board->version = 'trigger';
     }
@@ -103,7 +103,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::__set
      */
     public function testSetPropertyFirmwareExpectingException() {
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $this->setExpectedException('LogicException');
       $board->firmware = 'trigger';
     }
@@ -112,7 +112,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::__set
      */
     public function testSetPropertyWithUnknownPropertyName() {
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $this->setExpectedException('LogicException');
       $board->INVALID_PROPERTY = 'trigger';
     }
@@ -121,19 +121,19 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::activate
      */
     public function testActivateStreamOpenReturnsFalse() {
-      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
       $events
         ->expects($this->exactly(3))
         ->method('on')
         ->with($this->logicalOr('error', 'read-data', 'response'));
 
-      $buffer = $this->getMock('Carica\Firmata\Buffer');
+      $buffer = $this->getMock('Carica\\Firmata\\Buffer');
       $buffer
         ->expects($this->any())
         ->method('events')
         ->will($this->returnValue($events));
 
-      $stream = $this->getMock('Carica\Io\Stream\Tcp');
+      $stream = $this->getMock('Carica\\Io\\Stream\\Tcp');
       $stream
         ->expects($this->any())
         ->method('events')
@@ -147,7 +147,7 @@ namespace Carica\Firmata {
       $board->buffer($buffer);
 
       $promise = $board->activate(function(){});
-      $this->assertInstanceOf('Carica\Io\Deferred\Promise', $promise);
+      $this->assertInstanceOf('Carica\\Io\\Deferred\\Promise', $promise);
     }
 
     /**
@@ -156,7 +156,7 @@ namespace Carica\Firmata {
     public function testActivateStreamErrorRejectsPromise() {
       $events = new \Carica\Io\Event\Emitter();
 
-      $stream = $this->getMock('Carica\Io\Stream\Tcp');
+      $stream = $this->getMock('Carica\\Io\\Stream\\Tcp');
       $stream
         ->expects($this->any())
         ->method('events')
@@ -183,13 +183,13 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board
      */
     public function testActivateWithSimpleStartUp() {
-      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
       $events
         ->expects($this->exactly(2))
         ->method('on')
         ->with($this->logicalOr('error', 'read-data'));
 
-      $stream = $this->getMock('Carica\Io\Stream\Tcp');
+      $stream = $this->getMock('Carica\\Io\\Stream\\Tcp');
       $stream
         ->expects($this->any())
         ->method('events')
@@ -215,7 +215,7 @@ namespace Carica\Firmata {
         "\x7F\x00".
         "\xF7"
       );
-      $this->assertInstanceOf('Carica\Io\Deferred\Promise', $promise);
+      $this->assertInstanceOf('Carica\\Io\\Deferred\\Promise', $promise);
       $this->assertEquals(\Carica\Io\Deferred::STATE_RESOLVED, $promise->state());
       $this->assertEquals('3.2', (string)$board->version);
       $this->assertEquals('Sample 2.3', (string)$board->firmware);
@@ -227,7 +227,7 @@ namespace Carica\Firmata {
      */
     public function testOnResponseWithUnknownResponseExpectingException() {
       $response = $this
-        ->getMockBuilder('Carica\Firmata\Response\SysEx')
+        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx')
         ->disableOriginalConstructor()
         ->getMock();
       $response
@@ -240,7 +240,7 @@ namespace Carica\Firmata {
             )
           )
         );
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $this->setExpectedException(
         'UnexpectedValueException',
         'Unknown response command: 0x00'
@@ -254,7 +254,7 @@ namespace Carica\Firmata {
      */
     public function testOnResponseWithQueryFirmware() {
       $response = $this
-        ->getMockBuilder('Carica\Firmata\Response\SysEx\QueryFirmware')
+        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx\\QueryFirmware')
         ->disableOriginalConstructor()
         ->getMock();
       $response
@@ -270,13 +270,13 @@ namespace Carica\Firmata {
             )
           )
         );
-      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
       $events
         ->expects($this->once())
         ->method('emit')
         ->with('queryfirmware');
 
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $board->events($events);
       $board->onResponse($response);
       $this->assertEquals('TEST 42.21', (string)$board->firmware);
@@ -288,7 +288,7 @@ namespace Carica\Firmata {
      */
     public function testOnResponseWithCapabilityResponse() {
       $response = $this
-        ->getMockBuilder('Carica\Firmata\Response\SysEx\CapabilityResponse')
+        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx\\CapabilityResponse')
         ->disableOriginalConstructor()
         ->getMock();
       $response
@@ -302,13 +302,13 @@ namespace Carica\Firmata {
             )
           )
         );
-      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
       $events
         ->expects($this->once())
         ->method('emit')
         ->with('capability-query');
 
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $board->events($events);
       $board->onResponse($response);
       $this->assertTrue(isset($board->pins[1]));
@@ -321,7 +321,7 @@ namespace Carica\Firmata {
      */
     public function testOnResponseWithAnalogMappingResponse() {
       $response = $this
-        ->getMockBuilder('Carica\Firmata\Response\SysEx\AnalogMappingResponse')
+        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx\\AnalogMappingResponse')
         ->disableOriginalConstructor()
         ->getMock();
       $response
@@ -335,14 +335,14 @@ namespace Carica\Firmata {
             )
           )
         );
-      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
       $events
         ->expects($this->once())
         ->method('emit')
         ->with('analog-mapping-query');
 
       $pins = $this
-        ->getMockBuilder('Carica\Firmata\Pins')
+        ->getMockBuilder('Carica\\Firmata\\Pins')
         ->disableOriginalConstructor()
         ->getMock();
       $pins
@@ -350,7 +350,7 @@ namespace Carica\Firmata {
         ->method('setAnalogMapping')
         ->with([0 => 14]);
 
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $board->events($events);
       $board->pins = $pins;
 
@@ -363,7 +363,7 @@ namespace Carica\Firmata {
      */
     public function testOnResponseWithAnalogMessage() {
       $response = $this
-        ->getMockBuilder('Carica\Firmata\Response\Midi\Message')
+        ->getMockBuilder('Carica\\Firmata\\Response\\Midi\\Message')
         ->disableOriginalConstructor()
         ->getMock();
       $response
@@ -378,7 +378,7 @@ namespace Carica\Firmata {
             )
           )
         );
-      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
       $events
         ->expects($this->at(0))
         ->method('emit')
@@ -389,7 +389,7 @@ namespace Carica\Firmata {
         ->with('analog-read', ['pin' => 42, 'value' => 23]);
 
       $pins = $this
-        ->getMockBuilder('Carica\Firmata\Pins')
+        ->getMockBuilder('Carica\\Firmata\\Pins')
         ->disableOriginalConstructor()
         ->getMock();
       $pins
@@ -398,7 +398,7 @@ namespace Carica\Firmata {
         ->with(21)
         ->will($this->returnValue(42));
 
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $board->events($events);
       $board->pins = $pins;
 
@@ -411,7 +411,7 @@ namespace Carica\Firmata {
      */
     public function testOnResponseWithDigitalMessage() {
       $response = $this
-        ->getMockBuilder('Carica\Firmata\Response\Midi\Message')
+        ->getMockBuilder('Carica\\Firmata\\Response\\Midi\\Message')
         ->disableOriginalConstructor()
         ->getMock();
       $response
@@ -427,7 +427,7 @@ namespace Carica\Firmata {
           )
         );
       $pins = $this
-        ->getMockBuilder('Carica\Firmata\Pins')
+        ->getMockBuilder('Carica\\Firmata\\Pins')
         ->disableOriginalConstructor()
         ->getMock();
       $pins
@@ -462,7 +462,7 @@ namespace Carica\Firmata {
           )
         );
 
-      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
       $events
         ->expects($this->at(0))
         ->method('emit')
@@ -472,7 +472,7 @@ namespace Carica\Firmata {
         ->method('emit')
         ->with('digital-read', ['pin' => 17, 'value' => Board::DIGITAL_LOW]);
 
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $board->events($events);
       $board->pins = $pins;
 
@@ -485,7 +485,7 @@ namespace Carica\Firmata {
      */
     public function testOnResponseWithStringData() {
       $response = $this
-        ->getMockBuilder('Carica\Firmata\Response\SysEx\String')
+        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx\\String')
         ->disableOriginalConstructor()
         ->getMock();
       $response
@@ -499,13 +499,13 @@ namespace Carica\Firmata {
             )
           )
         );
-      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
       $events
         ->expects($this->once())
         ->method('emit')
         ->with('string', 'Hello World!');
 
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $board->events($events);
       $board->onResponse($response);
     }
@@ -516,7 +516,7 @@ namespace Carica\Firmata {
      */
     public function testOnResponseWithPinStateResponse() {
       $response = $this
-        ->getMockBuilder('Carica\Firmata\Response\SysEx\PinStateResponse')
+        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx\\PinStateResponse')
         ->disableOriginalConstructor()
         ->getMock();
       $response
@@ -532,13 +532,13 @@ namespace Carica\Firmata {
             )
           )
         );
-      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
       $events
         ->expects($this->once())
         ->method('emit')
         ->with('pin-state-42', Board::PIN_MODE_PWM, 23);
 
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $board->events($events);
       $board->onResponse($response);
     }
@@ -549,7 +549,7 @@ namespace Carica\Firmata {
      */
     public function testOnResponseWithI2CReply() {
       $response = $this
-        ->getMockBuilder('Carica\Firmata\Response\SysEx\I2CReply')
+        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx\\I2CReply')
         ->disableOriginalConstructor()
         ->getMock();
       $response
@@ -564,13 +564,13 @@ namespace Carica\Firmata {
             )
           )
         );
-      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
       $events
         ->expects($this->once())
         ->method('emit')
         ->with('I2C-reply-42', 'Hello World!');
 
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $board->events($events);
       $board->onResponse($response);
     }
@@ -581,7 +581,7 @@ namespace Carica\Firmata {
      */
     public function testOnResponseWithPulseIn() {
       $response = $this
-        ->getMockBuilder('Carica\Firmata\Response\SysEx\PulseIn')
+        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx\\PulseIn')
         ->disableOriginalConstructor()
         ->getMock();
       $response
@@ -596,7 +596,7 @@ namespace Carica\Firmata {
             )
           )
         );
-      $events = $this->getMock('Carica\Io\Event\Emitter');
+      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
       $events
         ->expects($this->at(0))
         ->method('emit')
@@ -606,7 +606,7 @@ namespace Carica\Firmata {
         ->method('emit')
         ->with('pulse-in', 42, 23);
 
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $board->events($events);
       $board->onResponse($response);
     }
@@ -615,7 +615,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::reset
      */
     public function testReset() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
@@ -629,7 +629,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::reportVersion
      */
     public function testReportVersion() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
@@ -646,7 +646,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::queryFirmware
      */
     public function testQueryFirmware() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
@@ -663,7 +663,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::queryCapabilities
      */
     public function testQueryCapabilities() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
@@ -680,7 +680,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::queryAnalogMapping
      */
     public function testQueryAnalogMapping() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
@@ -697,7 +697,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::queryPinState
      */
     public function testQueryPinState() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
@@ -714,7 +714,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::queryAllPinStates
      */
     public function testQueryAllPinStates() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
@@ -732,7 +732,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::analogRead
      */
     public function testAnalogRead() {
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $board->analogRead(42, $callback = function() {});
       $this->assertCount(
          1,
@@ -744,7 +744,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::digitalRead
      */
     public function testDigitalRead() {
-      $board = new Board($this->getMock('Carica\Io\Stream'));
+      $board = new Board($this->getMock('Carica\\Io\\Stream'));
       $board->digitalRead(42, $callback = function() {});
       $this->assertCount(
          1,
@@ -756,13 +756,13 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::analogWrite
      */
     public function testAnalogWrite() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
         ->with([0xE3, 0x17, 0x00]);
       $pin = $this
-        ->getMockBuilder('Carica\Firmata\Pin')
+        ->getMockBuilder('Carica\\Firmata\\Pin')
         ->disableOriginalConstructor()
         ->getMock();
       $pin
@@ -779,7 +779,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::analogWrite
      */
     public function testAnalogWriteWithHighPinNumber() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
@@ -793,7 +793,7 @@ namespace Carica\Firmata {
           ]
         );
       $pin = $this
-        ->getMockBuilder('Carica\Firmata\Pin')
+        ->getMockBuilder('Carica\\Firmata\\Pin')
         ->disableOriginalConstructor()
         ->getMock();
       $pin
@@ -810,7 +810,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::analogWrite
      */
     public function testAnalogWriteWithLargeValue() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
@@ -826,7 +826,7 @@ namespace Carica\Firmata {
           ]
         );
       $pin = $this
-        ->getMockBuilder('Carica\Firmata\Pin')
+        ->getMockBuilder('Carica\\Firmata\\Pin')
         ->disableOriginalConstructor()
         ->getMock();
       $pin
@@ -843,13 +843,13 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::servoWrite
      */
     public function testServoWrite() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
         ->with([0xE3, 0x17, 0x00]);
       $pin = $this
-        ->getMockBuilder('Carica\Firmata\Pin')
+        ->getMockBuilder('Carica\\Firmata\\Pin')
         ->disableOriginalConstructor()
         ->getMock();
       $pin
@@ -866,7 +866,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::digitalWrite
      */
     public function testDigitalWrite() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
@@ -904,13 +904,13 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::pinMode
      */
     public function testPinMode() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
         ->with([Board::PIN_MODE, 0x2A, Board::PIN_MODE_OUTPUT]);
       $pin = $this
-        ->getMockBuilder('Carica\Firmata\Pin')
+        ->getMockBuilder('Carica\\Firmata\\Pin')
         ->disableOriginalConstructor()
         ->getMock();
       $pin
@@ -927,7 +927,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::sendI2CConfig
      */
     public function testSendI2CConfig() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
@@ -948,7 +948,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::sendI2CWriteRequest
      */
     public function testSendI2CWriteRequest() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
@@ -961,7 +961,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::sendI2CReadRequest
      */
     public function testSendI2CReadRequest() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
@@ -988,7 +988,7 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::pulseIn
      */
     public function testPulseIn() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
         ->expects($this->once())
         ->method('write')
@@ -1007,7 +1007,7 @@ namespace Carica\Firmata {
 
     private function getPinFixture($data = []) {
       $pin = $this
-        ->getMockBuilder('Carica\Firmata\Pin')
+        ->getMockBuilder('Carica\\Firmata\\Pin')
         ->disableOriginalConstructor()
         ->getMock();
       $pin
@@ -1030,7 +1030,7 @@ namespace Carica\Firmata {
 
     private function getPinsFixture(array $pins = []) {
       $result = $this
-        ->getMockBuilder('Carica\Firmata\Pins')
+        ->getMockBuilder('Carica\\Firmata\\Pins')
         ->disableOriginalConstructor()
         ->getMock();
       $result
