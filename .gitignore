@@ -5,5 +5,7 @@
 /build
 /vendor
 /example/configuration.php
+/phpunit.xml
 
 /.idea
+
