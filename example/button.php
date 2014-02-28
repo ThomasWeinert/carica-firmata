@@ -21,7 +21,7 @@ $board
       $board->digitalRead(
         $buttonPin,
         function($value) use ($board, $ledPin) {
-          echo ($value == Firmata\DIGITAL_HIGH) ? "Button down\n" :  "Button up\n";
+          echo ($value == Firmata\Board::DIGITAL_HIGH) ? "Button down\n" :  "Button up\n";
           $board->pins[$ledPin]->digital = $value == Firmata\Board::DIGITAL_HIGH;
         }
       );

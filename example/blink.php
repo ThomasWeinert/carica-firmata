@@ -4,24 +4,30 @@ $board = require(__DIR__.'/bootstrap.php');
 use Carica\Io;
 use Carica\Firmata;
 
+// create the event loop
 $loop = Io\Event\Loop\Factory::get();
 
+// activate the board
 $board
   ->activate()
   ->done(
+    // after the board got activated
     function () use ($board, $loop) {
+      // output the version
       echo "Firmata ".$board->version." active\n";
 
-      $led = 9;
-      $board->pinMode($led, Firmata\Board::PIN_MODE_OUTPUT);
-      echo "PIN: $led\n";
+      // get pin 13 (most boards already have an led on this pin)
+      $pin = $board->pins[13];
+      // set the mode of pin 13 to digital output
+      $pin->mode = Firmata\Board::PIN_MODE_OUTPUT;
 
+      // add an callback to the event loop that is called every second
       $loop->setInterval(
-        function () use ($board, $led) {
-          static $ledOn = TRUE;
-          echo 'LED: '.($ledOn ? 'on' : 'off')."\n";
-          $board->digitalWrite($led, $ledOn ? Firmata\Board::DIGITAL_HIGH : Firmata\Board::DIGITAL_LOW);
-          $ledOn = !$ledOn;
+        function () use ($pin) {
+          // toggle the pin (digital) value
+          $pin->digital = !$pin->digital;
+          // output the current status
+          echo 'LED: '.($pin->digital ? 'on' : 'off')."\n";
         },
         1000
       );
@@ -33,9 +39,7 @@ $board
     }
   );
 
-
-if ($board->isActive()) {
-  $loop->run();
-}
+// start the event loop
+$loop->run();
 
 

@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="files/toggle/toggle-switch.css">
     <style type="text/css">
       body {
-        margin: 2em 0em;
+        margin: 2em 0;
       }
       .pin-control {
         height: 8.5em;
@@ -23,12 +23,11 @@
       .switch label.disabled {
         cursor: default;
         opacity: 0.65;
-        filter: alpha(opacity=65);
       }
     </style>
   </head>
   <body>
-    <div class="container-fluid">   
+    <div class="container-fluid">
       <div class="row firmataBoard">
       </div>
     </div>
@@ -39,7 +38,7 @@
       jQuery(
         function() {
           jQuery('.firmataBoard').firmata();
-        }  
+        }
       );
     </script>
   </body>
