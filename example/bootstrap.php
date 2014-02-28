@@ -1,11 +1,6 @@
 <?php
 require(__DIR__ . '/../vendor/autoload.php');
 
-Carica\Io\Loader::map(
-  ['Carica\Firmata' => __DIR__ . '/../src/Carica/Firmata']
-);
-Carica\Io\Loader::register();
-
 use Carica\Io;
 use Carica\Firmata;
 
