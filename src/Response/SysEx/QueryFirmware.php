@@ -1,6 +1,6 @@
 <?php
 
-namespace Carica\Firmata\Response\Sysex {
+namespace Carica\Firmata\Response\SysEx {
 
   use Carica\Firmata;
 
@@ -11,7 +11,7 @@ namespace Carica\Firmata\Response\Sysex {
    * @property integer $major
    * @property integer $minor
    */
-  class QueryFirmware extends Firmata\Response\Sysex {
+  class QueryFirmware extends Firmata\Response\SysEx {
 
     private $_name = '';
     private $_major = 0;

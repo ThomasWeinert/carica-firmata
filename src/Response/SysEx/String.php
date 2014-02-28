@@ -1,6 +1,6 @@
 <?php
 
-namespace Carica\Firmata\Response\Sysex {
+namespace Carica\Firmata\Response\SysEx {
 
   use Carica\Firmata;
 
@@ -9,7 +9,7 @@ namespace Carica\Firmata\Response\Sysex {
    *
    * @property string $text
    */
-  class String extends Firmata\Response\Sysex {
+  class String extends Firmata\Response\SysEx {
 
     private $_text = '';
 

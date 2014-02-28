@@ -4,7 +4,7 @@ namespace Carica\Firmata\Response {
 
   use Carica\Firmata;
 
-  abstract class Sysex extends Firmata\Response {
+  abstract class SysEx extends Firmata\Response {
 
   }
 }

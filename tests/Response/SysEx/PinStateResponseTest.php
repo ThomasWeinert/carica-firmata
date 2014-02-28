@@ -2,7 +2,7 @@
 
 namespace Carica\Firmata\Response\SysEx {
 
-  use Carica\Firmata\Response\Sysex\PinStateResponse;
+  use Carica\Firmata\Response\SysEx\PinStateResponse;
 
   include_once(__DIR__ . '/../../Bootstrap.php');
 

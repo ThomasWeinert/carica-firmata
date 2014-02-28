@@ -289,7 +289,7 @@ namespace Carica\Firmata {
      *
      * @param Response\Sysex\QueryFirmware $response
      */
-    private function onQueryFirmware(Response\Sysex\QueryFirmware $response) {
+    private function onQueryFirmware(Response\SysEx\QueryFirmware $response) {
       $this->_firmware = new Version($response->major, $response->minor, $response->name);
       $this->events()->emit('queryfirmware');
     }
@@ -300,7 +300,7 @@ namespace Carica\Firmata {
      *
      * @param Response\Sysex\CapabilityResponse $response
      */
-    private function onCapabilityResponse(Response\Sysex\CapabilityResponse $response) {
+    private function onCapabilityResponse(Response\SysEx\CapabilityResponse $response) {
       $this->pins(new Pins($this, $response->pins));
       $this->events()->emit('capability-query');
     }
@@ -310,7 +310,7 @@ namespace Carica\Firmata {
      *
      * @param Response\Sysex\AnalogMappingResponse $response
      */
-    private function onAnalogMappingResponse(Response\Sysex\AnalogMappingResponse $response) {
+    private function onAnalogMappingResponse(Response\SysEx\AnalogMappingResponse $response) {
       $this->pins->setAnalogMapping($response->channels);
       $this->events()->emit('analog-mapping-query');
     }
@@ -385,7 +385,7 @@ namespace Carica\Firmata {
      *
      * @param Response\Sysex\PinStateResponse $response
      */
-    private function onPinStateResponse(Response\Sysex\PinStateResponse $response) {
+    private function onPinStateResponse(Response\SysEx\PinStateResponse $response) {
       $this->events()->emit('pin-state-'.$response->pin, $response->mode, $response->value);
     }
 

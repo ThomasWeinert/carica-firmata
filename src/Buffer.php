@@ -14,16 +14,16 @@ namespace Carica\Firmata {
     private $_lastResponse = NULL;
 
     private $_classes = array(
-      Board::REPORT_VERSION => 'Midi\ReportVersion',
-      Board::ANALOG_MESSAGE => 'Midi\Message',
-      Board::DIGITAL_MESSAGE => 'Midi\Message',
-      Board::STRING_DATA => 'Sysex\String',
-      Board::PULSE_IN => 'Sysex\PulseIn',
-      Board::QUERY_FIRMWARE => 'Sysex\QueryFirmware',
-      Board::CAPABILITY_RESPONSE => 'Sysex\CapabilityResponse',
-      Board::PIN_STATE_RESPONSE => 'Sysex\PinStateResponse',
-      Board::ANALOG_MAPPING_RESPONSE => 'Sysex\AnalogMappingResponse',
-      Board::I2C_REPLY => 'SysEx\I2CReply'
+      Board::REPORT_VERSION => 'Midi\\ReportVersion',
+      Board::ANALOG_MESSAGE => 'Midi\\Message',
+      Board::DIGITAL_MESSAGE => 'Midi\\Message',
+      Board::STRING_DATA => 'SysEx\\String',
+      Board::PULSE_IN => 'SysEx\\PulseIn',
+      Board::QUERY_FIRMWARE => 'SysEx\\QueryFirmware',
+      Board::CAPABILITY_RESPONSE => 'SysEx\\CapabilityResponse',
+      Board::PIN_STATE_RESPONSE => 'SysEx\\PinStateResponse',
+      Board::ANALOG_MAPPING_RESPONSE => 'SysEx\\AnalogMappingResponse',
+      Board::I2C_REPLY => 'SysEx\\I2CReply'
     );
 
     public function addData($data) {

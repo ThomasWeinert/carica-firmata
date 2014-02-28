@@ -1,6 +1,6 @@
 <?php
 
-namespace Carica\Firmata\Response\Sysex {
+namespace Carica\Firmata\Response\SysEx {
 
   use Carica\Firmata;
 
@@ -12,7 +12,7 @@ namespace Carica\Firmata\Response\Sysex {
    *
    * @property array $pins
    */
-  class CapabilityResponse extends Firmata\Response\Sysex {
+  class CapabilityResponse extends Firmata\Response\SysEx {
 
     private $_pins = array();
 

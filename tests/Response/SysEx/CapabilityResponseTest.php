@@ -2,7 +2,7 @@
 
 namespace Carica\Firmata\Response\SysEx {
 
-  use Carica\Firmata\Response\Sysex\CapabilityResponse;
+  use Carica\Firmata\Response\SysEx\CapabilityResponse;
 
   include_once(__DIR__ . '/../../Bootstrap.php');
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Carica\Firmata\Response\Sysex {
+namespace Carica\Firmata\Response\SysEx {
 
   use Carica\Firmata;
 
@@ -10,7 +10,7 @@ namespace Carica\Firmata\Response\Sysex {
    * @property integer $pin pin index
    * @property integer $duration pulse duration in microsecond
    */
-  class PulseIn extends Firmata\Response\Sysex {
+  class PulseIn extends Firmata\Response\SysEx {
 
     private $_pin = 0;
     private $_duration = 0;

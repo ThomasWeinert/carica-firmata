@@ -1,6 +1,6 @@
 <?php
 
-namespace Carica\Firmata\Response\Sysex {
+namespace Carica\Firmata\Response\SysEx {
 
   use Carica\Firmata;
 
@@ -9,7 +9,7 @@ namespace Carica\Firmata\Response\Sysex {
    * @property-read integer $mode
    * @property-read integer $value
    */
-  class PinStateResponse extends Firmata\Response\Sysex {
+  class PinStateResponse extends Firmata\Response\SysEx {
 
     private $_pin = 0;
     private $_mode = 0;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Carica\Firmata\Response\Sysex {
+namespace Carica\Firmata\Response\SysEx {
 
   use Carica\Firmata;
 
@@ -9,7 +9,7 @@ namespace Carica\Firmata\Response\Sysex {
    * @property-read integer $register
    * @property-read string $data
    */
-  class I2CReply extends Firmata\Response\Sysex {
+  class I2CReply extends Firmata\Response\SysEx {
 
     private $_slaveAddress = 0;
     private $_register = 0;
