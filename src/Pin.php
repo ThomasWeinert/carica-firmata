@@ -13,7 +13,7 @@ namespace Carica\Firmata {
    * @property-read int $maximum Maximum value of the current mode
    * @property int $mode Get/set the pin mode
    * @property int $value Get/set the pin value using an analog integer value
-   * @property int $analog Get/set the pin value using a float between 0 and 1
+   * @property float $analog Get/set the pin value using a float between 0 and 1
    * @property bool $digital Get/set the pin value using an boolean value
    */
   class Pin
