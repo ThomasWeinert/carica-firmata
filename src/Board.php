@@ -235,33 +235,43 @@ namespace Carica\Firmata {
     public function onResponse(Response $response) {
       switch ($response->command) {
       case self::REPORT_VERSION :
+        /** @noinspection PhpParamsInspection */
         $this->onReportVersion($response);
         return;
       case self::ANALOG_MESSAGE :
+        /** @noinspection PhpParamsInspection */
         $this->onAnalogMessage($response);
         return;
       case self::DIGITAL_MESSAGE :
+        /** @noinspection PhpParamsInspection */
         $this->onDigitalMessage($response);
         return;
       case self::STRING_DATA :
+        /** @noinspection PhpParamsInspection */
         $this->onStringData($response);
         return;
       case self::PULSE_IN :
+        /** @noinspection PhpParamsInspection */
         $this->onPulseIn($response);
         return;
       case self::QUERY_FIRMWARE :
+        /** @noinspection PhpParamsInspection */
         $this->onQueryFirmware($response);
         return;
       case self::CAPABILITY_RESPONSE :
+        /** @noinspection PhpParamsInspection */
         $this->onCapabilityResponse($response);
         return;
       case self::PIN_STATE_RESPONSE :
+        /** @noinspection PhpParamsInspection */
         $this->onPinStateResponse($response);
         return;
       case self::ANALOG_MAPPING_RESPONSE :
+        /** @noinspection PhpParamsInspection */
         $this->onAnalogMappingResponse($response);
         return;
       case self::I2C_REPLY :
+        /** @noinspection PhpParamsInspection */
         $this->onI2CReply($response);
         return;
       }
@@ -484,6 +494,7 @@ namespace Carica\Firmata {
      * @param integer $value
      */
     public function analogWrite($pin, $value) {
+      /** @noinspection PhpUndefinedMethodInspection */
       $this->pins[$pin]->setValue($value);
       if ($pin > 15 || $value > 255) {
         $bytes = [self::START_SYSEX, self::EXTENDED_ANALOG, $pin];
@@ -516,6 +527,7 @@ namespace Carica\Firmata {
      * @param integer $value 0-1
      */
     public function digitalWrite($pin, $value) {
+      /** @noinspection PhpUndefinedMethodInspection */
       $this->pins[$pin]->setDigital($value == self::DIGITAL_HIGH);
       $port = floor($pin / 8);
       $portValue = 0;
@@ -542,6 +554,7 @@ namespace Carica\Firmata {
      * @param integer $mode
      */
     public function pinMode($pin, $mode) {
+      /** @noinspection PhpUndefinedMethodInspection */
       $this->pins[$pin]->setMode($mode);
       $this->stream()->write([self::PIN_MODE, $pin, $mode]);
     }
