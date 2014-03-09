@@ -21,6 +21,18 @@ namespace Carica\Firmata {
 
     use Io\Event\Emitter\Aggregation;
 
+    /*
+     * io mode constants for easier access, map to board pin modes
+     */
+    const MODE_UNKNOWN = Board::PIN_MODE_UNKNOWN;
+    const MODE_INPUT = Board::PIN_MODE_INPUT;
+    const MODE_OUTPUT = Board::PIN_MODE_OUTPUT;
+    const MODE_ANALOG = Board::PIN_MODE_ANALOG;
+    const MODE_PWM = Board::PIN_MODE_PWM;
+    const MODE_SERVO = Board::PIN_MODE_SERVO;
+    const MODE_SHIFT = Board::PIN_MODE_SHIFT;
+    const MODE_I2C = Board::PIN_MODE_I2C;
+
     /**
      * @var Board
      */
@@ -38,7 +50,7 @@ namespace Carica\Firmata {
     /**
      * @var integer
      */
-    private $_mode = Board::PIN_MODE_UNKNOWN;
+    private $_mode = self::MODE_UNKNOWN;
     /**
      * @var integer
      */
@@ -68,7 +80,7 @@ namespace Carica\Firmata {
       $this->_pin = (int)$pin;
       $this->_supports = $supports;
       $modes = array_keys($supports);
-      $this->_mode = isset($modes[0]) ? $modes[0] : Board::PIN_MODE_UNKNOWN;
+      $this->_mode = isset($modes[0]) ? $modes[0] : self::MODE_UNKNOWN;
       $this->attachEvents();
     }
 
