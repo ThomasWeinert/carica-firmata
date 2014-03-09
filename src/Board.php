@@ -546,6 +546,28 @@ namespace Carica\Firmata {
       $this->stream()->write([self::PIN_MODE, $pin, $mode]);
     }
 
+    public function shiftOut($dataPin, $clockPin, $value, $isBigEndian = TRUE) {
+
+      $write = function ($mask, $value) use ($dataPin, $clockPin) {
+        $this->digitalWrite($clockPin, self::DIGITAL_LOW);
+        $this->digitalWrite(
+          $dataPin,
+          ($value & $mask) ? self::DIGITAL_HIGH : self::DIGITAL_LOW
+        );
+        $this->digitalWrite($clockPin, self::DIGITAL_HIGH);
+      };
+
+      if ($isBigEndian) {
+        for ($mask = 128; $mask > 0; $mask = $mask >> 1) {
+          $write($value, $mask);
+        }
+      } else {
+        for ($mask = 0; $mask < 128; $mask = $mask << 1) {
+          $write($value, $mask);
+        }
+      }
+    }
+
     /**
      * Configure the i2c coomunication
      *
