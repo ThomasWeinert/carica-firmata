@@ -559,6 +559,15 @@ namespace Carica\Firmata {
       $this->stream()->write([self::PIN_MODE, $pin, $mode]);
     }
 
+    /**
+     * Shift out the data. The data kann be an integer values representing a
+     * byte value (0 to 255) an array of integers or a binary string.
+     *
+     * @param int $dataPin
+     * @param int $clockPin
+     * @param int|array:int|string $value
+     * @param bool $isBigEndian
+     */
     public function shiftOut($dataPin, $clockPin, $value, $isBigEndian = TRUE) {
 
       $write = function ($mask, $value) use ($dataPin, $clockPin) {
@@ -570,13 +579,23 @@ namespace Carica\Firmata {
         $this->digitalWrite($clockPin, self::DIGITAL_HIGH);
       };
 
-      if ($isBigEndian) {
-        for ($mask = 128; $mask > 0; $mask = $mask >> 1) {
-          $write($value, $mask);
-        }
+      if (is_string($value)) {
+        $values = array_slice(unpack("C*", "\0".$value), 1);
+      } elseif (is_array($value)) {
+        $values = $value;
       } else {
-        for ($mask = 0; $mask < 128; $mask = $mask << 1) {
-          $write($value, $mask);
+        $values = array((int)$value);
+      }
+
+      foreach ($values as $value) {
+        if ($isBigEndian) {
+          for ($mask = 128; $mask > 0; $mask = $mask >> 1) {
+            $write($value, $mask);
+          }
+        } else {
+          for ($mask = 0; $mask < 128; $mask = $mask << 1) {
+            $write($value, $mask);
+          }
         }
       }
     }
