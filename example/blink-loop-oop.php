@@ -3,10 +3,8 @@
 $board = require(__DIR__.'/bootstrap.php');
 Carica\Io\Event\Loop\Factory::run($board->activate());
 
-$board->pinMode(13, 0x01);
+$board->pins[13]->mode = Carica\Firmata\Pin::MODE_OUTPUT;
 while (TRUE) {
-  $board->digitalWrite(13, 0xFF);
-  sleep(1);
-  $board->digitalWrite(13, 0x00);
+  $board->pins[13]->digital = !$board->pins[13]->digital;
   sleep(1);
 }
