@@ -1,5 +1,5 @@
 <?php
-$board = require(__DIR__.'/bootstrap.php');
+$board = require(__DIR__.'/../bootstrap.php');
 
 use Carica\Io;
 use Carica\Firmata;
@@ -19,20 +19,13 @@ $board
       $clockPin->mode = Firmata\Pin::MODE_OUTPUT;
       $dataPin->mode = Firmata\Pin::MODE_OUTPUT;
 
-
       $loop->setInterval(
         function () use ($board, $latchPin, $clockPin, $dataPin) {
           static $number = 0;
-          $numbers = [
-            0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F
-          ];
-          echo $number, "\n";
           $latchPin->digital = FALSE;
-          $board->shiftOut(
-            $dataPin->pin, $clockPin->pin, 0xFF ^ $numbers[$number]
-          );
+          $board->shiftOut($dataPin->pin, $clockPin->pin, $number);
           $latchPin->digital = TRUE;
-          if (++$number > 9) {
+          if (++$number > 255) {
             $number = 0;
           }
         },
