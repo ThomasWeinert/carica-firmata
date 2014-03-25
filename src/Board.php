@@ -529,7 +529,7 @@ namespace Carica\Firmata {
     public function digitalWrite($pin, $value) {
       /** @noinspection PhpUndefinedMethodInspection */
       $this->pins[$pin]->setDigital($value == self::DIGITAL_HIGH);
-      $port = floor($pin / 8);
+      $port = (int)floor($pin / 8);
       $portValue = $this->getDigitalPortValue($port);
       $this->stream()->write(
         [self::DIGITAL_MESSAGE | $port, $portValue & 0x7F, ($portValue >> 7) & 0x7F]
@@ -576,53 +576,50 @@ namespace Carica\Firmata {
     public function shiftOut($dataPin, $clockPin, $value, $isBigEndian = TRUE) {
       $dataPort = floor($dataPin / 8);
       $clockPort = floor($clockPin / 8);
+      $dataOffset = 1 << (int)($dataPin - ($dataPort * 8));
+      $clockOffset = 1 << (int)($clockPin - ($clockPort * 8));
       if ($dataPort == $clockPort) {
-        $value = $this->getDigitalPortValue($dataPort);
-        $clockOffset = $clockPin - $dataPort * 8;
-        $dataOffset = $dataPin - $dataPort * 8;
-        $values['start'] = $value & ~$clockOffset;
-        $values['low'] = $value & ~$dataOffset;
-        $values['high'] = $value & $dataOffset;
-        $values['end_low'] = $values['data_low']  & $clockOffset;
-        $values['end_high'] = $values['data_high']  & $clockOffset;
+        $portValue = $this->getDigitalPortValue($clockPort);
+        $low = $portValue & ~$clockOffset & ~$dataOffset;
+        $high = $portValue & ~$clockOffset | $dataOffset;
+        $endLow = $low  | $clockOffset;
+        $endHigh = $high | $clockOffset;
+        $messages = [
+          'low' => [
+            self::DIGITAL_MESSAGE | $clockPort, $low & 0x7F, ($low >> 7) & 0x7F,
+            self::DIGITAL_MESSAGE | $clockPort, $endLow & 0x7F, ($endLow >> 7) & 0x7F,
+          ],
+          'high' => [
+            self::DIGITAL_MESSAGE | $clockPort, $high & 0x7F, ($high >> 7) & 0x7F,
+            self::DIGITAL_MESSAGE | $clockPort, $endHigh & 0x7F, ($endHigh >> 7) & 0x7F,
+          ]
+        ];
       } else {
-        $clockValue = $this->getDigitalPortValue($clockPort);
-        $dataValue = $this->getDigitalPortValue($dataPort);
-        $clockOffset = $clockPin - $clockPort * 8;
-        $dataOffset = $dataPin - $clockPort * 8;
-        $values['start'] = $clockValue & ~$clockOffset;
-        $values['low'] = $dataValue & ~$dataOffset;
-        $values['high'] = $dataValue & $dataOffset;
-        $values['end_low'] = $values['end_high'] = $clockValue  & $clockOffset;
+        $clockPortValue = $this->getDigitalPortValue($clockPort);
+        $dataPortValue = $this->getDigitalPortValue($dataPort);
+        $start = $clockPortValue & ~$clockOffset;
+        $low = $dataPortValue & ~$dataOffset;
+        $high = $dataPortValue | $dataOffset;
+        $end = $clockPortValue | $clockOffset;
+        $messages = [
+          'low' => [
+            self::DIGITAL_MESSAGE | $clockPort, $start & 0x7F, ($start >> 7) & 0x7F,
+            self::DIGITAL_MESSAGE | $dataPort, $low & 0x7F, ($low >> 7) & 0x7F,
+            self::DIGITAL_MESSAGE | $clockPort, $end & 0x7F, ($end >> 7) & 0x7F,
+          ],
+          'high' => [
+            self::DIGITAL_MESSAGE | $clockPort, $start & 0x7F, ($start >> 7) & 0x7F,
+            self::DIGITAL_MESSAGE | $dataPort, $high & 0x7F, ($high >> 7) & 0x7F,
+            self::DIGITAL_MESSAGE | $clockPort, $end & 0x7F, ($end >> 7) & 0x7F,
+          ]
+        ];
       }
-      $messages = [
-        'low' => [
-          self::DIGITAL_MESSAGE | $clockPort,
-          $values['start'] & 0x7F,
-          ($values['start'] >> 7) & 0x7F,
-          self::DIGITAL_MESSAGE | $dataPort,
-          $values['low'] & 0x7F,
-          ($values['low'] >> 7) & 0x7F,
-          self::DIGITAL_MESSAGE | $clockPort,
-          $values['end_low'] & 0x7F,
-          ($values['end_low'] >> 7) & 0x7F
-        ],
-        'high' => [
-          self::DIGITAL_MESSAGE | $clockPort,
-          $values['start'] & 0x7F,
-          ($values['start'] >> 7) & 0x7F,
-          self::DIGITAL_MESSAGE | $dataPort,
-          $values['high'] & 0x7F,
-          ($values['high'] >> 7) & 0x7F,
-          self::DIGITAL_MESSAGE | $clockPort,
-          $values['end_high'] & 0x7F,
-          ($values['end_high'] >> 7) & 0x7F
-        ]
-      ];
 
       $write = function ($mask, $value) use ($messages) {
-        $this->_stream->write(
-          $messages[($value & $mask) ? 'high' : 'low' ]
+        $bytes = new \Carica\Io\ByteArray();
+        $bytes->fromArray($messages[($value & $mask) ? 'high' : 'low'], TRUE);
+        $this->stream()->write(
+          $messages[($value & $mask) ? 'high' : 'low']
         );
       };
 
