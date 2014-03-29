@@ -616,8 +616,6 @@ namespace Carica\Firmata {
       }
 
       $write = function ($mask, $value) use ($messages) {
-        $bytes = new \Carica\Io\ByteArray();
-        $bytes->fromArray($messages[($value & $mask) ? 'high' : 'low'], TRUE);
         $this->stream()->write(
           $messages[($value & $mask) ? 'high' : 'low']
         );
