@@ -428,6 +428,7 @@ namespace Carica\Firmata {
       $this->events()->on('response',Array($this,'recieveDataMaybeVersion'));
       $this->waitingForVersion = true;
       $this->versionRetriesMessageCount = 24;
+      $this->events()->once('reportversion', $callback);
       $this->stream()->write([self::REPORT_VERSION]);
     }
 
