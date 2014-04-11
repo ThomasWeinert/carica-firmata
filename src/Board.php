@@ -407,13 +407,53 @@ namespace Carica\Firmata {
     }
 
     /**
+     * Somewhere to store the "global" state for the retries
+     */
+    private $waitingForVersion = false;
+    private $versionRetriesMessageCount = 0;
+
+    /**
      * Request version from board and execute callback after it is recieved.
      *
      * @param callable $callback
      */
     public function reportVersion(Callable $callback) {
-      $this->events()->once('reportversion', $callback);
+      /* On quite a few board combinations, the board may well miss the version command.
+          In these instances we really need to retry.  Here's some suggested behaviour :
+         * Request version
+         * If we don't get a version within 5 messages, request again
+         * repeat retry up to 4 times (that's 24 midi frames missed)
+         * Still don't get a response?  Emit an Error. */
+      $this->events()->once('reportversion',Array($this, 'reportVersionSuccess'));
+      $this->events()->on('response',Array($this,'recieveDataMaybeVersion'));
+      $this->waitingForVersion = true;
+      $this->versionRetriesMessageCount = 24;
       $this->stream()->write([self::REPORT_VERSION]);
+    }
+
+    /**
+     * This is a workround to accomodate Arduino's poor serial code
+     */
+    public function reportVersionSuccess() {
+      // Success, drop the retries.
+      $this->waitingForVersion = false;
+    }
+
+    /**
+     * This is a workround to accomodate Arduino's poor serial code
+     */
+    public function recieveDataMaybeVersion() {
+      // Success, drop the retries and call the callback.
+      if ($this->waitingForVersion) {
+        if ($this->versionRetriesMessageCount % 5) {
+          $this->stream()->write([self::REPORT_VERSION]);
+          $this->versionRetriesMessageCount--;
+        }
+        if ($this->versionRetriesMessageCount <= 0) {
+          $this->waitingForVersion = false;
+          $this->events()->emit('string', 'No response recieved from version request (tried 5 times).  Are you sure this is a firmata device?');
+        }
+      }
     }
 
     /**
