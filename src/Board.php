@@ -11,6 +11,7 @@ namespace Carica\Firmata {
    * @property-read array $version
    * @property-read array $firmware
    * @property-read Pins $pins
+   * @property mixed _waitingForVersion
    */
   class Board
     implements Event\HasEmitter {
@@ -82,6 +83,15 @@ namespace Carica\Firmata {
      * @var Version
      */
     private $_firmware= NULL;
+
+    /**
+     * Store the watcher callback allowing to retrigger report version
+     * if no answer is recieved
+     *
+     * @var callable|NULL
+     */
+    private $_waitingForVersion = false;
+
 
     /**
      * Create board and assign stream object
@@ -407,54 +417,44 @@ namespace Carica\Firmata {
     }
 
     /**
-     * Somewhere to store the "global" state for the retries
-     */
-    private $waitingForVersion = false;
-    private $versionRetriesMessageCount = 0;
-
-    /**
      * Request version from board and execute callback after it is recieved.
+     *
+     * On quite a few board combinations, the board may well miss the version command.
+     * In these instances we need to retry.
+     *
+     * Here's some suggested behaviour :
+     *   Request version
+     *   If we don't get a version within 5 messages, request again
+     *   repeat retry up to 4 times (that's 24 midi frames missed)
+     *   Still don't get a response?  Emit an Error.
      *
      * @param callable $callback
      */
     public function reportVersion(Callable $callback) {
-      /* On quite a few board combinations, the board may well miss the version command.
-          In these instances we really need to retry.  Here's some suggested behaviour :
-         * Request version
-         * If we don't get a version within 5 messages, request again
-         * repeat retry up to 4 times (that's 24 midi frames missed)
-         * Still don't get a response?  Emit an Error. */
-      $this->events()->once('reportversion',Array($this, 'reportVersionSuccess'));
-      $this->events()->on('response',Array($this,'recieveDataMaybeVersion'));
-      $this->waitingForVersion = true;
-      $this->versionRetriesMessageCount = 24;
-      $this->events()->once('reportversion', $callback);
       $this->stream()->write([self::REPORT_VERSION]);
-    }
-
-    /**
-     * This is a workround to accomodate Arduino's poor serial code
-     */
-    public function reportVersionSuccess() {
-      // Success, drop the retries.
-      $this->waitingForVersion = false;
-    }
-
-    /**
-     * This is a workround to accomodate Arduino's poor serial code
-     */
-    public function recieveDataMaybeVersion() {
-      // Success, drop the retries and call the callback.
-      if ($this->waitingForVersion) {
+      $this->_waitingForVersion = function() {
+        static $counter = 24;
         if ($this->versionRetriesMessageCount % 5) {
           $this->stream()->write([self::REPORT_VERSION]);
-          $this->versionRetriesMessageCount--;
+          $counter--;
         }
-        if ($this->versionRetriesMessageCount <= 0) {
-          $this->waitingForVersion = false;
-          $this->events()->emit('string', 'No response recieved from version request (tried 5 times).  Are you sure this is a firmata device?');
+        if ($counter <= 0) {
+          $this->events()->removeListener('response', $this->_waitingForVersion);
+          $this->events()->emit(
+            'error',
+            'No response recieved from version request (tried 5 times). Are you sure this is a firmata device?'
+          );
         }
-      }
+      };
+      $this->events()->once(
+        'reportversion',
+        function () {
+          $this->events()->removeListener('response', $this->_waitingForVersion);
+          $this->_waitingForVersion = NULL;
+        }
+      );
+      $this->events()->once('reportversion', $callback);
+      $this->events()->on('response', array($this, $this->_waitingForVersion));
     }
 
     /**

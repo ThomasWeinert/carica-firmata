@@ -637,8 +637,10 @@ namespace Carica\Firmata {
       $board = new Board($stream);
       $board->reportVersion(function() {});
       $this->assertCount(
-         1,
-         $board->events()->listeners('reportversion')
+        1, $board->events()->listeners('response')
+      );
+      $this->assertCount(
+        2, $board->events()->listeners('reportversion')
       );
     }
 
