@@ -108,7 +108,7 @@ namespace Carica\Firmata {
      * @return boolean
      */
     public function isActive() {
-      return is_resource($this->stream()->resource());
+      return $this->stream()->isOpen();
     }
 
     /**
