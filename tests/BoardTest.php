@@ -19,7 +19,11 @@ namespace Carica\Firmata {
      * @covers Carica\Firmata\Board::isActive
      */
     public function testIsActiveExpectingFalse() {
-      $board = new Board($this->getMock('Carica\\Io\\Stream'));
+      $board = new Board($stream = $this->getMock('Carica\\Io\\Stream'));
+      $stream
+        ->expects($this->once())
+        ->method('isOpen')
+        ->will($this->returnValue(FALSE));
       $this->assertFalse($board->isActive());
     }
 

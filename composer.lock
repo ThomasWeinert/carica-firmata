@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "a89f34f78208c9ead21214cf1e1624fc",
+    "hash": "c87bbadc95f8af523635a3b9e07dcd56",
     "packages": [
         {
             "name": "carica/io",
@@ -11,12 +11,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ThomasWeinert/carica-io.git",
-                "reference": "89090f85d68eccab9aaea56de7c5412eb9ef11f2"
+                "reference": "e65912f04eff3361431dcc407a5cbf0cf0d51f05"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ThomasWeinert/carica-io/zipball/89090f85d68eccab9aaea56de7c5412eb9ef11f2",
-                "reference": "89090f85d68eccab9aaea56de7c5412eb9ef11f2",
+                "url": "https://api.github.com/repos/ThomasWeinert/carica-io/zipball/e65912f04eff3361431dcc407a5cbf0cf0d51f05",
+                "reference": "e65912f04eff3361431dcc407a5cbf0cf0d51f05",
                 "shasum": ""
             },
             "require": {
@@ -44,7 +44,7 @@
                 "asynchronous-io",
                 "non-blocking-io"
             ],
-            "time": "2014-02-28 22:22:52"
+            "time": "2014-04-30 21:12:16"
         }
     ],
     "packages-dev": [
