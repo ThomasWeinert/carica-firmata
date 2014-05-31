@@ -1,7 +1,12 @@
 Carica Firmata
 ==============
 
-[![Build Status](https://travis-ci.org/ThomasWeinert/carica-firmata.png?branch=master)](https://travis-ci.org/ThomasWeinert/carica-firmata)
+[![Build Status](https://travis-ci.org/ThomasWeinert/carica-firmata.svg?branch=master)](https://travis-ci.org/ThomasWeinert/carica-firmata)
+[![HHVM Status](http://hhvm.h4cc.de/badge/carica/firmata.png)](http://hhvm.h4cc.de/package/carica/firmata)
+[![License](https://poser.pugx.org/carica/firmata/license.svg)](https://packagist.org/packages/carica/firmata)
+[![Total Downloads](https://poser.pugx.org/carica/firmata/downloads.svg)](https://packagist.org/packages/carica/firmata)
+[![Latest Stable Version](https://poser.pugx.org/carica/firmata/v/stable.svg)](https://packagist.org/packages/carica/firmata)
+[![Latest Unstable Version](https://poser.pugx.org/carica/firmata/v/unstable.svg)](https://packagist.org/packages/carica/firmata)
 
 License: [The MIT License](http://www.opensource.org/licenses/mit-license.php)
 
