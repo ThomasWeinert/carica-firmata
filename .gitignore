@@ -4,7 +4,7 @@
 /.settings
 /build
 /vendor
-/example/configuration.php
+/examples/configuration.php
 /phpunit.xml
 
 /.idea
