@@ -6,11 +6,33 @@ namespace Carica\Firmata\Request {
 
   class PulseIn extends Firmata\Request {
 
+    /**
+     * @var int
+     */
     private $_pin = 0;
+
+    /**
+     * @var int
+     */
     private $_value = Firmata\Board::DIGITAL_HIGH;
+
+    /**
+     * @var int
+     */
     private $_pulseLength = 0;
+
+    /**
+     * @var int
+     */
     private $_timeout = 1000000;
 
+    /**
+     * @param Firmata\Board $board
+     * @param int $pin
+     * @param int $value
+     * @param int $pulseLength
+     * @param int $timeout
+     */
     public function __construct(
       Firmata\Board $board,
       $pin,
@@ -25,6 +47,9 @@ namespace Carica\Firmata\Request {
       $this->_timeout = (int)$timeout;
     }
 
+    /**
+     * @return void
+     */
     public function send() {
       $data = pack(
         'CCCC',

@@ -11,10 +11,25 @@ namespace Carica\Firmata\Response\SysEx {
    */
   class PinStateResponse extends Firmata\Response\SysEx {
 
+    /**
+     * @var int
+     */
     private $_pin = 0;
+
+    /**
+     * @var int
+     */
     private $_mode = 0;
+
+    /**
+     * @var int
+     */
     private $_value = 0;
 
+    /**
+     * @param string $command
+     * @param array $bytes
+     */
     public function __construct($command, array $bytes) {
       parent::__construct($command, $bytes);
       $length = count($bytes);
@@ -26,6 +41,10 @@ namespace Carica\Firmata\Response\SysEx {
       }
     }
 
+    /**
+     * @param string $name
+     * @return int
+     */
     public function __get($name) {
       switch ($name) {
       case 'pin' :

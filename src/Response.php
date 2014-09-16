@@ -10,16 +10,31 @@ namespace Carica\Firmata {
    */
   abstract class Response {
 
+    /**
+     * @var int
+     */
     private $_command = 0x00;
 
+    /**
+     * @param string $command
+     * @param array $bytes
+     */
     public function __construct($command, array $bytes) {
       $this->_command = $command;
     }
 
+    /**
+     * @return int
+     */
     public function getCommand() {
       return $this->_command;
     }
 
+    /**
+     * @param string $name
+     * @return int
+     * @throws \LogicException
+     */
     public function __get($name) {
       switch ($name) {
       case 'command' :

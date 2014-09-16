@@ -6,6 +6,9 @@ namespace Carica\Firmata\Exception {
 
   class NonExistingPin extends \Exception implements Io\Exception {
 
+    /**
+     * @param int $pin
+     */
     public function __construct($pin) {
       parent::__construct(
         sprintf('Pin %d does not exists.', $pin)

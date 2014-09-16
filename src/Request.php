@@ -4,16 +4,28 @@ namespace Carica\Firmata {
 
   abstract class Request {
 
+    /**
+     * @var Board
+     */
     private $_board = NULL;
 
+    /**
+     * @param Board $board
+     */
     public function __construct(Board $board) {
       $this->_board = $board;
     }
 
+    /**
+     * @return Board
+     */
     public function board() {
       return $this->_board;
     }
 
+    /**
+     * @return mixed
+     */
     abstract public function send();
 
     /**

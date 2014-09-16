@@ -6,9 +6,21 @@ namespace Carica\Firmata\Request\I2C {
 
   class Write extends Firmata\Request {
 
+    /**
+     * @var int
+     */
     private $_slaveAddress = 0;
+
+    /**
+     * @var string
+     */
     private $_data = '';
 
+    /**
+     * @param Firmata\Board $board
+     * @param int $slaveAddress
+     * @param string $data
+     */
     public function __construct(
       Firmata\Board $board,
       $slaveAddress,
@@ -19,6 +31,9 @@ namespace Carica\Firmata\Request\I2C {
       $this->setData($data);
     }
 
+    /**
+     * @param string $data
+     */
     public function setData($data) {
       if (is_array($data)) {
         array_unshift($data, 'C*');
@@ -28,6 +43,9 @@ namespace Carica\Firmata\Request\I2C {
       }
     }
 
+    /**
+     * @return mixed
+     */
     public function send() {
       $data = pack(
         'CCCC',

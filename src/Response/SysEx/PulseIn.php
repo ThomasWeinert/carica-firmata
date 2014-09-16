@@ -12,9 +12,20 @@ namespace Carica\Firmata\Response\SysEx {
    */
   class PulseIn extends Firmata\Response\SysEx {
 
+    /**
+     * @var int
+     */
     private $_pin = 0;
+
+    /**
+     * @var int
+     */
     private $_duration = 0;
 
+    /**
+     * @param string $command
+     * @param array $bytes
+     */
     public function __construct($command, array $bytes) {
       parent::__construct($command, $bytes);
       $pin = unpack('C', self::decodeBytes([$bytes[1], $bytes[2]]));

@@ -7,9 +7,19 @@ namespace Carica\Firmata\Rest {
 
   class Pins {
 
+    /**
+     * @var Firmata\Board
+     */
     private $_board = NULL;
+
+    /**
+     * @var Firmata\Pin
+     */
     private $_pinHandler = NULL;
 
+    /**
+     * @param Firmata\Board $board
+     */
     public function __construct(Firmata\Board $board) {
       $this->_board = $board;
     }

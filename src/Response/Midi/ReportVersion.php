@@ -12,15 +12,30 @@ namespace Carica\Firmata\Response\Midi {
    */
   class ReportVersion extends Firmata\Response\Midi {
 
+    /**
+     * @var int
+     */
     private $_major = 0;
+
+    /**
+     * @var int
+     */
     private $_minor = 0;
 
+    /**
+     * @param string $command
+     * @param array $bytes
+     */
     public function __construct($command, array $bytes) {
       parent::__construct($command, $bytes);
       $this->_major = $bytes[1];
       $this->_minor = $bytes[2];
     }
 
+    /**
+     * @param string $name
+     * @return int
+     */
     public function __get($name) {
       switch ($name) {
       case 'major' :

@@ -9,10 +9,24 @@ namespace Carica\Firmata {
 
     use Io\Event\Emitter\Aggregation;
 
+    /**
+     * @var array
+     */
     private $_bytes = array();
+
+    /**
+     * @var bool
+     */
     private $_versionReceived = FALSE;
+
+    /**
+     * @var null
+     */
     private $_lastResponse = NULL;
 
+    /**
+     * @var array
+     */
     private $_classes = array(
       Board::REPORT_VERSION => 'Midi\\ReportVersion',
       Board::ANALOG_MESSAGE => 'Midi\\Message',
@@ -26,6 +40,9 @@ namespace Carica\Firmata {
       Board::I2C_REPLY => 'SysEx\\I2CReply'
     );
 
+    /**
+     * @param string $data
+     */
     public function addData($data) {
       if (count($this->_bytes) == 0) {
         $data = ltrim($data, pack('C', 0));
@@ -36,6 +53,9 @@ namespace Carica\Firmata {
       }
     }
 
+    /**
+     * @param int $byte
+     */
     private function addByte($byte) {
       if (!$this->_versionReceived) {
         if ($byte !== Board::REPORT_VERSION) {
@@ -68,6 +88,10 @@ namespace Carica\Firmata {
       }
     }
 
+    /**
+     * @param int $command
+     * @param array $bytes
+     */
     private function handleResponse($command, array $bytes) {
       $response = NULL;
       if (isset($this->_classes[$command])) {
@@ -80,6 +104,9 @@ namespace Carica\Firmata {
       }
     }
 
+    /**
+     * @return Response
+     */
     public function getLastResponse() {
       return $this->_lastResponse;
     }

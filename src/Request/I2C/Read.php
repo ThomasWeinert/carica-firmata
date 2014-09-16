@@ -6,9 +6,21 @@ namespace Carica\Firmata\Request\I2C {
 
   class Read extends Firmata\Request {
 
+    /**
+     * @var int
+     */
     private $_slaveAddress = 0;
-    private $_length = '';
 
+    /**
+     * @var int
+     */
+    private $_length = 0;
+
+    /**
+     * @param Firmata\Board $board
+     * @param int $slaveAddress
+     * @param int $length
+     */
     public function __construct(
       Firmata\Board $board,
       $slaveAddress,
@@ -19,6 +31,9 @@ namespace Carica\Firmata\Request\I2C {
       $this->_length = (int)$length;
     }
 
+    /**
+     * @return void
+     */
     public function send() {
       $this
         ->board()

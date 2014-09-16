@@ -7,8 +7,14 @@ namespace Carica\Firmata\Rest {
 
   class Pin {
 
+    /**
+     * @var Firmata\Board
+     */
     private $_board;
 
+    /**
+     * @var array
+     */
     private $_modeStrings = array(
       Firmata\Board::PIN_MODE_INPUT => 'input',
       Firmata\Board::PIN_MODE_OUTPUT => 'output',
@@ -19,17 +25,31 @@ namespace Carica\Firmata\Rest {
       Firmata\Board::PIN_MODE_I2C => 'i2c'
     );
 
+    /**
+     * @var array
+     */
     private $_modeMap = NULL;
 
+    /**
+     * @param Firmata\Board $board
+     */
     public function __construct(Firmata\Board $board) {
       $this->_modeMap = array_flip($this->_modeStrings);
       $this->_board = $board;
     }
 
+    /**
+     * @return Firmata\Response
+     */
     public function __invoke() {
       return call_user_func_array(array($this, 'handle'), func_get_args());
     }
 
+    /**
+     * @param Http\Request $request
+     * @param array $parameters
+     * @return Http\Response
+     */
     public function handle(Http\Request $request, array $parameters) {
       $response = $request->createResponse();
       $response->content = new Http\Response\Content\Xml;
@@ -59,6 +79,10 @@ namespace Carica\Firmata\Rest {
       return $response;
     }
 
+    /**
+     * @param Firmata\Pin $pin
+     * @param string $modeString
+     */
     private function setPinMode(Firmata\Pin $pin, $modeString) {
       if (isset($this->_modeMap[$modeString])) {
         try {
@@ -68,6 +92,10 @@ namespace Carica\Firmata\Rest {
       }
     }
 
+    /**
+     * @param \DOMElement $parent
+     * @param int $pinId
+     */
     public function appendPin(\DOMElement $parent, $pinId) {
       if (isset($this->_board->pins[$pinId])) {
         $dom = $parent->ownerDocument;
@@ -95,6 +123,10 @@ namespace Carica\Firmata\Rest {
       }
     }
 
+    /**
+     * @param string $mode
+     * @return string
+     */
     private function getModeString($mode) {
       return isset($this->_modeStrings[$mode]) ? $this->_modeStrings[$mode] : 'unknown';
     }

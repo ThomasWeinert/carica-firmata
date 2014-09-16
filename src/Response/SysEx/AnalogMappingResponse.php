@@ -14,9 +14,20 @@ namespace Carica\Firmata\Response\SysEx {
    */
   class AnalogMappingResponse extends Firmata\Response\SysEx {
 
+    /**
+     * @var array
+     */
     private $_pins = array();
+
+    /**
+     * @var array
+     */
     private $_channels = array();
 
+    /**
+     * @param string $command
+     * @param array $bytes
+     */
     public function __construct($command, array $bytes) {
       parent::__construct($command, $bytes);
       $length = count($bytes);
@@ -29,6 +40,10 @@ namespace Carica\Firmata\Response\SysEx {
       }
     }
 
+    /**
+     * @param string $name
+     * @return array|int
+     */
     public function __get($name) {
       switch ($name) {
       case 'channels' :

@@ -11,10 +11,25 @@ namespace Carica\Firmata\Response\SysEx {
    */
   class I2CReply extends Firmata\Response\SysEx {
 
+    /**
+     * @var int
+     */
     private $_slaveAddress = 0;
+
+    /**
+     * @var int
+     */
     private $_register = 0;
+
+    /**
+     * @var string
+     */
     private $_data = '';
 
+    /**
+     * @param string $command
+     * @param array $bytes
+     */
     public function __construct($command, array $bytes) {
       parent::__construct($command, $bytes);
       $this->_slaveAddress = $bytes[1] | ($bytes[2] << 7);
@@ -22,6 +37,10 @@ namespace Carica\Firmata\Response\SysEx {
       $this->_data = self::decodeBytes(array_slice($bytes, 5));
     }
 
+    /**
+     * @param string $name
+     * @return int|string
+     */
     public function __get($name) {
       switch ($name) {
       case 'slaveAddress' :
