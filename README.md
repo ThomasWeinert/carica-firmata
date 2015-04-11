@@ -16,6 +16,8 @@ Carica Firmata is a PHP client library for the Firmata protocol.
 
 ***It's a learning project not a product. Use it at your own risk.***
 
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/ThomasWeinert/carica-chip)
+
 Basics
 ------
 
