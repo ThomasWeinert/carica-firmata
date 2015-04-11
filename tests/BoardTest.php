@@ -956,20 +956,74 @@ namespace Carica\Firmata {
     public function testSendI2CWriteRequest() {
       $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
-        ->expects($this->once())
+        ->expects($this->at(0))
         ->method('write')
-        ->with("\xF0\x76\x03\x00\x48\x00\x61\x00\x6C\x00\x6C\x00\x6F\x00\xF7");
+        ->with(
+          [
+            Board::START_SYSEX,
+            Board::I2C_CONFIG,
+            0x00,
+            0x00,
+            board::END_SYSEX
+          ]
+        );
+      $stream
+        ->expects($this->at(1))
+        ->method('write')
+        ->with(
+          "\xF0\x76\x03\x00\x48\x00\x61\x00\x6C\x00\x6C\x00\x6F\x00\xF7"
+        );
       $board = new Board($stream);
       $board->sendI2CWriteRequest(3, 'Hallo');
     }
 
+    /**
+     * @covers Carica\Firmata\Board::sendI2CWriteRequest
+     */
+    public function testSendI2CWriteRequestwithExplicitConfig() {
+      $stream = $this->getMock('Carica\\Io\\Stream');
+      $stream
+        ->expects($this->at(0))
+        ->method('write')
+        ->with(
+          [
+            Board::START_SYSEX,
+            Board::I2C_CONFIG,
+            0x00,
+            0x27,
+            board::END_SYSEX
+          ]
+        );
+      $stream
+        ->expects($this->at(1))
+        ->method('write')
+        ->with(
+          "\xF0\x76\x03\x00\x48\x00\x61\x00\x6C\x00\x6C\x00\x6F\x00\xF7"
+        );
+      $board = new Board($stream);
+      $board->sendI2CConfig(10000);
+      $board->sendI2CWriteRequest(3, 'Hallo');
+    }
+    
     /**
      * @covers Carica\Firmata\Board::sendI2CReadRequest
      */
     public function testSendI2CReadRequest() {
       $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
-        ->expects($this->once())
+        ->expects($this->at(0))
+        ->method('write')
+        ->with(
+          [
+            Board::START_SYSEX,
+            Board::I2C_CONFIG,
+            0x00,
+            0x00,
+            board::END_SYSEX
+          ]
+        );
+      $stream
+        ->expects($this->at(1))
         ->method('write')
         ->with(
           [

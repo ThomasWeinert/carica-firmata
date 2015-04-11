@@ -91,6 +91,14 @@ namespace Carica\Firmata {
      * @var callable|NULL
      */
     private $_waitingForVersion = false;
+    
+    /**
+     * Will be set to true if i2c is initialized, allows write/read to ensure
+     * the initalization. 
+     *
+     * @var boolean
+     */
+    private $_isI2CInitialized = false;
 
 
     /**
@@ -700,6 +708,17 @@ namespace Carica\Firmata {
              self::END_SYSEX
            )
         );
+      $this->_isI2CInitialized = true;
+    }
+
+    /**
+     * Allow i2c read/write to make sure that config was called.
+     */
+    private function ensureI2CConfig() {
+      if (!$this->_isI2CInitialized) {
+        $this->sendI2CConfig();
+        $this->_isI2CInitialized = true;
+      }
     }
 
     /**
@@ -709,6 +728,7 @@ namespace Carica\Firmata {
      * @param string $data
      */
     public function sendI2CWriteRequest($slaveAddress, $data) {
+      $this->ensureI2CConfig();
       $request = new Request\I2C\Write($this, $slaveAddress, $data);
       $request->send();
     }
@@ -722,6 +742,7 @@ namespace Carica\Firmata {
      * @param callable $callback
      */
     public function sendI2CReadRequest($slaveAddress, $byteCount, Callable $callback) {
+      $this->ensureI2CConfig();
       $request = new Request\I2C\Read($this, $slaveAddress, $byteCount);
       $request->send();
       $this->events()->once('I2C-reply-'.$slaveAddress, $callback);
