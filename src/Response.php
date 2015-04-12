@@ -51,8 +51,6 @@ namespace Carica\Firmata {
       switch ($name) {
       case 'command' :
         return $this->getCommand();
-      case 'rawData' :
-        return $this->getRawData();
       }
       throw new \LogicException(
         sprintf('Unknown property %s::$%s', get_class($this), $name)

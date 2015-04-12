@@ -1,7 +1,6 @@
 <?php
 namespace Carica\Firmata {
 
-  use Carica\Firmata\Response\SysEx\I2CReply;
   use Carica\Io\Event;
 
   class I2C {
@@ -33,7 +32,7 @@ namespace Carica\Firmata {
         'response',
         function(Response $response) {
           if ($response->command == self::REPLY) {
-            $reply = new I2CReply(self::REPLY, $response->getRawData());
+            $reply = new I2C\Reply(self::REPLY, $response->getRawData());
             $this->events()->emit('reply-'.$reply->slaveAddress, $reply->data);
             $this->events()->emit('reply', $reply->slaveAddress, $reply->data);
           }
@@ -75,7 +74,7 @@ namespace Carica\Firmata {
      */
     public function write($slaveAddress, $data) {
       $this->ensureConfiguration();
-      $request = new Request\I2C\Write($this, $slaveAddress, $data);
+      $request = new I2C\Request\Write($this, $slaveAddress, $data);
       $request->send();
     }
 
@@ -90,7 +89,7 @@ namespace Carica\Firmata {
     public function read($slaveAddress, $byteCount, Callable $callback) {
       $this->ensureConfiguration();
       $this->events()->once('reply-'.$slaveAddress, $callback);
-      $request = new Request\I2C\Read($this, $slaveAddress, $byteCount);
+      $request = new I2C\Request\Read($this, $slaveAddress, $byteCount);
       $request->send();
     }
   }

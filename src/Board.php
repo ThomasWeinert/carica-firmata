@@ -35,7 +35,6 @@ namespace Carica\Firmata {
     const ANALOG_MAPPING_QUERY = 0x69;
     const ANALOG_MAPPING_RESPONSE = 0x6A;
     const STRING_DATA = 0x71;
-    const PULSE_IN = 0x74;
     const SYSTEM_RESET = 0xFF;
 
     const PIN_MODE_UNKNOWN = 0xFF; // internal state to recognize unininitialized pins
@@ -281,41 +280,37 @@ namespace Carica\Firmata {
      * @throws \UnexpectedValueException
      */
     private function handleResponse(Response $response) {
+      $command = $response->getCommand();
       if ($response instanceof Response\SysEx) {
-        switch ($response->command) {
+        switch ($command) {
         case self::STRING_DATA :
           $this->onStringData(
-            new Response\SysEx\String($response->command, $response->rawData)
+            new Response\SysEx\String($command, $response->getRawData())
           );
           return;
         case self::QUERY_FIRMWARE :
           $this->onQueryFirmware(
-            new Response\SysEx\QueryFirmware($response->command, $response->rawData)
+            new Response\SysEx\QueryFirmware($command, $response->getRawData())
           );
           return;
         case self::CAPABILITY_RESPONSE :
           $this->onCapabilityResponse(
-            new Response\SysEx\CapabilityResponse($response->command, $response->rawData)
+            new Response\SysEx\CapabilityResponse($command, $response->getRawData())
           );
           return;
         case self::PIN_STATE_RESPONSE :
           $this->onPinStateResponse(
-            new Response\SysEx\PinStateResponse($response->command, $response->rawData)
+            new Response\SysEx\PinStateResponse($command, $response->getRawData())
           );
           return;
         case self::ANALOG_MAPPING_RESPONSE :
           $this->onAnalogMappingResponse(
-            new Response\SysEx\AnalogMappingResponse($response->command, $response->rawData)
-          );
-          return;
-        case self::PULSE_IN :
-          $this->onPulseIn(
-            new Response\SysEx\PulseIn($response->command, $response->rawData)
+            new Response\SysEx\AnalogMappingResponse($command, $response->getRawData())
           );
           return;
         }
       } elseif ($response instanceof Response\Midi\Message) {
-        switch ($response->command) {
+        switch ($command) {
         case self::ANALOG_MESSAGE :
           $this->onAnalogMessage($response);
           return;
@@ -689,24 +684,6 @@ namespace Carica\Firmata {
           }
         }
       }
-    }
-
-    /**
-     * Send a pulse and execute the callback attach the callback so it will be executed
-     * with the duration as an argument.
-     *
-     * @param integer $pin
-     * @param Callable $callback
-     * @param integer $value
-     * @param integer $pulseLength
-     * @param integer $timeout
-     */
-    public function pulseIn(
-      $pin, $callback, $value = self::DIGITAL_HIGH, $pulseLength = 5, $timeout = 1000000
-    ) {
-      $this->events()->once('pulse-in-'.$pin, $callback);
-      $request = new Request\PulseIn($this, $pin, $value, $pulseLength, $timeout);
-      $request->send();
     }
   }
 }
