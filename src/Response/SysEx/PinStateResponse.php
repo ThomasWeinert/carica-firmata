@@ -27,16 +27,15 @@ namespace Carica\Firmata\Response\SysEx {
     private $_value = 0;
 
     /**
-     * @param string $command
      * @param array $bytes
      */
-    public function __construct($command, array $bytes) {
-      parent::__construct($command, $bytes);
+    public function __construct(array $bytes) {
+      parent::__construct(Firmata\Board::PIN_STATE_RESPONSE, $bytes);
       $length = count($bytes);
-      $this->_pin = $bytes[1];
-      $this->_mode = $bytes[2];
-      $this->_value = $bytes[3];
-      for ($i = 4, $shift = 7; $i < $length; ++$i, $shift *= 2) {
+      $this->_pin = $bytes[0];
+      $this->_mode = $bytes[1];
+      $this->_value = $bytes[2];
+      for ($i = 3, $shift = 7; $i < $length; ++$i, $shift *= 2) {
         $this->_value |= ($bytes[$i] << $shift);
       }
     }

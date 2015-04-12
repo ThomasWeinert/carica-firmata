@@ -20,14 +20,13 @@ namespace Carica\Firmata\Response\SysEx {
     private $_pins = array();
 
     /**
-     * @param string $command
      * @param array $bytes
      */
-    public function __construct($command, array $bytes) {
-      parent::__construct($command, $bytes);
+    public function __construct(array $bytes) {
+      parent::__construct(Firmata\Board::CAPABILITY_RESPONSE, $bytes);
       $length = count($bytes);
       $pin = 0;
-      $i = 1;
+      $i = 0;
       while ($i < $length) {
         if ($bytes[$i] == 0x7F) {
           /*

@@ -16,9 +16,7 @@ namespace Carica\Firmata\Response\SysEx {
      */
     public function testConstructor() {
       $response = new CapabilityResponse(
-        Firmata\Board::CAPABILITY_RESPONSE,
         $data = [
-          0x6c,
           0x7f, // pin 0
           0x7f, // pin 1
           0x00, 0x01, 0x01, 0x01, 0x04, 0x0e, 0x7f, // pin 2
@@ -165,9 +163,7 @@ namespace Carica\Firmata\Response\SysEx {
      */
     public function testConstructorWithAnalogDefault() {
       $response = new CapabilityResponse(
-        Firmata\Board::CAPABILITY_RESPONSE,
         $data = [
-          0x6c,
           0x7f, // pin 0
           0x7f, // pin 1
           0x00, 0x01, 0x01, 0x01, 0x02, 0x00, 0x7f, // pin with analog fallback

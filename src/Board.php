@@ -8,8 +8,8 @@ namespace Carica\Firmata {
   /**
    * This class represents an Arduino board running firmata.
    *
-   * @property-read array $version
-   * @property-read array $firmware
+   * @property-read Version $version
+   * @property-read Version $firmware
    * @property-read Pins $pins
    * @property mixed _waitingForVersion
    */
@@ -80,14 +80,6 @@ namespace Carica\Firmata {
      * @var Version
      */
     private $_firmware= NULL;
-
-    /**
-     * Store the watcher callback allowing to retrigger report version
-     * if no answer is recieved
-     *
-     * @var callable|NULL
-     */
-    private $_waitingForVersion = false;
 
 
     /**
@@ -251,21 +243,13 @@ namespace Carica\Firmata {
             $last === Board::END_SYSEX) {
           if ($byteCount > 2) {
             $this->handleResponse(
-              new Response($this->_buffer[1], array_slice($this->_buffer, 1, -1))
+              $this->_buffer[1], array_slice($this->_buffer, 2, -1)
             );
           }
           $this->_buffer = array();
         } elseif ($byteCount == 3 && $first !== Board::START_SYSEX) {
           $command = ($first < 240) ? ($first & 0xF0) : $first;
-          if ($command == Board::REPORT_VERSION) {
-            $this->handleResponse(
-              new Response\Midi\ReportVersion($command, $this->_buffer)
-            );
-          } else {
-            $this->handleResponse(
-              new Response\Midi\Message($command, $this->_buffer)
-            );
-          }
+          $this->handleResponse($command, $this->_buffer);
           $this->_buffer = array();
         }
       }
@@ -275,61 +259,56 @@ namespace Carica\Firmata {
      * Callback for the buffer, received a response from the board. Call a more specific
      * private event handler based on the $_responseHandler mapping array
      *
-     * @param Response $response
+     * @param int $command
+     * @param array $rawData
      *
-     * @throws \UnexpectedValueException
      */
-    private function handleResponse(Response $response) {
-      $command = $response->getCommand();
-      if ($response instanceof Response\Midi\ReportVersion) {
-        $this->onReportVersion($response);
-      } elseif ($response instanceof Response\Midi\Message) {
-        switch ($command) {
-        case self::ANALOG_MESSAGE :
-          $this->onAnalogMessage($response);
-          return;
-        case self::DIGITAL_MESSAGE :
-          $this->onDigitalMessage($response);
-          return;
-        }
-      } else {
-        switch ($command) {
-        case self::STRING_DATA :
-          $this->onStringData(
-            new Response\SysEx\String($command, $response->getRawData())
-          );
-          return;
-        case self::QUERY_FIRMWARE :
-          $this->onQueryFirmware(
-            new Response\SysEx\QueryFirmware($command, $response->getRawData())
-          );
-          return;
-        case self::CAPABILITY_RESPONSE :
-          $this->onCapabilityResponse(
-            new Response\SysEx\CapabilityResponse($command, $response->getRawData())
-          );
-          return;
-        case self::PIN_STATE_RESPONSE :
-          $this->onPinStateResponse(
-            new Response\SysEx\PinStateResponse($command, $response->getRawData())
-          );
-          return;
-        case self::ANALOG_MAPPING_RESPONSE :
-          $this->onAnalogMappingResponse(
-            new Response\SysEx\AnalogMappingResponse($command, $response->getRawData())
-          );
-          return;
-        }
+    private function handleResponse($command, $rawData) {
+      switch ($command) {
+      case self::REPORT_VERSION :
+        $this->handleVersionMessage($command, $rawData);
+        return;
+      case self::ANALOG_MESSAGE :
+        $this->handleAnalogMessage($command, $rawData);
+        return;
+      case self::DIGITAL_MESSAGE :
+        $this->handleDigitalMessage($command, $rawData);
+        return;
+      case self::STRING_DATA :
+        $this->events()->emit('string', Response::decodeBytes($rawData));
+        return;
+      case self::QUERY_FIRMWARE :
+        $response = new Response\SysEx\QueryFirmware($rawData);
+        $this->_firmware = new Version($response->major, $response->minor, $response->name);
+        $this->events()->emit('queryfirmware');
+        return;
+      case self::CAPABILITY_RESPONSE :
+        $response = new Response\SysEx\CapabilityResponse($rawData);
+        $this->pins(new Pins($this, $response->pins));
+        $this->events()->emit('capability-query');
+        return;
+      case self::PIN_STATE_RESPONSE :
+        $response = new Response\SysEx\PinStateResponse($rawData);
+        $this->events()->emit('pin-state-'.$response->pin, $response->mode, $response->value);
+        $this->events()->emit('pin-state', $response->pin, $response->mode, $response->value);
+        return;
+      case self::ANALOG_MAPPING_RESPONSE :
+        $response = new Response\SysEx\AnalogMappingResponse($rawData);
+        $this->pins->setAnalogMapping($response->channels);
+        $this->events()->emit('analog-mapping-query');
+        return;
+      default :
+        $this->events()->emit('response', new Response($command, $rawData));
+        return;
       }
-      $this->events()->emit('response', $response);
     }
 
     /**
-     * A version was reported, store it and request value reading
-     *
-     * @param Response\Midi\ReportVersion $response
+     * @param int $command
+     * @param $rawData
      */
-    private function onReportVersion(Response\Midi\ReportVersion $response) {
+    private function handleVersionMessage($command, $rawData) {
+      $response = new Response\Midi\ReportVersion($command, $rawData);
       $this->_version = new Version($response->major, $response->minor);
       for ($i = 0; $i < 16; $i++) {
         $this->stream()->write([self::REPORT_DIGITAL | $i, 1]);
@@ -339,43 +318,13 @@ namespace Carica\Firmata {
     }
 
     /**
-     * Firmware was reported, store it and emit event
-     *
-     * @param Response\Sysex\QueryFirmware $response
-     */
-    private function onQueryFirmware(Response\SysEx\QueryFirmware $response) {
-      $this->_firmware = new Version($response->major, $response->minor, $response->name);
-      $this->events()->emit('queryfirmware');
-    }
-
-
-    /**
-     * Capabilities for all pins were reported, store pin status and emit event
-     *
-     * @param Response\Sysex\CapabilityResponse $response
-     */
-    private function onCapabilityResponse(Response\SysEx\CapabilityResponse $response) {
-      $this->pins(new Pins($this, $response->pins));
-      $this->events()->emit('capability-query');
-    }
-
-    /**
-     * Analog mapping data was reported, store it and report event
-     *
-     * @param Response\Sysex\AnalogMappingResponse $response
-     */
-    private function onAnalogMappingResponse(Response\SysEx\AnalogMappingResponse $response) {
-      $this->pins->setAnalogMapping($response->channels);
-      $this->events()->emit('analog-mapping-query');
-    }
-
-
-    /**
      * Got an analog message, change pin value and emit events
      *
-     * @param Response\Midi\Message $response
+     * @param int $command
+     * @param array $rawData
      */
-    private function onAnalogMessage(Response\Midi\Message $response) {
+    private function handleAnalogMessage($command, $rawData) {
+      $response = new Response\Midi\Message($command, $rawData);
       if (0 <= ($pinNumber = $this->pins->getPinByChannel($response->port))) {
         $this->events()->emit('analog-read-'.$pinNumber, $response->value);
         $this->events()->emit('analog-read', ['pin' => $pinNumber, 'value' => $response->value]);
@@ -385,9 +334,11 @@ namespace Carica\Firmata {
     /**
      * Got a digital message, change pin value and emit events
      *
-     * @param Response\Midi\Message $response
+     * @param int $command
+     * @param array $rawData
      */
-    private function onDigitalMessage(Response\Midi\Message $response) {
+    private function handleDigitalMessage($command, $rawData) {
+      $response = new Response\Midi\Message($command, $rawData);
       $firstPin = 8 * $response->port;
       for ($i = 0; $i < 8; $i++) {
         $pinNumber = $firstPin + $i;
@@ -402,36 +353,6 @@ namespace Carica\Firmata {
           $this->events()->emit('digital-read', ['pin' => $pinNumber, 'value' => $value]);
         }
       }
-    }
-
-    /**
-     * Firmata send some string data (error message most likely) emit an
-     * event for it.
-     *
-     * @param Response\SysEx\String $response
-     */
-    private function onStringData(Response\SysEx\String $response) {
-      $this->events()->emit('string', $response->text);
-    }
-
-    /**
-     * An (sonar) pulse was sent and recived, emit an event with
-     * the duration (in microseconds).
-     *
-     * @param Response\SysEx\PulseIn $response
-     */
-    private function onPulseIn(Response\SysEx\PulseIn $response) {
-      $this->events()->emit('pulse-in-'.$response->pin, $response->duration);
-      $this->events()->emit('pulse-in', $response->pin, $response->duration);
-    }
-
-    /**
-     * Pin status was reported, store it and emit event
-     *
-     * @param Response\Sysex\PinStateResponse $response
-     */
-    private function onPinStateResponse(Response\SysEx\PinStateResponse $response) {
-      $this->events()->emit('pin-state-'.$response->pin, $response->mode, $response->value);
     }
 
     /**

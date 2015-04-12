@@ -204,392 +204,96 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Board::onResponse
+     * @covers Carica\Firmata\Board
      */
-    public function _testOnResponseWithUnknownResponseExpectingException() {
-      $response = $this
-        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx')
-        ->disableOriginalConstructor()
-        ->getMock();
-      $response
-        ->expects($this->any())
-        ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('command', 0x00)
-            )
-          )
-        );
+    public function testVersionResponse() {
       $board = new Board($this->getStreamFixture());
-      $this->setExpectedException(
-        'UnexpectedValueException',
-        'Unknown response command: 0x00'
+      $board->stream()->events()->emit(
+        'read-data', "\xF9\x03\x02"
       );
-      $board->onResponse($response);
+      $this->assertEquals(
+        '3.2', (string)$board->version
+      );
     }
 
     /**
-     * @covers Carica\Firmata\Board::onResponse
-     * @covers Carica\Firmata\Board::onQueryFirmware
+     * @covers Carica\Firmata\Board
      */
-    public function _testOnResponseWithQueryFirmware() {
-      $response = $this
-        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx\\QueryFirmware')
-        ->disableOriginalConstructor()
-        ->getMock();
-      $response
-        ->expects($this->any())
-        ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('command', Board::QUERY_FIRMWARE),
-              array('major', 42),
-              array('minor', 21),
-              array('name', 'TEST')
-            )
-          )
-        );
-      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
-      $events
-        ->expects($this->once())
-        ->method('emit')
-        ->with('queryfirmware');
-
+    public function testStringResponse() {
       $board = new Board($this->getStreamFixture());
-      $board->events($events);
-      $board->onResponse($response);
-      $this->assertEquals('TEST 42.21', (string)$board->firmware);
+      $board->stream()->events()->emit('read-data', "\xF9\x03\x02");
+      $result = NULL;
+      $board->events()->on(
+        'string',
+        function($string) use (&$result) {
+          $result = $string;
+        }
+      );
+      $board->stream()->events()->emit(
+        'read-data',
+        "\xF0\x71\x48\x00\x61\x00\x6C\x00\x6C\x00\x6F\x00\xF7"
+      );
+      $this->assertEquals('Hallo', $result);
     }
 
     /**
-     * @covers Carica\Firmata\Board::onResponse
-     * @covers Carica\Firmata\Board::onCapabilityResponse
+     * @covers Carica\Firmata\Board
      */
-    public function _testOnResponseWithCapabilityResponse() {
-      $response = $this
-        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx\\CapabilityResponse')
-        ->disableOriginalConstructor()
-        ->getMock();
-      $response
-        ->expects($this->any())
-        ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('command', Board::CAPABILITY_RESPONSE),
-              array('pins', array(1 => array(Board::PIN_MODE_PWM => 255)))
-            )
-          )
-        );
-      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
-      $events
-        ->expects($this->once())
-        ->method('emit')
-        ->with('capability-query');
-
+    public function testI2CResponseExpectingResponseEvent() {
       $board = new Board($this->getStreamFixture());
-      $board->events($events);
-      $board->onResponse($response);
-      $this->assertTrue(isset($board->pins[1]));
-      $this->assertTrue($board->pins[1]->supports(Board::PIN_MODE_PWM));
+      $board->stream()->events()->emit('read-data', "\xF9\x03\x02");
+      $result = NULL;
+      $board->events()->on(
+        'response',
+        function(Response $response) use (&$result) {
+          $result = $response;
+        }
+      );
+      $board->stream()->events()->emit(
+        'read-data',
+        "\xF0\x77\x01\x00\x02\x00\x48\x00\x61\x00\x6C\x00\x6C\x00\x6F\x00\xF7"
+      );
+      $this->assertInstanceOf('Carica\Firmata\Response', $result);
+      /** @var Response $result */
+      $this->assertEquals(I2C::REPLY, $result->getCommand());
     }
 
     /**
-     * @covers Carica\Firmata\Board::onResponse
-     * @covers Carica\Firmata\Board::onAnalogMappingResponse
+     * @covers Carica\Firmata\Board
      */
-    public function _testOnResponseWithAnalogMappingResponse() {
-      $response = $this
-        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx\\AnalogMappingResponse')
-        ->disableOriginalConstructor()
-        ->getMock();
-      $response
-        ->expects($this->any())
-        ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('command', Board::ANALOG_MAPPING_RESPONSE),
-              array('channels', array(0 => 14))
-            )
-          )
-        );
-      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
-      $events
-        ->expects($this->once())
-        ->method('emit')
-        ->with('analog-mapping-query');
-
-      $pins = $this
-        ->getMockBuilder('Carica\\Firmata\\Pins')
-        ->disableOriginalConstructor()
-        ->getMock();
-      $pins
-        ->expects($this->once())
-        ->method('setAnalogMapping')
-        ->with([0 => 14]);
-
+    public function testQueryFirmwareResponse() {
       $board = new Board($this->getStreamFixture());
-      $board->events($events);
-      $board->pins = $pins;
-
-      $board->onResponse($response);
+      $board->stream()->events()->emit('read-data', "\xF9\x03\x02");
+      $board->stream()->events()->emit(
+        'read-data',
+        "\xF0\x79\x02\x03\x53\x00\x61\x00\x6D\x00\x70\x00\x6C\x00\x65\x00\xF7"
+      );
+      $this->assertEquals('Sample 2.3', (string)$board->firmware);
     }
 
     /**
-     * @covers Carica\Firmata\Board::onResponse
-     * @covers Carica\Firmata\Board::onAnalogMessage
+     * @covers Carica\Firmata\Board
      */
-    public function _testOnResponseWithAnalogMessage() {
-      $response = $this
-        ->getMockBuilder('Carica\\Firmata\\Response\\Midi\\Message')
-        ->disableOriginalConstructor()
-        ->getMock();
-      $response
-        ->expects($this->any())
-        ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('command', Board::ANALOG_MESSAGE),
-              array('port', 21),
-              array('value', 23)
-            )
-          )
-        );
-      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
-      $events
-        ->expects($this->at(0))
-        ->method('emit')
-        ->with('analog-read-42', 23);
-      $events
-        ->expects($this->at(1))
-        ->method('emit')
-        ->with('analog-read', ['pin' => 42, 'value' => 23]);
-
-      $pins = $this
-        ->getMockBuilder('Carica\\Firmata\\Pins')
-        ->disableOriginalConstructor()
-        ->getMock();
-      $pins
-        ->expects($this->once())
-        ->method('getPinByChannel')
-        ->with(21)
-        ->will($this->returnValue(42));
-
+    public function testCapabilityResponse() {
       $board = new Board($this->getStreamFixture());
-      $board->events($events);
-      $board->pins = $pins;
-
-      $board->onResponse($response);
+      $board->stream()->events()->emit('read-data', "\xF9\x03\x02");
+      $board->stream()->events()->emit(
+        'read-data',
+        "\xF0\x6C\x7F\x7F\x00\x01\x01\x01\x02\x00\xF7"
+      );
+      $this->assertInstanceOf('Carica\Firmata\Pin', $board->pins[2]);
+      $this->assertTrue($board->pins[2]->supports(Board::PIN_MODE_ANALOG));
     }
 
     /**
-     * @covers Carica\Firmata\Board::onResponse
-     * @covers Carica\Firmata\Board::onDigitalMessage
+     * @covers Carica\Firmata\Board
      */
-    public function _testOnResponseWithDigitalMessage() {
-      $response = $this
-        ->getMockBuilder('Carica\\Firmata\\Response\\Midi\\Message')
-        ->disableOriginalConstructor()
-        ->getMock();
-      $response
-        ->expects($this->any())
-        ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('command', Board::DIGITAL_MESSAGE),
-              array('port', 2),
-              array('value', 0x80)
-            )
-          )
-        );
-      $pins = $this
-        ->getMockBuilder('Carica\\Firmata\\Pins')
-        ->disableOriginalConstructor()
-        ->getMock();
-      $pins
-        ->expects($this->any())
-        ->method('offsetExists')
-        ->will(
-          $this->returnCallback(
-            function ($pin) {
-              return in_array($pin, [17, 20]);
-            }
-          )
-        );
-      $pins
-        ->expects($this->any())
-        ->method('offsetGet')
-        ->will(
-          $this->returnValueMap(
-            [
-              [
-                17,
-                $this->getPinFixture(
-                  ['mode' => Board::PIN_MODE_INPUT, 'value' => Board::DIGITAL_HIGH]
-                )
-              ],
-              [
-                20,
-                $this->getPinFixture(
-                  ['mode' => Board::PIN_MODE_OUTPUT, 'value' => Board::DIGITAL_HIGH]
-                )
-              ]
-            ]
-          )
-        );
-
-      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
-      $events
-        ->expects($this->at(0))
-        ->method('emit')
-        ->with('digital-read-17', Board::DIGITAL_LOW);
-      $events
-        ->expects($this->at(1))
-        ->method('emit')
-        ->with('digital-read', ['pin' => 17, 'value' => Board::DIGITAL_LOW]);
-
+    public function testAnalogMappingResponse() {
       $board = new Board($this->getStreamFixture());
-      $board->events($events);
-      $board->pins = $pins;
-
-      $board->onResponse($response);
-    }
-
-    /**
-     * @covers Carica\Firmata\Board::onResponse
-     * @covers Carica\Firmata\Board::onStringData
-     */
-    public function _testOnResponseWithStringData() {
-      $response = $this
-        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx\\String')
-        ->disableOriginalConstructor()
-        ->getMock();
-      $response
-        ->expects($this->any())
-        ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('command', Board::STRING_DATA),
-              array('text', 'Hello World!')
-            )
-          )
-        );
-      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
-      $events
-        ->expects($this->once())
-        ->method('emit')
-        ->with('string', 'Hello World!');
-
-      $board = new Board($this->getStreamFixture());
-      $board->events($events);
-      $board->onResponse($response);
-    }
-
-    /**
-     * @covers Carica\Firmata\Board::onResponse
-     * @covers Carica\Firmata\Board::onPinStateResponse
-     */
-    public function _testOnResponseWithPinStateResponse() {
-      $response = $this
-        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx\\PinStateResponse')
-        ->disableOriginalConstructor()
-        ->getMock();
-      $response
-        ->expects($this->any())
-        ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('command', Board::PIN_STATE_RESPONSE),
-              array('pin', 42),
-              array('mode', Board::PIN_MODE_PWM),
-              array('value', 23)
-            )
-          )
-        );
-      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
-      $events
-        ->expects($this->once())
-        ->method('emit')
-        ->with('pin-state-42', Board::PIN_MODE_PWM, 23);
-
-      $board = new Board($this->getStreamFixture());
-      $board->events($events);
-      $board->onResponse($response);
-    }
-
-    /**
-     * @covers Carica\Firmata\Board::onResponse
-     * @covers Carica\Firmata\Board::onI2CReply
-     */
-    public function _testOnResponseWithI2CReply() {
-      $response = $this
-        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx\\I2CReply')
-        ->disableOriginalConstructor()
-        ->getMock();
-      $response
-        ->expects($this->any())
-        ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('command', Board::I2C_REPLY),
-              array('slaveAddress', 42),
-              array('data', 'Hello World!')
-            )
-          )
-        );
-      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
-      $events
-        ->expects($this->once())
-        ->method('emit')
-        ->with('I2C-reply-42', 'Hello World!');
-
-      $board = new Board($this->getStreamFixture());
-      $board->events($events);
-      $board->onResponse($response);
-    }
-
-    /**
-     * @covers Carica\Firmata\Board::onResponse
-     * @covers Carica\Firmata\Board::onPulseIn
-     */
-    public function _testOnResponseWithPulseIn() {
-      $response = $this
-        ->getMockBuilder('Carica\\Firmata\\Response\\SysEx\\PulseIn')
-        ->disableOriginalConstructor()
-        ->getMock();
-      $response
-        ->expects($this->any())
-        ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('command', Board::PULSE_IN),
-              array('pin', 42),
-              array('duration', 23)
-            )
-          )
-        );
-      $events = $this->getMock('Carica\\Io\\Event\\Emitter');
-      $events
-        ->expects($this->at(0))
-        ->method('emit')
-        ->with('pulse-in-42', 23);
-      $events
-        ->expects($this->at(1))
-        ->method('emit')
-        ->with('pulse-in', 42, 23);
-
-      $board = new Board($this->getStreamFixture());
-      $board->events($events);
-      $board->onResponse($response);
+      $board->stream()->events()->emit('read-data', "\xF9\x03\x02");
+      $board->stream()->events()->emit('read-data', "\xF0\x6A\x7F\x7F\x01\x03\xF7");
+      $this->assertEquals(2, $board->pins->getPinByChannel(1));
+      $this->assertEquals(3, $board->pins->getPinByChannel(3));
     }
 
     /**
@@ -907,6 +611,10 @@ namespace Carica\Firmata {
      * Fixtures
      ***************************/
 
+    /**
+     * @param \Carica\Io\Event\Emitter $events
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Carica\Io\Stream
+     */
     private function getStreamFixture(\Carica\Io\Event\Emitter $events = NULL) {
       $stream = $this->getMock('Carica\\Io\\Stream');
       $stream
