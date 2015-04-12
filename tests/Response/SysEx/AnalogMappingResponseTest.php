@@ -13,9 +13,7 @@ namespace Carica\Firmata\Response\SysEx {
      */
     public function testConstructor() {
       $response = new AnalogMappingResponse(
-        Firmata\Board::ANALOG_MAPPING_RESPONSE,
         [
-          0x6A,
           // pin 0 to 13
           0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
           // pin 14 (a0) to 21 (a7)

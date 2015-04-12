@@ -26,6 +26,17 @@ namespace Carica\Firmata {
     /**
      * @covers Carica\Firmata\Response
      */
+    public function testGetRawData() {
+      $response = new Response_TestProxy(0x42, [0x42, 0x01, 0x02]);
+      $this->assertEquals(
+        [0x42, 0x01, 0x02],
+        $response->getRawData()
+      );
+    }
+
+    /**
+     * @covers Carica\Firmata\Response
+     */
     public function testDecodeBytes() {
       $this->assertSame(
         'Sample',

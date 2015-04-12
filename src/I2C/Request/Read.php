@@ -1,6 +1,6 @@
 <?php
 
-namespace Carica\Firmata\Request\I2C {
+namespace Carica\Firmata\I2C\Request {
 
   use Carica\Firmata;
 
@@ -41,9 +41,9 @@ namespace Carica\Firmata\Request\I2C {
         ->write(
           array(
             Firmata\Board::START_SYSEX,
-            Firmata\Board::I2C_REQUEST,
+            Firmata\I2C::REQUEST,
             $this->_slaveAddress,
-            Firmata\Board::I2C_MODE_READ << 3,
+            Firmata\I2C::MODE_READ << 3,
             $this->_length & 0x7F,
             ($this->_length >> 7) & 0x7F,
             Firmata\Board::END_SYSEX

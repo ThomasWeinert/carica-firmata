@@ -10,7 +10,7 @@ namespace Carica\Firmata\Response\Midi {
    * @property integer $port
    * @property integer $value
    */
-  class Message extends Firmata\Response\Midi {
+  class Message extends Firmata\Response {
 
     /**
      * @var int

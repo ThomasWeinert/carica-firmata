@@ -15,7 +15,7 @@ namespace Carica\Firmata\Response\SysEx {
      * @dataProvider providePinStateExamples
      */
     public function testConstructor($pin, $mode, $value, $bytes) {
-      $response = new PinStateResponse(Firmata\Board::PIN_STATE_RESPONSE, $bytes);
+      $response = new PinStateResponse($bytes);
       $this->assertEquals($pin, $response->pin);
       $this->assertEquals($mode, $response->mode);
       $this->assertEquals($value, $response->value);
@@ -28,25 +28,25 @@ namespace Carica\Firmata\Response\SysEx {
           9,
           Firmata\Board::PIN_MODE_INPUT,
           1,
-          [0x6E, 0x09, 0x00, 0x01]
+          [0x09, 0x00, 0x01]
         ),
         array(
           4,
           Firmata\Board::PIN_MODE_ANALOG,
           127,
-          [0x6E, 0x04, 0x02, 0x7f]
+          [0x04, 0x02, 0x7f]
         ),
         array(
           4,
           Firmata\Board::PIN_MODE_ANALOG,
           1000,
-          [0x6E, 0x04, 0x02, 0x68, 0x07]
+          [0x04, 0x02, 0x68, 0x07]
         ),
         array(
           4,
           Firmata\Board::PIN_MODE_ANALOG,
           100000,
-          [0x6E, 0x04, 0x02, 0x20, 0x0D, 0x06]
+          [0x04, 0x02, 0x20, 0x0D, 0x06]
         )
       );
     }

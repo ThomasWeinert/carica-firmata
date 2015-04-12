@@ -13,7 +13,7 @@ namespace Carica\Firmata\Response\Midi {
      * @covers Carica\Firmata\Response\Midi\ReportVersion
      */
     public function testConstructor() {
-      $message = new ReportVersion(0xF9, [0xF9, 0x15, 0x2A]);
+      $message = new ReportVersion([0xF9, 0x15, 0x2A]);
       $this->assertEquals(
         0xF9, $message->command
       );

@@ -1,6 +1,6 @@
 <?php
 
-namespace Carica\Firmata\Request\I2C {
+namespace Carica\Firmata\I2C\Request {
 
   include_once(__DIR__ . '/../../Bootstrap.php');
 
@@ -10,12 +10,12 @@ namespace Carica\Firmata\Request\I2C {
   class ReadTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Request\I2C\Read
+     * @covers Carica\Firmata\I2C\Request\Read
      */
     public function testSend() {
       $expected = [
         Firmata\Board::START_SYSEX,
-        Firmata\Board::I2C_REQUEST,
+        Firmata\I2C::REQUEST,
         0x02,
         0x08,
         0x07,

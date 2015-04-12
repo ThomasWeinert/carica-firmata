@@ -11,7 +11,7 @@ namespace Carica\Firmata\Response\SysEx {
    * @property integer $major
    * @property integer $minor
    */
-  class QueryFirmware extends Firmata\Response\SysEx {
+  class QueryFirmware extends Firmata\Response {
 
     /**
      * @var string
@@ -29,14 +29,13 @@ namespace Carica\Firmata\Response\SysEx {
     private $_minor = 0;
 
     /**
-     * @param string $command
      * @param array $bytes
      */
-    public function __construct($command, array $bytes) {
-      parent::__construct($command, $bytes);
-      $this->_major = $bytes[1];
-      $this->_minor = $bytes[2];
-      $this->_name = trim(self::decodeBytes(array_slice($bytes, 3)));
+    public function __construct(array $bytes) {
+      parent::__construct(Firmata\Board::QUERY_FIRMWARE, $bytes);
+      $this->_major = $bytes[0];
+      $this->_minor = $bytes[1];
+      $this->_name = trim(self::decodeBytes(array_slice($bytes, 2)));
     }
 
     /**

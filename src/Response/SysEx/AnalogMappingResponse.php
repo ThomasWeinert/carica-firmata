@@ -12,7 +12,7 @@ namespace Carica\Firmata\Response\SysEx {
    * @property array $pins
    * @property array $channels
    */
-  class AnalogMappingResponse extends Firmata\Response\SysEx {
+  class AnalogMappingResponse extends Firmata\Response {
 
     /**
      * @var array
@@ -25,13 +25,12 @@ namespace Carica\Firmata\Response\SysEx {
     private $_channels = array();
 
     /**
-     * @param string $command
      * @param array $bytes
      */
-    public function __construct($command, array $bytes) {
-      parent::__construct($command, $bytes);
+    public function __construct(array $bytes) {
+      parent::__construct(Firmata\Board::ANALOG_MAPPING_RESPONSE, $bytes);
       $length = count($bytes);
-      for ($i = 1, $pin = 0; $i < $length; ++$i, ++$pin) {
+      for ($i = 0, $pin = 0; $i < $length; ++$i, ++$pin) {
         $channel = $bytes[$i];
         if ($channel !== 127) {
           $this->_channels[$channel] = $pin;
