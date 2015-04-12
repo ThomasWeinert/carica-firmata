@@ -16,6 +16,7 @@ namespace Carica\Firmata {
     implements Event\HasEmitter {
 
     use Event\Emitter\Aggregation;
+    use Event\Loop\Aggregation;
 
     const PIN_MODE = 0xF4;
     const REPORT_DIGITAL = 0xD0;
@@ -364,20 +365,31 @@ namespace Carica\Firmata {
     /**
      * Request version from board and execute callback after it is recieved.
      *
-     * On quite a few board combinations, the board may well miss the version command.
-     * In these instances we need to retry.
-     *
-     * Here's some suggested behaviour :
-     *   Request version
-     *   If we don't get a version within 5 messages, request again
-     *   repeat retry up to 4 times (that's 24 midi frames missed)
-     *   Still don't get a response?  Emit an Error.
+     * On quite a few board combinations, the board may well miss the version command on the inital
+     * connection. In these instances we need to retry.
      *
      * @param callable $callback
      */
     public function reportVersion(Callable $callback) {
       $this->stream()->write([self::REPORT_VERSION]);
-      $this->events()->once('reportversion', $callback);
+      $interval = $this->loop()->setInterval(
+        function() {
+          static $counter = 0;
+          if (!$this->_bufferVersionReceived && ++$counter < 30) {
+            $this->stream()->write([self::REPORT_VERSION]);
+          }
+        },
+        1000
+      );
+      $this->events()->once(
+        'reportversion',
+        function () use ($interval, $callback) {
+          $this->loop()->remove($interval);
+          if (isset($callback)) {
+            $callback();
+          }
+        }
+      );
     }
 
     /**
