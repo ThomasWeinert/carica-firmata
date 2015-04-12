@@ -291,9 +291,40 @@ namespace Carica\Firmata {
     public function testAnalogMappingResponse() {
       $board = new Board($this->getStreamFixture());
       $board->stream()->events()->emit('read-data', "\xF9\x03\x02");
+      $board->stream()->events()->emit(
+        'read-data', "\xF0\x6C\x7F\x7F\x00\x01\x01\x01\x02\x00\xF7"
+      );
       $board->stream()->events()->emit('read-data', "\xF0\x6A\x7F\x7F\x01\x03\xF7");
       $this->assertEquals(2, $board->pins->getPinByChannel(1));
       $this->assertEquals(3, $board->pins->getPinByChannel(3));
+    }
+
+    /**
+     * @covers Carica\Firmata\Board
+     */
+    public function testPinStateResponse() {
+      $board = new Board($this->getStreamFixture());
+      $board->stream()->events()->emit('read-data', "\xF9\x03\x02");
+      $result = [];
+      $board->events()->on(
+        'pin-state',
+        function($pin, $mode, $value) use (&$result) {
+          $result = [
+            'pin' => $pin,
+            'mode' => $mode,
+            'value' => $value
+          ];
+        }
+      );
+      $board->stream()->events()->emit('read-data', "\xF0\x6E\x02\x02\x7F\xF7");
+      $this->assertEquals(
+        [
+          'pin' => 2,
+          'mode' => Board::PIN_MODE_ANALOG,
+          'value' => 127
+        ],
+        $result
+      );
     }
 
     /**
