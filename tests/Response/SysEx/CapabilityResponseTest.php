@@ -159,5 +159,32 @@ namespace Carica\Firmata\Response\SysEx {
         $response->command
       );
     }
+
+    /**
+     * @covers Carica\Firmata\Response\SysEx\CapabilityResponse
+     */
+    public function testConstructorWithAnalogDefault() {
+      $response = new CapabilityResponse(
+        Firmata\Board::CAPABILITY_RESPONSE,
+        $data = [
+          0x6c,
+          0x7f, // pin 0
+          0x7f, // pin 1
+          0x00, 0x01, 0x01, 0x01, 0x02, 0x00, 0x7f, // pin with analog fallback
+        ]
+      );
+      $this->assertEquals(
+        array(
+          array(), // pin 0
+          array(), // pin 1
+          array( // pin with analog fallback
+            Firmata\Board::PIN_MODE_INPUT => 1,
+            Firmata\Board::PIN_MODE_OUTPUT => 1,
+            Firmata\Board::PIN_MODE_ANALOG => 1023
+          )
+        ),
+        $response->pins
+      );
+    }
   }
 }
