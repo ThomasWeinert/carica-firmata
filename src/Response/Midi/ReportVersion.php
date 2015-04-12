@@ -23,11 +23,10 @@ namespace Carica\Firmata\Response\Midi {
     private $_minor = 0;
 
     /**
-     * @param string $command
      * @param array $bytes
      */
-    public function __construct($command, array $bytes) {
-      parent::__construct($command, $bytes);
+    public function __construct(array $bytes) {
+      parent::__construct(Firmata\Board::REPORT_VERSION, $bytes);
       $this->_major = $bytes[1];
       $this->_minor = $bytes[2];
     }

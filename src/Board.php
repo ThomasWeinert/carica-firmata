@@ -242,60 +242,36 @@ namespace Carica\Firmata {
         if ($first === Board::START_SYSEX &&
             $last === Board::END_SYSEX) {
           if ($byteCount > 2) {
-            $this->handleResponse(
+            $this->handleExtendedMessage(
               $this->_buffer[1], array_slice($this->_buffer, 2, -1)
             );
           }
           $this->_buffer = array();
         } elseif ($byteCount == 3 && $first !== Board::START_SYSEX) {
           $command = ($first < 240) ? ($first & 0xF0) : $first;
-          $this->handleResponse($command, $this->_buffer);
+          $this->handleMessage($command, $this->_buffer);
           $this->_buffer = array();
         }
       }
     }
 
     /**
-     * Callback for the buffer, received a response from the board. Call a more specific
-     * private event handler based on the $_responseHandler mapping array
+     * Callback for the buffer, received a message from the board.
      *
      * @param int $command
      * @param array $rawData
      *
      */
-    private function handleResponse($command, $rawData) {
+    private function handleMessage($command, $rawData) {
       switch ($command) {
       case self::REPORT_VERSION :
-        $this->handleVersionMessage($command, $rawData);
+        $this->handleVersionMessage($rawData);
         return;
       case self::ANALOG_MESSAGE :
         $this->handleAnalogMessage($command, $rawData);
         return;
       case self::DIGITAL_MESSAGE :
         $this->handleDigitalMessage($command, $rawData);
-        return;
-      case self::STRING_DATA :
-        $this->events()->emit('string', Response::decodeBytes($rawData));
-        return;
-      case self::QUERY_FIRMWARE :
-        $response = new Response\SysEx\QueryFirmware($rawData);
-        $this->_firmware = new Version($response->major, $response->minor, $response->name);
-        $this->events()->emit('queryfirmware');
-        return;
-      case self::CAPABILITY_RESPONSE :
-        $response = new Response\SysEx\CapabilityResponse($rawData);
-        $this->pins(new Pins($this, $response->pins));
-        $this->events()->emit('capability-query');
-        return;
-      case self::PIN_STATE_RESPONSE :
-        $response = new Response\SysEx\PinStateResponse($rawData);
-        $this->events()->emit('pin-state-'.$response->pin, $response->mode, $response->value);
-        $this->events()->emit('pin-state', $response->pin, $response->mode, $response->value);
-        return;
-      case self::ANALOG_MAPPING_RESPONSE :
-        $response = new Response\SysEx\AnalogMappingResponse($rawData);
-        $this->pins->setAnalogMapping($response->channels);
-        $this->events()->emit('analog-mapping-query');
         return;
       default :
         $this->events()->emit('response', new Response($command, $rawData));
@@ -307,8 +283,8 @@ namespace Carica\Firmata {
      * @param int $command
      * @param $rawData
      */
-    private function handleVersionMessage($command, $rawData) {
-      $response = new Response\Midi\ReportVersion($command, $rawData);
+    private function handleVersionMessage($rawData) {
+      $response = new Response\Midi\ReportVersion($rawData);
       $this->_version = new Version($response->major, $response->minor);
       for ($i = 0; $i < 16; $i++) {
         $this->stream()->write([self::REPORT_DIGITAL | $i, 1]);
@@ -352,6 +328,44 @@ namespace Carica\Firmata {
           $this->events()->emit('digital-read-'.$pinNumber, $value);
           $this->events()->emit('digital-read', ['pin' => $pinNumber, 'value' => $value]);
         }
+      }
+    }
+
+    /**
+     * Callback for the buffer, received an extended (SysEx) message from the board.
+     *
+     * @param int $command
+     * @param array $rawData
+     *
+     */
+    private function handleExtendedMessage($command, $rawData) {
+      switch ($command) {
+      case self::STRING_DATA :
+        $this->events()->emit('string', Response::decodeBytes($rawData));
+        return;
+      case self::QUERY_FIRMWARE :
+        $response = new Response\SysEx\QueryFirmware($rawData);
+        $this->_firmware = new Version($response->major, $response->minor, $response->name);
+        $this->events()->emit('queryfirmware');
+        return;
+      case self::CAPABILITY_RESPONSE :
+        $response = new Response\SysEx\CapabilityResponse($rawData);
+        $this->pins(new Pins($this, $response->pins));
+        $this->events()->emit('capability-query');
+        return;
+      case self::PIN_STATE_RESPONSE :
+        $response = new Response\SysEx\PinStateResponse($rawData);
+        $this->events()->emit('pin-state-'.$response->pin, $response->mode, $response->value);
+        $this->events()->emit('pin-state', $response->pin, $response->mode, $response->value);
+        return;
+      case self::ANALOG_MAPPING_RESPONSE :
+        $response = new Response\SysEx\AnalogMappingResponse($rawData);
+        $this->pins->setAnalogMapping($response->channels);
+        $this->events()->emit('analog-mapping-query');
+        return;
+      default :
+        $this->events()->emit('response', new Response($command, $rawData));
+        return;
       }
     }
 
