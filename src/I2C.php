@@ -28,7 +28,7 @@ namespace Carica\Firmata {
 
     public function __construct(Board $board) {
       $this->_board = $board;
-      $this->_board->events->on(
+      $this->_board->events()->on(
         'response',
         function(Response $response) {
           if ($response->command == self::REPLY) {
@@ -74,7 +74,7 @@ namespace Carica\Firmata {
      */
     public function write($slaveAddress, $data) {
       $this->ensureConfiguration();
-      $request = new I2C\Request\Write($this, $slaveAddress, $data);
+      $request = new I2C\Request\Write($this->_board, $slaveAddress, $data);
       $request->send();
     }
 
@@ -89,7 +89,7 @@ namespace Carica\Firmata {
     public function read($slaveAddress, $byteCount, Callable $callback) {
       $this->ensureConfiguration();
       $this->events()->once('reply-'.$slaveAddress, $callback);
-      $request = new I2C\Request\Read($this, $slaveAddress, $byteCount);
+      $request = new I2C\Request\Read($this->_board, $slaveAddress, $byteCount);
       $request->send();
     }
   }
