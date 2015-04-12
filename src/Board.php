@@ -265,13 +265,19 @@ namespace Carica\Firmata {
     private function handleMessage($command, $rawData) {
       switch ($command) {
       case self::REPORT_VERSION :
-        $this->handleVersionMessage($rawData);
+        $this->handleVersionMessage(
+          new Response\Midi\ReportVersion($rawData)
+        );
         return;
       case self::ANALOG_MESSAGE :
-        $this->handleAnalogMessage($command, $rawData);
+        $this->handleAnalogMessage(
+          new Response\Midi\Message($command, $rawData)
+        );
         return;
       case self::DIGITAL_MESSAGE :
-        $this->handleDigitalMessage($command, $rawData);
+        $this->handleDigitalMessage(
+          new Response\Midi\Message($command, $rawData)
+        );
         return;
       default :
         $this->events()->emit('response', new Response($command, $rawData));
@@ -280,11 +286,9 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @param int $command
-     * @param $rawData
+     * @param Response\Midi\ReportVersion $response
      */
-    private function handleVersionMessage($rawData) {
-      $response = new Response\Midi\ReportVersion($rawData);
+    private function handleVersionMessage(Response\Midi\ReportVersion $response) {
       $this->_version = new Version($response->major, $response->minor);
       for ($i = 0; $i < 16; $i++) {
         $this->stream()->write([self::REPORT_DIGITAL | $i, 1]);
@@ -296,11 +300,9 @@ namespace Carica\Firmata {
     /**
      * Got an analog message, change pin value and emit events
      *
-     * @param int $command
-     * @param array $rawData
+     * @param Response\Midi\Message $response
      */
-    private function handleAnalogMessage($command, $rawData) {
-      $response = new Response\Midi\Message($command, $rawData);
+    private function handleAnalogMessage(Response\Midi\Message $response) {
       if (0 <= ($pinNumber = $this->pins->getPinByChannel($response->port))) {
         $this->events()->emit('analog-read-'.$pinNumber, $response->value);
         $this->events()->emit('analog-read', ['pin' => $pinNumber, 'value' => $response->value]);
@@ -310,11 +312,9 @@ namespace Carica\Firmata {
     /**
      * Got a digital message, change pin value and emit events
      *
-     * @param int $command
-     * @param array $rawData
+     * @param Response\Midi\Message $response
      */
-    private function handleDigitalMessage($command, $rawData) {
-      $response = new Response\Midi\Message($command, $rawData);
+    private function handleDigitalMessage(Response\Midi\Message $response) {
       $firstPin = 8 * $response->port;
       for ($i = 0; $i < 8; $i++) {
         $pinNumber = $firstPin + $i;
