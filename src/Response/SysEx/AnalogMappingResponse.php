@@ -12,7 +12,7 @@ namespace Carica\Firmata\Response\SysEx {
    * @property array $pins
    * @property array $channels
    */
-  class AnalogMappingResponse extends Firmata\Response\SysEx {
+  class AnalogMappingResponse extends Firmata\Response {
 
     /**
      * @var array

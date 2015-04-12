@@ -12,7 +12,7 @@ namespace Carica\Firmata\Response\SysEx {
    *
    * @property array $pins
    */
-  class CapabilityResponse extends Firmata\Response\SysEx {
+  class CapabilityResponse extends Firmata\Response {
 
     /**
      * @var array

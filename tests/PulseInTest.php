@@ -42,7 +42,7 @@ namespace Carica\Firmata {
       );
       $events->emit(
         'response',
-        new Firmata\Response\SysEx(
+        new Firmata\Response(
           PulseIn::COMMAND, [0x74, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2A, 0x00]
         )
       );

@@ -251,7 +251,7 @@ namespace Carica\Firmata {
             $last === Board::END_SYSEX) {
           if ($byteCount > 2) {
             $this->handleResponse(
-              new Response\SysEx($this->_buffer[1], array_slice($this->_buffer, 1, -1))
+              new Response($this->_buffer[1], array_slice($this->_buffer, 1, -1))
             );
           }
           $this->_buffer = array();
@@ -281,7 +281,18 @@ namespace Carica\Firmata {
      */
     private function handleResponse(Response $response) {
       $command = $response->getCommand();
-      if ($response instanceof Response\SysEx) {
+      if ($response instanceof Response\Midi\ReportVersion) {
+        $this->onReportVersion($response);
+      } elseif ($response instanceof Response\Midi\Message) {
+        switch ($command) {
+        case self::ANALOG_MESSAGE :
+          $this->onAnalogMessage($response);
+          return;
+        case self::DIGITAL_MESSAGE :
+          $this->onDigitalMessage($response);
+          return;
+        }
+      } else {
         switch ($command) {
         case self::STRING_DATA :
           $this->onStringData(
@@ -309,17 +320,6 @@ namespace Carica\Firmata {
           );
           return;
         }
-      } elseif ($response instanceof Response\Midi\Message) {
-        switch ($command) {
-        case self::ANALOG_MESSAGE :
-          $this->onAnalogMessage($response);
-          return;
-        case self::DIGITAL_MESSAGE :
-          $this->onDigitalMessage($response);
-          return;
-        }
-      } elseif ($response instanceof Response\Midi\ReportVersion) {
-        $this->onReportVersion($response);
       }
       $this->events()->emit('response', $response);
     }

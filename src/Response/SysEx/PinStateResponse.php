@@ -9,7 +9,7 @@ namespace Carica\Firmata\Response\SysEx {
    * @property-read integer $mode
    * @property-read integer $value
    */
-  class PinStateResponse extends Firmata\Response\SysEx {
+  class PinStateResponse extends Firmata\Response {
 
     /**
      * @var int

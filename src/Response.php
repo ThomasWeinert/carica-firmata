@@ -8,7 +8,7 @@ namespace Carica\Firmata {
    *
    * @property integer $command
    */
-  abstract class Response {
+  class Response {
 
     /**
      * @var int

@@ -9,7 +9,7 @@ namespace Carica\Firmata\Response\SysEx {
    *
    * @property string $text
    */
-  class String extends Firmata\Response\SysEx {
+  class String extends Firmata\Response {
 
     /**
      * @var string

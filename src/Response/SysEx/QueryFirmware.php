@@ -11,7 +11,7 @@ namespace Carica\Firmata\Response\SysEx {
    * @property integer $major
    * @property integer $minor
    */
-  class QueryFirmware extends Firmata\Response\SysEx {
+  class QueryFirmware extends Firmata\Response {
 
     /**
      * @var string

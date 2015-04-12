@@ -9,7 +9,7 @@ namespace Carica\Firmata\I2C {
    * @property-read integer $register
    * @property-read string $data
    */
-  class Reply extends Firmata\Response\SysEx {
+  class Reply extends Firmata\Response {
 
     /**
      * @var int
