@@ -16,11 +16,16 @@ namespace Carica\Firmata {
     private $_command = 0x00;
 
     /**
-     * @param string $command
-     * @param array $bytes
+     * @var array
      */
-    public function __construct($command, array $bytes) {
+    private $_bytes = [];
+
+    /**
+     * @param string $command
+     */
+    public function __construct($command, $bytes) {
       $this->_command = $command;
+      $this->_bytes = $bytes;
     }
 
     /**
@@ -28,6 +33,13 @@ namespace Carica\Firmata {
      */
     public function getCommand() {
       return $this->_command;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRawData() {
+      return $this->_bytes;
     }
 
     /**
@@ -39,6 +51,8 @@ namespace Carica\Firmata {
       switch ($name) {
       case 'command' :
         return $this->getCommand();
+      case 'rawData' :
+        return $this->getRawData();
       }
       throw new \LogicException(
         sprintf('Unknown property %s::$%s', get_class($this), $name)

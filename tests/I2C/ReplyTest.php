@@ -1,20 +1,20 @@
 <?php
 
-namespace Carica\Firmata\Response\SysEx {
+namespace Carica\Firmata\I2C {
 
-  include_once(__DIR__ . '/../../Bootstrap.php');
+  include_once(__DIR__ . '/../Bootstrap.php');
 
   use Carica\Io;
   use Carica\Firmata;
 
-  class I2CReplyTest extends \PHPUnit_Framework_TestCase {
+  class ReplyTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Response\SysEx\I2CReply
+     * @covers Carica\Firmata\I2C\Reply
      */
     public function testConstructor() {
-      $reply = new I2CReply(
-        Firmata\Board::I2C_REPLY,
+      $reply = new Reply(
+        Firmata\I2C::REPLY,
         [
           0x77,
           0x01, 0x00,
@@ -26,7 +26,7 @@ namespace Carica\Firmata\Response\SysEx {
       $this->assertEquals(1, $reply->slaveAddress);
       $this->assertEquals(2, $reply->register);
       $this->assertEquals('Hallo', $reply->data);
-      $this->assertEquals(Firmata\Board::I2C_REPLY, $reply->command);
+      $this->assertEquals(Firmata\I2C::REPLY, $reply->command);
     }
   }
 }

@@ -10,7 +10,7 @@ namespace Carica\Firmata\Response\Midi {
    * @property integer $major
    * @property integer $minor
    */
-  class ReportVersion extends Firmata\Response\Midi {
+  class ReportVersion extends Firmata\Response {
 
     /**
      * @var int

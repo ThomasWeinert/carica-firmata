@@ -1,6 +1,6 @@
 <?php
 
-namespace Carica\Firmata\Response\SysEx {
+namespace Carica\Firmata\I2C {
 
   use Carica\Firmata;
 
@@ -9,7 +9,7 @@ namespace Carica\Firmata\Response\SysEx {
    * @property-read integer $register
    * @property-read string $data
    */
-  class I2CReply extends Firmata\Response\SysEx {
+  class Reply extends Firmata\Response\SysEx {
 
     /**
      * @var int

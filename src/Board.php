@@ -34,9 +34,6 @@ namespace Carica\Firmata {
     const EXTENDED_ANALOG = 0x6F;
     const ANALOG_MAPPING_QUERY = 0x69;
     const ANALOG_MAPPING_RESPONSE = 0x6A;
-    const I2C_REQUEST = 0x76;
-    const I2C_REPLY = 0x77;
-    const I2C_CONFIG = 0x78;
     const STRING_DATA = 0x71;
     const PULSE_IN = 0x74;
     const SYSTEM_RESET = 0xFF;
@@ -53,11 +50,6 @@ namespace Carica\Firmata {
     const DIGITAL_LOW = 0;
     const DIGITAL_HIGH = 1;
 
-    const I2C_MODE_WRITE = 0;
-    const I2C_MODE_READ = 1;
-    const I2C_MODE_CONTINOUS_READ = 2;
-    const I2C_MODE_STOP_READING = 3;
-
     /**
      * @var \Carica\Firmata\Pins
      */
@@ -67,10 +59,16 @@ namespace Carica\Firmata {
      * @var \Carica\Io\Stream
      */
     private $_stream = NULL;
+
     /**
-     * @var Buffer
+     * @var array Data Buffer
      */
-    private $_buffer = NULL;
+    private $_buffer = [];
+
+    /**
+     * @var bool Set to true after here was a version byte on the buffer
+     */
+    private $_bufferVersionReceived = false;
 
     /**
      * Firmata version information
@@ -91,14 +89,6 @@ namespace Carica\Firmata {
      * @var callable|NULL
      */
     private $_waitingForVersion = false;
-    
-    /**
-     * Will be set to true if i2c is initialized, allows write/read to ensure
-     * the initalization. 
-     *
-     * @var boolean
-     */
-    private $_isI2CInitialized = false;
 
 
     /**
@@ -108,6 +98,18 @@ namespace Carica\Firmata {
      */
     public function __construct(Io\Stream $stream) {
       $this->_stream = $stream;
+      $this->_stream->events()->on(
+        'read-data',
+        function($data) {
+          if (count($this->_buffer) == 0) {
+            $data = ltrim($data, pack('C', 0));
+          }
+          $bytes = array_slice(unpack("C*", "\0".$data), 1);
+          foreach ($bytes as $byte) {
+            $this->handleData($byte);
+          }
+        }
+      );
     }
 
     /**
@@ -126,21 +128,6 @@ namespace Carica\Firmata {
      */
     public function stream() {
       return $this->_stream;
-    }
-
-    /**
-     * Buffer for recieved data
-     *
-     * @param Buffer $buffer
-     * @return Buffer
-     */
-    public function buffer(Buffer $buffer = NULL) {
-      if (isset($buffer)) {
-        $this->_buffer = $buffer;
-      } elseif (NULL === $this->_buffer) {
-        $this->_buffer = new Buffer();
-      }
-      return $this->_buffer;
     }
 
     /**
@@ -170,14 +157,12 @@ namespace Carica\Firmata {
       if (isset($callback)) {
         $defer->always($callback);
       }
-      $this->stream()->events()->on(
+      $this->_stream->events()->once(
         'error',
         function($message) use ($defer) {
           $defer->reject($message);
         }
       );
-      $this->stream()->events()->on('read-data', array($this->buffer(), 'addData'));
-      $this->buffer()->events()->on('response', array($this, 'onResponse'));
       if ($this->stream()->open()) {
         $board = $this;
         $board->reportVersion(
@@ -243,6 +228,51 @@ namespace Carica\Firmata {
     }
 
     /**
+     * @param int $byte
+     */
+    private function handleData($byte) {
+      if (!$this->_bufferVersionReceived) {
+        if ($byte !== Board::REPORT_VERSION) {
+          return;
+        } else {
+          $this->_bufferVersionReceived = TRUE;
+        }
+      }
+      $byteCount = count($this->_buffer);
+      if ($byte == 0 && $byteCount == 0) {
+        return;
+      } else {
+        $this->_buffer[] = $byte;
+        ++$byteCount;
+      }
+      if ($byteCount > 0) {
+        $first = reset($this->_buffer);
+        $last = end($this->_buffer);
+        if ($first === Board::START_SYSEX &&
+            $last === Board::END_SYSEX) {
+          if ($byteCount > 2) {
+            $this->handleResponse(
+              new Response\SysEx($this->_buffer[1], array_slice($this->_buffer, 1, -1))
+            );
+          }
+          $this->_buffer = array();
+        } elseif ($byteCount == 3 && $first !== Board::START_SYSEX) {
+          $command = ($first < 240) ? ($first & 0xF0) : $first;
+          if ($command == Board::REPORT_VERSION) {
+            $this->handleResponse(
+              new Response\Midi\ReportVersion($command, $this->_buffer)
+            );
+          } else {
+            $this->handleResponse(
+              new Response\Midi\Message($command, $this->_buffer)
+            );
+          }
+          $this->_buffer = array();
+        }
+      }
+    }
+
+    /**
      * Callback for the buffer, received a response from the board. Call a more specific
      * private event handler based on the $_responseHandler mapping array
      *
@@ -250,52 +280,53 @@ namespace Carica\Firmata {
      *
      * @throws \UnexpectedValueException
      */
-    public function onResponse(Response $response) {
-      switch ($response->command) {
-      case self::REPORT_VERSION :
-        /** @noinspection PhpParamsInspection */
+    private function handleResponse(Response $response) {
+      if ($response instanceof Response\SysEx) {
+        switch ($response->command) {
+        case self::STRING_DATA :
+          $this->onStringData(
+            new Response\SysEx\String($response->command, $response->rawData)
+          );
+          return;
+        case self::QUERY_FIRMWARE :
+          $this->onQueryFirmware(
+            new Response\SysEx\QueryFirmware($response->command, $response->rawData)
+          );
+          return;
+        case self::CAPABILITY_RESPONSE :
+          $this->onCapabilityResponse(
+            new Response\SysEx\CapabilityResponse($response->command, $response->rawData)
+          );
+          return;
+        case self::PIN_STATE_RESPONSE :
+          $this->onPinStateResponse(
+            new Response\SysEx\PinStateResponse($response->command, $response->rawData)
+          );
+          return;
+        case self::ANALOG_MAPPING_RESPONSE :
+          $this->onAnalogMappingResponse(
+            new Response\SysEx\AnalogMappingResponse($response->command, $response->rawData)
+          );
+          return;
+        case self::PULSE_IN :
+          $this->onPulseIn(
+            new Response\SysEx\PulseIn($response->command, $response->rawData)
+          );
+          return;
+        }
+      } elseif ($response instanceof Response\Midi\Message) {
+        switch ($response->command) {
+        case self::ANALOG_MESSAGE :
+          $this->onAnalogMessage($response);
+          return;
+        case self::DIGITAL_MESSAGE :
+          $this->onDigitalMessage($response);
+          return;
+        }
+      } elseif ($response instanceof Response\Midi\ReportVersion) {
         $this->onReportVersion($response);
-        return;
-      case self::ANALOG_MESSAGE :
-        /** @noinspection PhpParamsInspection */
-        $this->onAnalogMessage($response);
-        return;
-      case self::DIGITAL_MESSAGE :
-        /** @noinspection PhpParamsInspection */
-        $this->onDigitalMessage($response);
-        return;
-      case self::STRING_DATA :
-        /** @noinspection PhpParamsInspection */
-        $this->onStringData($response);
-        return;
-      case self::PULSE_IN :
-        /** @noinspection PhpParamsInspection */
-        $this->onPulseIn($response);
-        return;
-      case self::QUERY_FIRMWARE :
-        /** @noinspection PhpParamsInspection */
-        $this->onQueryFirmware($response);
-        return;
-      case self::CAPABILITY_RESPONSE :
-        /** @noinspection PhpParamsInspection */
-        $this->onCapabilityResponse($response);
-        return;
-      case self::PIN_STATE_RESPONSE :
-        /** @noinspection PhpParamsInspection */
-        $this->onPinStateResponse($response);
-        return;
-      case self::ANALOG_MAPPING_RESPONSE :
-        /** @noinspection PhpParamsInspection */
-        $this->onAnalogMappingResponse($response);
-        return;
-      case self::I2C_REPLY :
-        /** @noinspection PhpParamsInspection */
-        $this->onI2CReply($response);
-        return;
       }
-      throw new \UnexpectedValueException(
-        sprintf('Unknown response command: 0x%02o', $response->command)
-      );
+      $this->events()->emit('response', $response);
     }
 
     /**
@@ -389,15 +420,6 @@ namespace Carica\Firmata {
     }
 
     /**
-     * Data returned from an i2c device emit the eent for it.
-     *
-     * @param Response\SysEx\I2CReply $response
-     */
-    private function onI2CReply(Response\SysEx\I2CReply $response) {
-      $this->events()->emit('I2C-reply-'.$response->slaveAddress, $response->data);
-    }
-
-    /**
      * An (sonar) pulse was sent and recived, emit an event with
      * the duration (in microseconds).
      *
@@ -440,29 +462,7 @@ namespace Carica\Firmata {
      */
     public function reportVersion(Callable $callback) {
       $this->stream()->write([self::REPORT_VERSION]);
-      $this->_waitingForVersion = function() {
-        static $counter = 24;
-        if ($this->versionRetriesMessageCount % 5) {
-          $this->stream()->write([self::REPORT_VERSION]);
-          $counter--;
-        }
-        if ($counter <= 0) {
-          $this->events()->removeListener('response', $this->_waitingForVersion);
-          $this->events()->emit(
-            'error',
-            'No response recieved from version request (tried 5 times). Are you sure this is a firmata device?'
-          );
-        }
-      };
-      $this->events()->once(
-        'reportversion',
-        function () {
-          $this->events()->removeListener('response', $this->_waitingForVersion);
-          $this->_waitingForVersion = NULL;
-        }
-      );
       $this->events()->once('reportversion', $callback);
-      $this->events()->on('response', array($this, $this->_waitingForVersion));
     }
 
     /**
@@ -689,63 +689,6 @@ namespace Carica\Firmata {
           }
         }
       }
-    }
-
-    /**
-     * Configure the i2c coomunication
-     *
-     * @param integer $delay
-     */
-    public function sendI2CConfig($delay = 0) {
-      $this
-        ->stream()
-        ->write(
-           array(
-             self::START_SYSEX,
-             self::I2C_CONFIG,
-             $delay >> 0xFF,
-             ($delay >> 8) & 0xFF,
-             self::END_SYSEX
-           )
-        );
-      $this->_isI2CInitialized = true;
-    }
-
-    /**
-     * Allow i2c read/write to make sure that config was called.
-     */
-    private function ensureI2CConfig() {
-      if (!$this->_isI2CInitialized) {
-        $this->sendI2CConfig();
-        $this->_isI2CInitialized = true;
-      }
-    }
-
-    /**
-     * Write some data to an i2c device
-     *
-     * @param integer $slaveAddress
-     * @param string $data
-     */
-    public function sendI2CWriteRequest($slaveAddress, $data) {
-      $this->ensureI2CConfig();
-      $request = new Request\I2C\Write($this, $slaveAddress, $data);
-      $request->send();
-    }
-
-    /**
-     * Request data from an i2c device and trigger callback if the
-     * data is sent.
-     *
-     * @param integer $slaveAddress
-     * @param integer $byteCount
-     * @param callable $callback
-     */
-    public function sendI2CReadRequest($slaveAddress, $byteCount, Callable $callback) {
-      $this->ensureI2CConfig();
-      $request = new Request\I2C\Read($this, $slaveAddress, $byteCount);
-      $request->send();
-      $this->events()->once('I2C-reply-'.$slaveAddress, $callback);
     }
 
     /**

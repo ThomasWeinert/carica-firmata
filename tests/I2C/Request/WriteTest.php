@@ -1,6 +1,6 @@
 <?php
 
-namespace Carica\Firmata\Request\I2C {
+namespace Carica\Firmata\I2C\Request {
 
   include_once(__DIR__ . '/../../Bootstrap.php');
 
@@ -10,7 +10,7 @@ namespace Carica\Firmata\Request\I2C {
   class WriteTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Request\I2C\Write
+     * @covers Carica\Firmata\I2C\Request\Write
      */
     public function testSend() {
       $expected = "\xF0\x76\x03\x00\x48\x00\x61\x00\x6C\x00\x6C\x00\x6F\x00\xF7";
@@ -23,7 +23,7 @@ namespace Carica\Firmata\Request\I2C {
     }
 
     /**
-     * @covers Carica\Firmata\Request\I2C\Write
+     * @covers Carica\Firmata\I2C\Request\Write
      */
     public function testSendWithArray() {
       $expected = "\xF0\x76\x03\x00\x7f\x01\x00\x00\x70\x01\xF7";

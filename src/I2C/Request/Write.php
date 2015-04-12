@@ -1,6 +1,6 @@
 <?php
 
-namespace Carica\Firmata\Request\I2C {
+namespace Carica\Firmata\I2C\Request {
 
   use Carica\Firmata;
 
@@ -50,9 +50,9 @@ namespace Carica\Firmata\Request\I2C {
       $data = pack(
         'CCCC',
         Firmata\Board::START_SYSEX,
-        Firmata\Board::I2C_REQUEST,
+        Firmata\I2C::REQUEST,
         $this->_slaveAddress,
-        Firmata\Board::I2C_MODE_WRITE << 3
+        Firmata\I2C::MODE_WRITE << 3
       );
       $data .= self::encodeBytes($this->_data);
       $data .= pack(
