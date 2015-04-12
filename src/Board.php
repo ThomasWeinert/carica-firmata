@@ -11,7 +11,6 @@ namespace Carica\Firmata {
    * @property-read Version $version
    * @property-read Version $firmware
    * @property-read Pins $pins
-   * @property mixed _waitingForVersion
    */
   class Board
     implements Event\HasEmitter {
