@@ -1,6 +1,7 @@
 <?php
 namespace Carica\Firmata {
 
+  use Carica\Io\ByteArray;
   use Carica\Io\Event;
 
   class I2C {
@@ -22,6 +23,11 @@ namespace Carica\Firmata {
     private $_board = NULL;
 
     /**
+     * @var bool Debug mode, blocks actual write() and issues a debug event.
+     */
+    private $_debug = FALSE;
+
+    /**
      * @var bool
      */
     private $_isInitialized = FALSE;
@@ -37,6 +43,30 @@ namespace Carica\Firmata {
             $this->events()->emit('reply', $reply->slaveAddress, $reply->data);
           }
         }
+      );
+    }
+
+    /**
+     * Enable/disable debug mode - Blocks write actions and emits a debug event with the data.
+     * @param $enable
+     */
+    public function debug($enable) {
+      $this->_debug = (bool)$enable;
+    }
+
+    /**
+     * Emit the debug event with the address as hex string and data bytes in binary representation.
+     * 
+     * @param $method
+     * @param $slaveAddress
+     * @param $data
+     */
+    private function emitDebug($method, $slaveAddress, $data) {
+      $this->emitEvent(
+        'debug', 
+        $method, 
+        '0x'.str_pad(dechex($slaveAddress), 2, '0', STR_PAD_LEFT), 
+        ByteArray::createFromArray($data)->asBitString()
       );
     }
 
@@ -73,6 +103,10 @@ namespace Carica\Firmata {
      * @param string $data
      */
     public function write($slaveAddress, $data) {
+      if ($this->_debug) {
+        $this->emitDebug(__FUNCTION__, $slaveAddress, $data);
+        return;
+      }
       $this->ensureConfiguration();
       $request = new I2C\Request\Write($this->_board, $slaveAddress, $data);
       $request->send();
