@@ -20,10 +20,13 @@ namespace Carica\Firmata {
      */
     private $_dataPin = NULL;
     
-    public function __construct(Pin $latch, Pin $clock, Pin $data) {
+    private $_highLatch = FALSE;
+    
+    public function __construct(Pin $latch, Pin $clock, Pin $data, $highLatch = FALSE) {
       $this->_latchPin = $latch;
       $this->_clockPin = $clock;
       $this->_dataPin = $data;
+      $this->_highLatch = (bool)$highLatch;
       if (!($latch->board == $clock->board && $latch->board == $clock->board)) {
         throw new \InvalidArgumentException('Pins have to be on the same board');
       }
@@ -46,15 +49,17 @@ namespace Carica\Firmata {
      */
     public function begin() {
       $this->_latchPin->mode = Pin::MODE_OUTPUT;
-      $this->_latchPin->digital = FALSE;
+      $this->_clockPin->mode = Pin::MODE_OUTPUT;
+      $this->_dataPin->mode = Pin::MODE_OUTPUT;
+      $this->_latchPin->digital = $this->_highLatch;
     }
     
     /**
      * Begin transfer (put the latch pin to high)
      */
     public function end() {
-      $this->_latchPin->mode = Pin::MODE_OUTPUT;
-      $this->_latchPin->digital = TRUE;
+      $this->_latchPin->board->digitalWrite($this->_latchPin->pin, Board::DIGITAL_HIGH);
+      $this->_latchPin->setDigital(!$this->_highLatch);
     }
 
     /**
@@ -65,8 +70,6 @@ namespace Carica\Firmata {
      * @param bool $isBigEndian
      */
     public function transfer($value, $isBigEndian = TRUE) {
-      $this->_clockPin->mode = Pin::MODE_OUTPUT;
-      $this->_dataPin->mode = Pin::MODE_OUTPUT;
       $dataPort = floor($this->_dataPin->pin / 8);
       $clockPort = floor($this->_clockPin->pin / 8);
       $dataOffset = 1 << (int)($this->_dataPin->pin - ($dataPort * 8));
