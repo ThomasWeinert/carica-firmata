@@ -520,13 +520,6 @@ namespace Carica\Firmata {
       /** @noinspection PhpUndefinedMethodInspection */
       $this->pins[$pin]->setDigital($value == self::DIGITAL_HIGH);
       $port = (int)floor($pin / 8);
-      $portValue = $this->getDigitalPortValue($port);
-      $this->stream()->write(
-        [self::DIGITAL_MESSAGE | $port, $portValue & 0x7F, ($portValue >> 7) & 0x7F]
-      );
-    }
-
-    private function getDigitalPortValue($port) {
       $portValue = 0;
       for ($i = 0; $i < 8; $i++) {
         $index = 8 * $port + $i;
@@ -534,7 +527,9 @@ namespace Carica\Firmata {
           $portValue |= (1 << $i);
         }
       }
-      return $portValue;
+      $this->stream()->write(
+        [self::DIGITAL_MESSAGE | $port, $portValue & 0x7F, ($portValue >> 7) & 0x7F]
+      );
     }
 
     /**
@@ -552,84 +547,6 @@ namespace Carica\Firmata {
       /** @noinspection PhpUndefinedMethodInspection */
       $this->pins[$pin]->setMode($mode);
       $this->stream()->write([self::PIN_MODE, $pin, $mode]);
-    }
-
-    /**
-     * Shift out the data. The data kann be an integer values representing a
-     * byte value (0 to 255) an array of integers or a binary string.
-     *
-     * @param int $dataPin
-     * @param int $clockPin
-     * @param int|array:int|string $value
-     * @param bool $isBigEndian
-     */
-    public function shiftOut($dataPin, $clockPin, $value, $isBigEndian = TRUE) {
-      $dataPort = floor($dataPin / 8);
-      $clockPort = floor($clockPin / 8);
-      $dataOffset = 1 << (int)($dataPin - ($dataPort * 8));
-      $clockOffset = 1 << (int)($clockPin - ($clockPort * 8));
-      if ($dataPort == $clockPort) {
-        $portValue = $this->getDigitalPortValue($clockPort);
-        $low = $portValue & ~$clockOffset & ~$dataOffset;
-        $high = $portValue & ~$clockOffset | $dataOffset;
-        $endLow = $low  | $clockOffset;
-        $endHigh = $high | $clockOffset;
-        $messages = [
-          'low' => [
-            self::DIGITAL_MESSAGE | $clockPort, $low & 0x7F, ($low >> 7) & 0x7F,
-            self::DIGITAL_MESSAGE | $clockPort, $endLow & 0x7F, ($endLow >> 7) & 0x7F,
-          ],
-          'high' => [
-            self::DIGITAL_MESSAGE | $clockPort, $high & 0x7F, ($high >> 7) & 0x7F,
-            self::DIGITAL_MESSAGE | $clockPort, $endHigh & 0x7F, ($endHigh >> 7) & 0x7F,
-          ]
-        ];
-      } else {
-        $clockPortValue = $this->getDigitalPortValue($clockPort);
-        $dataPortValue = $this->getDigitalPortValue($dataPort);
-        $start = $clockPortValue & ~$clockOffset;
-        $low = $dataPortValue & ~$dataOffset;
-        $high = $dataPortValue | $dataOffset;
-        $end = $clockPortValue | $clockOffset;
-        $messages = [
-          'low' => [
-            self::DIGITAL_MESSAGE | $clockPort, $start & 0x7F, ($start >> 7) & 0x7F,
-            self::DIGITAL_MESSAGE | $dataPort, $low & 0x7F, ($low >> 7) & 0x7F,
-            self::DIGITAL_MESSAGE | $clockPort, $end & 0x7F, ($end >> 7) & 0x7F,
-          ],
-          'high' => [
-            self::DIGITAL_MESSAGE | $clockPort, $start & 0x7F, ($start >> 7) & 0x7F,
-            self::DIGITAL_MESSAGE | $dataPort, $high & 0x7F, ($high >> 7) & 0x7F,
-            self::DIGITAL_MESSAGE | $clockPort, $end & 0x7F, ($end >> 7) & 0x7F,
-          ]
-        ];
-      }
-
-      $write = function ($mask, $value) use ($messages) {
-        $this->stream()->write(
-          $messages[($value & $mask) ? 'high' : 'low']
-        );
-      };
-
-      if (is_string($value)) {
-        $values = array_slice(unpack("C*", "\0".$value), 1);
-      } elseif (is_array($value)) {
-        $values = $value;
-      } else {
-        $values = array((int)$value);
-      }
-
-      foreach ($values as $value) {
-        if ($isBigEndian) {
-          for ($mask = 128; $mask > 0; $mask = $mask >> 1) {
-            $write($value, $mask);
-          }
-        } else {
-          for ($mask = 0; $mask < 128; $mask = $mask << 1) {
-            $write($value, $mask);
-          }
-        }
-      }
     }
   }
 }

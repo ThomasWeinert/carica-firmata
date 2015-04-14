@@ -12,19 +12,16 @@ $board
     function () use ($board, $loop) {
       echo "Firmata ".$board->version." active\n";
 
-      $latchPin = $board->pins[8];
-      $clockPin = $board->pins[12];
-      $dataPin = $board->pins[11];
-      $latchPin->mode = Firmata\Pin::MODE_OUTPUT;
-      $clockPin->mode = Firmata\Pin::MODE_OUTPUT;
-      $dataPin->mode = Firmata\Pin::MODE_OUTPUT;
-
+      $shiftOut = new Firmata\ShiftOut(
+        $board->pins[8],
+        $board->pins[12],
+        $board->pins[11]
+      );
+      
       $loop->setInterval(
-        function () use ($board, $latchPin, $clockPin, $dataPin) {
+        function () use ($shiftOut) {
           static $number = 0;
-          $latchPin->digital = FALSE;
-          $board->shiftOut($dataPin->pin, $clockPin->pin, $number);
-          $latchPin->digital = TRUE;
+          $shiftOut->write($number);
           if (++$number > 255) {
             $number = 0;
           }
