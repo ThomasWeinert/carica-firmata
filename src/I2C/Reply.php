@@ -32,9 +32,9 @@ namespace Carica\Firmata\I2C {
      */
     public function __construct($command, array $bytes) {
       parent::__construct($command, $bytes);
-      $this->_slaveAddress = $bytes[1] | ($bytes[2] << 7);
-      $this->_register = $bytes[3] | ($bytes[4] << 7);
-      $this->_data = self::decodeBytes(array_slice($bytes, 5));
+      $this->_slaveAddress = $bytes[0] | ($bytes[1] << 7);
+      $this->_register = $bytes[2] | ($bytes[3] << 7);
+      $this->_data = $bytes = array_slice(unpack("C*", "\0".self::decodeBytes(array_slice($bytes, 4))), 1);
     }
 
     /**
