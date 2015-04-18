@@ -37,9 +37,9 @@ $board
   ->activate()
   ->done(
     function () use ($board, $route) {
-      $board->pins[3]->mode = Carica\Firmata\Board::PIN_MODE_PWM;
-      $board->pins[5]->mode = Carica\Firmata\Board::PIN_MODE_PWM;
-      $board->pins[6]->mode = Carica\Firmata\Board::PIN_MODE_PWM;
+      $board->pins[3]->mode = Carica\Firmata\Pin::MODE_PWM;
+      $board->pins[5]->mode = Carica\Firmata\Pin::MODE_PWM;
+      $board->pins[6]->mode = Carica\Firmata\Pin::MODE_PWM;
       $server = new Carica\Io\Network\Http\Server($route);
       $server->listen(8080);
     }

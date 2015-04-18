@@ -2,8 +2,9 @@
 namespace Carica\Firmata {
 
   use Carica\Io\Event;
-
-  class ShiftOut {
+  use Carica\Io\Device;
+  
+  class ShiftOut implements Device\ShiftOut {
 
     use Event\Emitter\Aggregation;
 
@@ -48,17 +49,16 @@ namespace Carica\Firmata {
      * Begin transfer (put the latch pin to low)
      */
     public function begin() {
-      $this->_latchPin->mode = Pin::MODE_OUTPUT;
-      $this->_clockPin->mode = Pin::MODE_OUTPUT;
-      $this->_dataPin->mode = Pin::MODE_OUTPUT;
-      $this->_latchPin->digital = $this->_highLatch;
+      $this->_latchPin->setMode(Pin::MODE_DIGITAL_OUTPUT);
+      $this->_clockPin->setMode(Pin::MODE_DIGITAL_OUTPUT);
+      $this->_dataPin->setMode(Pin::MODE_DIGITAL_OUTPUT);
+      $this->_latchPin->setDigital($this->_highLatch);
     }
     
     /**
      * Begin transfer (put the latch pin to high)
      */
     public function end() {
-      $this->_latchPin->board->digitalWrite($this->_latchPin->pin, Board::DIGITAL_HIGH);
       $this->_latchPin->setDigital(!$this->_highLatch);
     }
 
@@ -149,7 +149,7 @@ namespace Carica\Firmata {
       $portValue = 0;
       for ($i = 0; $i < 8; $i++) {
         $index = 8 * $port + $i;
-        if (isset($board->pins[$index]) && $board->pins[$index]->digital) {
+        if (isset($board->pins[$index]) && $board->pins[$index]->getDigital()) {
           $portValue |= (1 << $i);
         }
       }

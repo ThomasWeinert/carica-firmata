@@ -37,15 +37,6 @@ namespace Carica\Firmata {
     const STRING_DATA = 0x71;
     const SYSTEM_RESET = 0xFF;
 
-    const PIN_MODE_UNKNOWN = 0xFF; // internal state to recognize unininitialized pins
-    const PIN_MODE_INPUT = 0x00;
-    const PIN_MODE_OUTPUT = 0x01;
-    const PIN_MODE_ANALOG = 0x02;
-    const PIN_MODE_PWM = 0x03;
-    const PIN_MODE_SERVO = 0x04;
-    const PIN_MODE_SHIFT = 0x05;
-    const PIN_MODE_I2C = 0x06;
-
     const DIGITAL_LOW = 0;
     const DIGITAL_HIGH = 1;
 
@@ -320,10 +311,10 @@ namespace Carica\Firmata {
         $pinNumber = $firstPin + $i;
         if (isset($this->pins[$pinNumber])) {
           $pin = $this->pins[$pinNumber];
-          if ($pin->mode == self::PIN_MODE_INPUT) {
+          if ($pin->getMode() == Pin::MODE_INPUT) {
             $value = ($response->value >> ($i & 0x07)) & 0x01;
           } else {
-            $value = $pin->value;
+            $value = $pin->getValue();
           }
           $this->events()->emit('digital-read-'.$pinNumber, $value);
           $this->events()->emit('digital-read', ['pin' => $pinNumber, 'value' => $value]);
@@ -546,7 +537,30 @@ namespace Carica\Firmata {
     public function pinMode($pin, $mode) {
       /** @noinspection PhpUndefinedMethodInspection */
       $this->pins[$pin]->setMode($mode);
-      $this->stream()->write([self::PIN_MODE, $pin, $mode]);
+      $this->stream()->write([self::PIN_MODE, $pin, $this->mapPinModeFirmataMode($mode)]);
+    }
+    
+
+    /**
+     * Add a callback function to be notified if the pin mode or value changes
+     * 
+     * @param callable $callback
+     */
+    public function onChange(callable $callback) {
+      $this->events()->on('change', $callback);
+    }
+    
+    private function mapPinModeFirmataMode($pinMode) {
+      $map = [
+        Pin::MODE_INPUT => 0x00,
+        Pin::MODE_OUTPUT => 0x01,
+        Pin::MODE_ANALOG => 0x02,
+        Pin::MODE_PWM => 0x03,
+        Pin::MODE_SERVO => 0x04,
+        Pin::MODE_SHIFT => 0x05,
+        Pin::MODE_I2C => 0x06 
+      ];
+      return (isset($map[$pinMode])) ? $map[$pinMode] : false;
     }
   }
 }

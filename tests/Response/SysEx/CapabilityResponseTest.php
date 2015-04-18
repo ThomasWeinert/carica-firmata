@@ -46,108 +46,108 @@ namespace Carica\Firmata\Response\SysEx {
           array(), // pin 0
           array(), // pin 1
           array( // pin 2
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_SERVO => 359
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_SERVO => 359
           ),
           array( // pin 3
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_PWM => 255,
-            Firmata\Board::PIN_MODE_SERVO => 359
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_PWM => 255,
+            Firmata\Pin::MODE_SERVO => 359
           ),
           array( // pin 4
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_SERVO => 359
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_SERVO => 359
           ),
           array( // pin 5
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_PWM => 255,
-            Firmata\Board::PIN_MODE_SERVO => 359
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_PWM => 255,
+            Firmata\Pin::MODE_SERVO => 359
           ),
           array( // pin 6
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_PWM => 255,
-            Firmata\Board::PIN_MODE_SERVO => 359
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_PWM => 255,
+            Firmata\Pin::MODE_SERVO => 359
           ),
           array( // pin 7
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_SERVO => 359
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_SERVO => 359
           ),
           array( // pin 8
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_SERVO => 359
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_SERVO => 359
           ),
           array( // pin 9
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_PWM => 255,
-            Firmata\Board::PIN_MODE_SERVO => 359
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_PWM => 255,
+            Firmata\Pin::MODE_SERVO => 359
           ),
           array( // pin 10
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_PWM => 255,
-            Firmata\Board::PIN_MODE_SERVO => 359
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_PWM => 255,
+            Firmata\Pin::MODE_SERVO => 359
           ),
           array( // pin 11
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_PWM => 255,
-            Firmata\Board::PIN_MODE_SERVO => 359
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_PWM => 255,
+            Firmata\Pin::MODE_SERVO => 359
           ),
           array( // pin 12
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_SERVO => 359
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_SERVO => 359
           ),
           array( // pin 13
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_SERVO => 359
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_SERVO => 359
           ),
           array( // pin 14 a0
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_ANALOG => 1023
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_ANALOG => 1023
           ),
           array( // pin 15 a1
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_ANALOG => 1023
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_ANALOG => 1023
           ),
           array( // pin 16 a2
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_ANALOG => 1023
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_ANALOG => 1023
           ),
           array( // pin 17 a3
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_ANALOG => 1023
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_ANALOG => 1023
           ),
           array( // pin 18 a4
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_ANALOG => 1023,
-            Firmata\Board::PIN_MODE_I2C => 1
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_ANALOG => 1023,
+            Firmata\Pin::MODE_I2C => 1
           ),
           array( // pin 19 a5
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_ANALOG => 1023,
-            Firmata\Board::PIN_MODE_I2C => 1
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_ANALOG => 1023,
+            Firmata\Pin::MODE_I2C => 1
           ),
           array( // pin 20 a6
-            Firmata\Board::PIN_MODE_ANALOG => 1023
+            Firmata\Pin::MODE_ANALOG => 1023
           ),
           array( // pin 21 a7
-            Firmata\Board::PIN_MODE_ANALOG => 1023
+            Firmata\Pin::MODE_ANALOG => 1023
           ),
         ),
         $response->pins
@@ -174,9 +174,9 @@ namespace Carica\Firmata\Response\SysEx {
           array(), // pin 0
           array(), // pin 1
           array( // pin with analog fallback
-            Firmata\Board::PIN_MODE_INPUT => 1,
-            Firmata\Board::PIN_MODE_OUTPUT => 1,
-            Firmata\Board::PIN_MODE_ANALOG => 1023
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_ANALOG => 1023
           )
         ),
         $response->pins

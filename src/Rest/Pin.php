@@ -16,13 +16,13 @@ namespace Carica\Firmata\Rest {
      * @var array
      */
     private $_modeStrings = array(
-      Firmata\Board::PIN_MODE_INPUT => 'input',
-      Firmata\Board::PIN_MODE_OUTPUT => 'output',
-      Firmata\Board::PIN_MODE_ANALOG => 'analog',
-      Firmata\Board::PIN_MODE_PWM => 'pwm',
-      Firmata\Board::PIN_MODE_SERVO => 'servo',
-      Firmata\Board::PIN_MODE_SHIFT => 'shift',
-      Firmata\Board::PIN_MODE_I2C => 'i2c'
+      Firmata\Pin::MODE_INPUT => 'input',
+      Firmata\Pin::MODE_OUTPUT => 'output',
+      Firmata\Pin::MODE_ANALOG => 'analog',
+      Firmata\Pin::MODE_PWM => 'pwm',
+      Firmata\Pin::MODE_SERVO => 'servo',
+      Firmata\Pin::MODE_SHIFT => 'shift',
+      Firmata\Pin::MODE_I2C => 'i2c'
     );
 
     /**
@@ -109,13 +109,13 @@ namespace Carica\Firmata\Rest {
         $pinNode->setAttribute('supports', implode(' ', $modes));
         $pinNode->setAttribute('mode', $this->getModeString($pin->mode));
         switch ($pin->mode) {
-        case Firmata\Board::PIN_MODE_INPUT :
-        case Firmata\Board::PIN_MODE_OUTPUT :
+        case Firmata\Pin::MODE_INPUT :
+        case Firmata\Pin::MODE_OUTPUT :
           $pinNode->setAttribute('digital', $pin->digital ? 'yes' : 'no');
           break;
-        case Firmata\Board::PIN_MODE_ANALOG :
-        case Firmata\Board::PIN_MODE_PWM :
-        case Firmata\Board::PIN_MODE_SERVO :
+        case Firmata\Pin::MODE_ANALOG :
+        case Firmata\Pin::MODE_PWM :
+        case Firmata\Pin::MODE_SERVO :
           $pinNode->setAttribute('analog', round($pin->analog, 4));
           break;
         }

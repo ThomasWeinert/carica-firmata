@@ -19,6 +19,16 @@ namespace Carica\Firmata\Response\SysEx {
      */
     private $_pins = array();
 
+    private $_modes = [
+      0x01 => Firmata\Pin::MODE_OUTPUT,
+      0x00 => Firmata\Pin::MODE_INPUT,
+      0x02 => Firmata\Pin::MODE_ANALOG,
+      0x03 => Firmata\Pin::MODE_PWM,
+      0x04 => Firmata\Pin::MODE_SERVO,
+      0x05 => Firmata\Pin::MODE_SHIFT,
+      0x06 => Firmata\Pin::MODE_I2C
+    ];
+    
     /**
      * @param array $bytes
      */
@@ -38,20 +48,20 @@ namespace Carica\Firmata\Response\SysEx {
           ++$pin;
           ++$i;
           continue;
-        } else {
-          $mode = $bytes[$i];
+        } else if (isset($this->_modes[$bytes[$i]])) {
+          $mode = $this->_modes[$bytes[$i]];
           /*
            * The resolution of the pins is reported as a bit count
            */
           $maximum = pow(2, (int)$bytes[$i + 1]) - 1;
-          if ($mode == Firmata\Board::PIN_MODE_SERVO) {
+          if ($mode == Firmata\Pin::MODE_SERVO) {
             /*
              * Servo reports an resolution of 14 bits (maxmimum value 16383), but
              * uses mostly degrees to set the position, so we use 1 as a full circle of
              * 360 degrees
              */
             $this->_pins[$pin][$mode] = 359;
-          } elseif ($mode == Firmata\Board::PIN_MODE_ANALOG && $maximum == 0) {
+          } elseif ($mode == Firmata\Pin::MODE_ANALOG && $maximum == 0) {
             /**
              * Use 10bit as a default for analog pins
              */
@@ -62,6 +72,19 @@ namespace Carica\Firmata\Response\SysEx {
         }
         $i += 2;
       }
+    }
+     
+    private function mapFirmataModeToPinMode($firmataMode) {
+      $map = [
+        0x01 => Firmata\Pin::MODE_OUTPUT,
+        0x00 => Firmata\Pin::MODE_INPUT,
+        0x02 => Firmata\Pin::MODE_ANALOG,
+        0x03 => Firmata\Pin::MODE_PWM,
+        0x04 => Firmata\Pin::MODE_SERVO,
+        0x05 => Firmata\Pin::MODE_SHIFT,
+        0x06 => Firmata\Pin::MODE_I2C
+      ];
+      return (isset($map[$firmataMode])) ? $map[$firmataMode] : false;
     }
 
     /**

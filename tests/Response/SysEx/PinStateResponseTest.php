@@ -26,25 +26,25 @@ namespace Carica\Firmata\Response\SysEx {
       return array(
         array(
           9,
-          Firmata\Board::PIN_MODE_INPUT,
+          Firmata\Pin::MODE_INPUT,
           1,
           [0x09, 0x00, 0x01]
         ),
         array(
           4,
-          Firmata\Board::PIN_MODE_ANALOG,
+          Firmata\Pin::MODE_ANALOG,
           127,
           [0x04, 0x02, 0x7f]
         ),
         array(
           4,
-          Firmata\Board::PIN_MODE_ANALOG,
+          Firmata\Pin::MODE_ANALOG,
           1000,
           [0x04, 0x02, 0x68, 0x07]
         ),
         array(
           4,
-          Firmata\Board::PIN_MODE_ANALOG,
+          Firmata\Pin::MODE_ANALOG,
           100000,
           [0x04, 0x02, 0x20, 0x0D, 0x06]
         )

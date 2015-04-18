@@ -282,7 +282,7 @@ namespace Carica\Firmata {
         "\xF0\x6C\x7F\x7F\x00\x01\x01\x01\x02\x00\xF7"
       );
       $this->assertInstanceOf('Carica\Firmata\Pin', $board->pins[2]);
-      $this->assertTrue($board->pins[2]->supports(Board::PIN_MODE_ANALOG));
+      $this->assertTrue($board->pins[2]->supports(Pin::MODE_ANALOG));
     }
 
     /**
@@ -320,7 +320,7 @@ namespace Carica\Firmata {
       $this->assertEquals(
         [
           'pin' => 2,
-          'mode' => Board::PIN_MODE_ANALOG,
+          'mode' => Pin::MODE_ANALOG,
           'value' => 127
         ],
         $result
@@ -587,7 +587,7 @@ namespace Carica\Firmata {
         ->method('write')
         ->with([0x91, 0x0B, 0x00]);
       $pin = $this->getPinFixture(
-        ['pin' => 8, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => TRUE]
+        ['pin' => 8, 'mode' => Pin::MODE_OUTPUT, 'digital' => TRUE]
       );
       $pin
         ->expects($this->once())
@@ -599,16 +599,16 @@ namespace Carica\Firmata {
         [
           8 => $pin,
           9 => $this->getPinFixture(
-            ['pin' => 9, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => TRUE]
+            ['pin' => 9, 'mode' => Pin::MODE_OUTPUT, 'digital' => TRUE]
           ),
           10 => $this->getPinFixture(
-            ['pin' => 10, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => FALSE]
+            ['pin' => 10, 'mode' => Pin::MODE_OUTPUT, 'digital' => FALSE]
           ),
           11 => $this->getPinFixture(
-            ['pin' => 11, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => TRUE]
+            ['pin' => 11, 'mode' => Pin::MODE_OUTPUT, 'digital' => TRUE]
           ),
           24 => $this->getPinFixture(
-            ['pin' => 24, 'mode' => Board::PIN_MODE_OUTPUT, 'digital' => TRUE]
+            ['pin' => 24, 'mode' => Pin::MODE_OUTPUT, 'digital' => TRUE]
           )
         ]
       );
@@ -623,7 +623,7 @@ namespace Carica\Firmata {
       $stream
         ->expects($this->once())
         ->method('write')
-        ->with([Board::PIN_MODE, 0x2A, Board::PIN_MODE_OUTPUT]);
+        ->with([Board::PIN_MODE, 0x2A, 0x01]);
       $pin = $this
         ->getMockBuilder('Carica\\Firmata\\Pin')
         ->disableOriginalConstructor()
@@ -631,11 +631,11 @@ namespace Carica\Firmata {
       $pin
         ->expects($this->once())
         ->method('setMode')
-        ->with(Board::PIN_MODE_OUTPUT);
+        ->with(Pin::MODE_OUTPUT);
 
       $board = new Board($stream);
       $board->pins = $this->getPinsFixture([42 => $pin]);
-      $board->pinMode(42, Board::PIN_MODE_OUTPUT);
+      $board->pinMode(42, Pin::MODE_OUTPUT);
     }
 
     /****************************

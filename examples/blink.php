@@ -19,7 +19,7 @@ $board
       // get pin 13 (most boards already have an led on this pin)
       $pin = $board->pins[13];
       // set the mode of pin 13 to digital output
-      $pin->mode = Firmata\Board::PIN_MODE_OUTPUT;
+      $pin->mode = Firmata\Pin::MODE_OUTPUT;
 
       // add an callback to the event loop that is called every second
       $loop->setInterval(

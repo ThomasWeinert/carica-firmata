@@ -10,10 +10,10 @@ namespace Carica\Firmata\Exception {
      * @var array
      */
     private $_modes = array(
-      Firmata\Board::PIN_MODE_OUTPUT => 'digital output',
-      Firmata\Board::PIN_MODE_INPUT => 'digital input',
-      Firmata\Board::PIN_MODE_ANALOG => 'analog input',
-      Firmata\Board::PIN_MODE_PWM => 'pwm output'
+      Firmata\Pin::MODE_OUTPUT => 'digital output',
+      Firmata\Pin::MODE_INPUT => 'digital input',
+      Firmata\Pin::MODE_ANALOG => 'analog input',
+      Firmata\Pin::MODE_PWM => 'pwm output'
     );
 
     /**

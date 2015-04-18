@@ -51,10 +51,10 @@ namespace Carica\Firmata\Rest {
       $pin = $this->getPinFixture(
         array(
           'pin' => 42,
-          'mode' => Firmata\Board::PIN_MODE_OUTPUT,
+          'mode' => Firmata\Pin::MODE_OUTPUT,
           'digital' => true,
           'value' => 0x01,
-          'supports' => array(Firmata\Board::PIN_MODE_OUTPUT => 1)
+          'supports' => array(Firmata\Pin::MODE_OUTPUT => 1)
         )
       );
       $handler = new Pin($this->getBoardFixture(array(42 => $pin)));
@@ -76,10 +76,10 @@ namespace Carica\Firmata\Rest {
       $pin = $this->getPinFixture(
         array(
           'pin' => 42,
-          'mode' => Firmata\Board::PIN_MODE_ANALOG,
+          'mode' => Firmata\Pin::MODE_ANALOG,
           'analog' => 23,
           'value' => 23,
-          'supports' => array(Firmata\Board::PIN_MODE_ANALOG => 1023)
+          'supports' => array(Firmata\Pin::MODE_ANALOG => 1023)
         )
       );
       $handler = new Pin($this->getBoardFixture(array(42 => $pin)));
@@ -103,7 +103,7 @@ namespace Carica\Firmata\Rest {
       $pin
         ->expects($this->once())
         ->method('__set')
-        ->with('mode', Firmata\Board::PIN_MODE_PWM);
+        ->with('mode', Firmata\Pin::MODE_PWM);
       $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
       $response = $handler($request, array('pin' => 0));
     }

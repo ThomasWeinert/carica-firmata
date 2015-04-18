@@ -12,7 +12,7 @@ namespace Carica\Firmata {
     public function testConstructor() {
       $pins = new Pins(
         $this->getBoardFixture(),
-        array(42 => array(Board::PIN_MODE_OUTPUT))
+        array(42 => array(Pin::MODE_OUTPUT))
       );
       $this->assertCount(1, $pins);
     }
@@ -24,7 +24,7 @@ namespace Carica\Firmata {
     public function testAnalogMappingWithValidChannel() {
       $pins = new Pins(
         $this->getBoardFixture(),
-        array(42 => array(Board::PIN_MODE_ANALOG))
+        array(42 => array(Pin::MODE_ANALOG))
       );
       $pins->setAnalogMapping(array(21 => 42));
       $this->assertEquals(42, $pins->getPinByChannel(21));
@@ -37,7 +37,7 @@ namespace Carica\Firmata {
     public function testAnalogMappingWithInvalidChannelExpectingNegativeOne() {
       $pins = new Pins(
         $this->getBoardFixture(),
-        array(42 => array(Board::PIN_MODE_ANALOG))
+        array(42 => array(Pin::MODE_ANALOG))
       );
       $pins->setAnalogMapping(array(21 => 42));
       $this->assertEquals(-1, $pins->getPinByChannel(23));
@@ -49,10 +49,10 @@ namespace Carica\Firmata {
     public function testIterator() {
       $pins = new Pins(
         $board = $this->getBoardFixture(),
-        array(42 => array(Board::PIN_MODE_OUTPUT))
+        array(42 => array(Pin::MODE_OUTPUT))
       );
       $this->assertEquals(
-        array(42 => new Pin($board, 42, array(Board::PIN_MODE_OUTPUT))),
+        array(42 => new Pin($board, 42, array(Pin::MODE_OUTPUT))),
         iterator_to_array($pins)
       );
     }
@@ -75,8 +75,8 @@ namespace Carica\Firmata {
       $pins = new Pins(
         $board = $this->getBoardFixture(),
         [
-          21 => [Board::PIN_MODE_OUTPUT],
-          42 => [Board::PIN_MODE_OUTPUT]
+          21 => [Pin::MODE_OUTPUT],
+          42 => [Pin::MODE_OUTPUT]
         ]
       );
       $this->assertCount(2, $pins);
@@ -88,7 +88,7 @@ namespace Carica\Firmata {
     public function testArrayAccessOffsetExistsExpectingTrue() {
       $pins = new Pins(
         $board = $this->getBoardFixture(),
-        array(42 => array(Board::PIN_MODE_OUTPUT))
+        array(42 => array(Pin::MODE_OUTPUT))
       );
       $this->assertTrue(isset($pins[42]));
     }
@@ -99,7 +99,7 @@ namespace Carica\Firmata {
     public function testArrayAccessOffsetExistsExpectingFalse() {
       $pins = new Pins(
         $board = $this->getBoardFixture(),
-        array(42 => array(Board::PIN_MODE_OUTPUT))
+        array(42 => array(Pin::MODE_OUTPUT))
       );
       $this->assertFalse(isset($pins[23]));
     }
@@ -110,7 +110,7 @@ namespace Carica\Firmata {
     public function testArrayAccessOffsetGet() {
       $pins = new Pins(
         $board = $this->getBoardFixture(),
-        array(42 => array(Board::PIN_MODE_OUTPUT))
+        array(42 => array(Pin::MODE_OUTPUT))
       );
       $this->assertInstanceOf('Carica\\Firmata\\Pin', $pins[42]);
     }

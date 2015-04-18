@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a89f34f78208c9ead21214cf1e1624fc",
+    "hash": "f6b8d9e794ce2bedf449805ffc535e6d",
     "packages": [
         {
             "name": "carica/io",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ThomasWeinert/carica-io.git",
-                "reference": "0dd3d24ef1c68c6d0ec0356a7beb5be72515f892"
+                "reference": "e1f9a17f7084cc62e0296b632095d7c1012e079e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ThomasWeinert/carica-io/zipball/0dd3d24ef1c68c6d0ec0356a7beb5be72515f892",
-                "reference": "0dd3d24ef1c68c6d0ec0356a7beb5be72515f892",
+                "url": "https://api.github.com/repos/ThomasWeinert/carica-io/zipball/e1f9a17f7084cc62e0296b632095d7c1012e079e",
+                "reference": "e1f9a17f7084cc62e0296b632095d7c1012e079e",
                 "shasum": ""
             },
             "require": {
@@ -26,7 +26,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Carica\\Io\\": "src\\"
+                    "Carica\\Io\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -45,24 +45,19 @@
                 "asynchronous-io",
                 "non-blocking-io"
             ],
-            "time": "2014-08-10 13:27:28"
+            "time": "2015-04-18 20:28:10"
         }
     ],
-    "packages-dev": [
-
-    ],
-    "aliases": [
-
-    ],
+    "packages-dev": [],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
         "carica/io": 20
     },
     "prefer-stable": false,
+    "prefer-lowest": false,
     "platform": {
         "php": ">=5.4"
     },
-    "platform-dev": [
-
-    ]
+    "platform-dev": []
 }

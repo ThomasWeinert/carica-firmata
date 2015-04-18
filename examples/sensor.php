@@ -24,9 +24,9 @@ $board
       $led = $board->pins[13];
 
       // mode for the sensor pin is analog input
-      $sensor->mode = Firmata\Board::PIN_MODE_ANALOG;
+      $sensor->mode = Firmata\Pin::MODE_ANALOG;
       // mode for the led pin is digital output
-      $led->mode = Firmata\Board::PIN_MODE_OUTPUT;
+      $led->mode = Firmata\Pin::MODE_OUTPUT;
 
       // if the sensor value changes
       $sensor->events()->on(

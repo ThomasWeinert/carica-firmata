@@ -3,8 +3,9 @@ namespace Carica\Firmata {
 
   use Carica\Io\ByteArray;
   use Carica\Io\Event;
+  use Carica\Io\Device;
 
-  class I2C {
+  class I2C implements Device\I2C {
 
     use Event\Emitter\Aggregation;
 

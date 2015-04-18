@@ -7,7 +7,7 @@ namespace Carica\Firmata\Exception {
   class UnsupportedModeTest extends \PHPUnit_Framework_TestCase {
 
     public function testConstructor() {
-      $exception = new UnsupportedMode(42, \Carica\Firmata\Board::PIN_MODE_OUTPUT);
+      $exception = new UnsupportedMode(42, \Carica\Firmata\Pin::MODE_OUTPUT);
       $this->assertEquals(
         'Pin 42 does not support mode "digital output"',
         $exception->getMessage()

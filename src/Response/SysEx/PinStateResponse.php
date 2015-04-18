@@ -25,6 +25,16 @@ namespace Carica\Firmata\Response\SysEx {
      * @var int
      */
     private $_value = 0;
+    
+    private $_modes = [
+      0x01 => Firmata\Pin::MODE_OUTPUT,
+      0x00 => Firmata\Pin::MODE_INPUT,
+      0x02 => Firmata\Pin::MODE_ANALOG,
+      0x03 => Firmata\Pin::MODE_PWM,
+      0x04 => Firmata\Pin::MODE_SERVO,
+      0x05 => Firmata\Pin::MODE_SHIFT,
+      0x06 => Firmata\Pin::MODE_I2C
+    ];
 
     /**
      * @param array $bytes
@@ -33,7 +43,7 @@ namespace Carica\Firmata\Response\SysEx {
       parent::__construct(Firmata\Board::PIN_STATE_RESPONSE, $bytes);
       $length = count($bytes);
       $this->_pin = $bytes[0];
-      $this->_mode = $bytes[1];
+      $this->_mode = (isset($this->_modes[$bytes[1]])) ? $this->_modes[$bytes[1]] : false;
       $this->_value = $bytes[2];
       for ($i = 3, $shift = 7; $i < $length; ++$i, $shift *= 2) {
         $this->_value |= ($bytes[$i] << $shift);

@@ -17,21 +17,11 @@ namespace Carica\Firmata {
    * @property bool $digital Get/set the pin value using an boolean value
    */
   class Pin
-    implements Io\Event\HasEmitter {
+    implements 
+      Io\Event\HasEmitter,
+      Io\Device\Pin {
 
     use Io\Event\Emitter\Aggregation;
-
-    /*
-     * io mode constants for easier access, map to board pin modes
-     */
-    const MODE_UNKNOWN = Board::PIN_MODE_UNKNOWN;
-    const MODE_INPUT = Board::PIN_MODE_INPUT;
-    const MODE_OUTPUT = Board::PIN_MODE_OUTPUT;
-    const MODE_ANALOG = Board::PIN_MODE_ANALOG;
-    const MODE_PWM = Board::PIN_MODE_PWM;
-    const MODE_SERVO = Board::PIN_MODE_SERVO;
-    const MODE_SHIFT = Board::PIN_MODE_SHIFT;
-    const MODE_I2C = Board::PIN_MODE_I2C;
 
     /**
      * @var Board
@@ -73,7 +63,7 @@ namespace Carica\Firmata {
      *
      * @param Board $board
      * @param integer $pin
-     * @param array $supports
+     * @param array $supports Array
      */
     public function __construct(Board $board, $pin, array $supports) {
       $this->_board = $board;
@@ -89,8 +79,8 @@ namespace Carica\Firmata {
       if ($events = $this->board->events()) {
         $events->on(
           'pin-state-'.$this->_pin,
-          function ($mode, $value) use ($that) {
-            $that->onUpdatePinState($mode, $value);
+          function ($mode, $value) {
+            $this->onUpdatePinState($mode, $value);
           }
         );
         $events->on(
@@ -187,7 +177,7 @@ namespace Carica\Firmata {
       case 'maximum' :
         return $this->getMaximum();
       case 'digital' :
-        return ($this->_value == Board::DIGITAL_HIGH);
+        return $this->getDigital();
       case 'analog' :
         return $this->getAnalog();
       }
@@ -220,6 +210,10 @@ namespace Carica\Firmata {
         sprintf('Property %s::$%s can not be written', get_class($this), $name)
       );
     }
+    
+    public function getMode() {
+      return $this->_mode;
+    }
 
     /**
      * Setter method for the mode property.
@@ -244,10 +238,18 @@ namespace Carica\Firmata {
     }
 
     /**
+     * Return the current state (low/high) of the pin as boolean
+     * @return bool 
+     */
+    public function getDigital() {
+      return ($this->_value == Board::DIGITAL_HIGH);
+    }
+
+    /**
      * Setter method for the digital property. Allows to change the value between low and high
      * using boolean values
      *
-     * @param boolean $isActive
+     * @param bool $isActive
      */
     public function setDigital($isActive) {
       $value = (boolean)$isActive ? Board::DIGITAL_HIGH : Board::DIGITAL_LOW;
@@ -320,6 +322,13 @@ namespace Carica\Firmata {
      */
     public function supports($mode) {
       return array_key_exists($mode, $this->_supports);
+    }
+
+    /**
+     * @param callable $callback
+     */
+    public function onChange(callable $callback) {
+      $this->events()->on('change', $callback);
     }
   }
 }
