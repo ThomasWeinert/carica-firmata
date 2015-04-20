@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f6b8d9e794ce2bedf449805ffc535e6d",
+    "hash": "8e44b0d94df5b789c614019dcc66e033",
     "packages": [
         {
             "name": "carica/io",
