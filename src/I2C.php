@@ -2,6 +2,7 @@
 namespace Carica\Firmata {
 
   use Carica\Io\ByteArray;
+  use Carica\Io\Deferred;
   use Carica\Io\Event;
   use Carica\Io\Device;
 
@@ -41,7 +42,6 @@ namespace Carica\Firmata {
           if ($response->command == self::REPLY) {
             $reply = new I2C\Reply(self::REPLY, $response->getRawData());
             $this->events()->emit('reply-'.$reply->slaveAddress, $reply->data);
-            $this->events()->emit('reply', $reply->slaveAddress, $reply->data);
           }
         }
       );
@@ -119,13 +119,24 @@ namespace Carica\Firmata {
      *
      * @param integer $slaveAddress
      * @param integer $byteCount
-     * @param callable $callback
+     * @return Deferred\Promise
      */
-    public function read($slaveAddress, $byteCount, Callable $callback) {
+    public function read($slaveAddress, $byteCount) {
       $this->ensureConfiguration();
-      $this->events()->once('reply-'.$slaveAddress, $callback);
+      $defer = new Deferred();
+      $this->events()->once(
+        'reply-'.$slaveAddress,
+        function ($bytes) use ($defer, $byteCount) {
+          if (count($bytes) == $byteCount) {
+            $defer->resolve();
+          } else {
+            $defer->reject('Invalid I2C response.');
+          }
+        }
+      );
       $request = new I2C\Request\Read($this->_board, $slaveAddress, $byteCount);
       $request->send();
+      return $defer->promise();
     }
   }
 }

@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ThomasWeinert/carica-io.git",
-                "reference": "e1f9a17f7084cc62e0296b632095d7c1012e079e"
+                "reference": "3702813d6d1bd1bd32aa27af08f69573e5e3117e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ThomasWeinert/carica-io/zipball/e1f9a17f7084cc62e0296b632095d7c1012e079e",
-                "reference": "e1f9a17f7084cc62e0296b632095d7c1012e079e",
+                "url": "https://api.github.com/repos/ThomasWeinert/carica-io/zipball/3702813d6d1bd1bd32aa27af08f69573e5e3117e",
+                "reference": "3702813d6d1bd1bd32aa27af08f69573e5e3117e",
                 "shasum": ""
             },
             "require": {
@@ -45,7 +45,7 @@
                 "asynchronous-io",
                 "non-blocking-io"
             ],
-            "time": "2015-04-18 20:28:10"
+            "time": "2015-04-24 08:21:05"
         }
     ],
     "packages-dev": [],
