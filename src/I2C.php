@@ -128,7 +128,7 @@ namespace Carica\Firmata {
         'reply-'.$slaveAddress,
         function ($bytes) use ($defer, $byteCount) {
           if (count($bytes) == $byteCount) {
-            $defer->resolve();
+            $defer->resolve($bytes);
           } else {
             $defer->reject('Invalid I2C response.');
           }
