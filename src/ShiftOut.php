@@ -49,9 +49,9 @@ namespace Carica\Firmata {
      * Begin transfer (put the latch pin to low)
      */
     public function begin() {
-      $this->_latchPin->setMode(Pin::MODE_DIGITAL_OUTPUT);
-      $this->_clockPin->setMode(Pin::MODE_DIGITAL_OUTPUT);
-      $this->_dataPin->setMode(Pin::MODE_DIGITAL_OUTPUT);
+      $this->_latchPin->setMode(Pin::MODE_OUTPUT);
+      $this->_clockPin->setMode(Pin::MODE_OUTPUT);
+      $this->_dataPin->setMode(Pin::MODE_OUTPUT);
       $this->_latchPin->setDigital($this->_highLatch);
     }
     
