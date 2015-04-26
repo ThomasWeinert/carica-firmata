@@ -170,10 +170,10 @@ namespace Carica\Firmata {
         return $this->_pin;
       case 'supports' :
         return $this->_supports;
-      case 'mode' :
-        return $this->_mode;
       case 'value' :
         return $this->_value;
+      case 'mode' :
+        return $this->getMode();
       case 'maximum' :
         return $this->getMaximum();
       case 'digital' :

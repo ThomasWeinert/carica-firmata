@@ -305,6 +305,22 @@ namespace Carica\Firmata {
         $pin->supports(Pin::MODE_PWM)
       );
     }
+    
+    /**
+     * @covers Carica\Firmata\Pin
+     */
+    public function testPinOnChange() {
+      $board = $this->getBoardFixture();
+      $pin = new Pin($board, 12, array(Pin::MODE_OUTPUT => 1, Pin::MODE_ANALOG => 1023));
+      $called = FALSE;
+      $pin->onChange(
+        $cb = function() use (&$called) {
+          $called = TRUE;
+        }
+      );
+      $pin->events()->emit('change');
+      $this->assertTrue($called);
+    }
 
     /*****************
      * Fixtures
