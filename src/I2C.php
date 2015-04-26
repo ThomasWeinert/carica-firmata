@@ -109,7 +109,7 @@ namespace Carica\Firmata {
         return;
       }
       $this->ensureConfiguration();
-      $request = new I2C\Request\Write($this->_board, $slaveAddress, $data);
+      $request = new I2C\Request($this->_board, $slaveAddress, self::MODE_WRITE, $data);
       $request->send();
     }
 
@@ -119,7 +119,7 @@ namespace Carica\Firmata {
      *
      * @param integer $slaveAddress
      * @param integer $byteCount
-     * @return Deferred\Promise
+     * @return Deferred
      */
     public function read($slaveAddress, $byteCount) {
       $this->ensureConfiguration();
@@ -134,9 +134,15 @@ namespace Carica\Firmata {
           }
         }
       );
-      $request = new I2C\Request\Read($this->_board, $slaveAddress, $byteCount);
+      $request = new I2C\Request(
+        $this->_board, $slaveAddress, self::MODE_READ, $byteCount
+      );
       $request->send();
-      return $defer->promise();
+      return $defer;
+    }
+    
+    public function start($slaveAddress, $byteCount, callable $listener) {
+      
     }
   }
 }
