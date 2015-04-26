@@ -66,7 +66,7 @@ namespace Carica\Firmata {
      * Shift out the data. The data kann be an integer values representing a
      * byte value (0 to 255) an array of integers or a binary string.
      *
-     * @param int|array:int|string $value
+     * @param int|int[]|string $value
      * @param bool $isBigEndian
      */
     public function transfer($value, $isBigEndian = TRUE) {
@@ -141,11 +141,12 @@ namespace Carica\Firmata {
 
     /**
      * Return the value for a digital port (Pins in groups of 8)
-     * 
+     *
+     * @param Board $board
      * @param int $port
      * @return int
      */
-    private function getDigitalPortValue($board, $port) {
+    private function getDigitalPortValue(Board $board, $port) {
       $portValue = 0;
       for ($i = 0; $i < 8; $i++) {
         $index = 8 * $port + $i;
