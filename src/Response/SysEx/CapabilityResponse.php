@@ -73,19 +73,6 @@ namespace Carica\Firmata\Response\SysEx {
         $i += 2;
       }
     }
-     
-    private function mapFirmataModeToPinMode($firmataMode) {
-      $map = [
-        0x01 => Firmata\Pin::MODE_OUTPUT,
-        0x00 => Firmata\Pin::MODE_INPUT,
-        0x02 => Firmata\Pin::MODE_ANALOG,
-        0x03 => Firmata\Pin::MODE_PWM,
-        0x04 => Firmata\Pin::MODE_SERVO,
-        0x05 => Firmata\Pin::MODE_SHIFT,
-        0x06 => Firmata\Pin::MODE_I2C
-      ];
-      return (isset($map[$firmataMode])) ? $map[$firmataMode] : false;
-    }
 
     /**
      * @param string $name
