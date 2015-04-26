@@ -36,7 +36,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @return int
+     * @return array
      */
     public function getRawData() {
       return $this->_bytes;

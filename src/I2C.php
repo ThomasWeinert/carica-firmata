@@ -140,9 +140,43 @@ namespace Carica\Firmata {
       $request->send();
       return $defer;
     }
-    
-    public function start($slaveAddress, $byteCount, callable $listener) {
-      
+
+    /**
+     * @param int $slaveAddress
+     * @param int $byteCount
+     * @param callable $listener
+     * @return Deferred
+     */
+    public function startReading($slaveAddress, $byteCount, callable $listener) {
+      $this->ensureConfiguration();
+      $this->stopReading($slaveAddress);
+      $defer = new Deferred();
+      $this->events()->on(
+        'reply-'.$slaveAddress,
+        function ($bytes) use ($slaveAddress, $listener, $byteCount) {
+          if (count($bytes) == $byteCount) {
+            $listener($bytes);
+          } else {
+            $this->stopReading($slaveAddress);
+          }
+        }
+      );
+      $request = new I2C\Request(
+        $this->_board, $slaveAddress, self::MODE_CONTINOUS_READ, $byteCount
+      );
+      $request->send();
+      return $defer;
+    }
+
+    /**
+     * @param int $slaveAddress
+     */
+    public function stopReading($slaveAddress) {
+      $this->events()->removeAllListeners('reply-'.$slaveAddress);
+      $request = new I2C\Request(
+        $this->_board, $slaveAddress, self::MODE_STOP_READING
+      );
+      $request->send();
     }
   }
 }

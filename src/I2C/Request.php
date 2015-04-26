@@ -12,9 +12,9 @@ namespace Carica\Firmata\I2C {
     private $_slaveAddress = 0;
 
     /**
-     * @var string
+     * @var string|NULL
      */
-    private $_data = '';
+    private $_data = NULL;
 
     /**
      * @var string
@@ -24,13 +24,13 @@ namespace Carica\Firmata\I2C {
     /**
      * @param Firmata\Board $board
      * @param int $slaveAddress
-     * @param string $data
+     * @param string|NULL $data
      */
     public function __construct(
       Firmata\Board $board,
       $slaveAddress,
       $mode,
-      $data
+      $data = NULL
     ) {
       parent::__construct($board);
       $this->_slaveAddress = (int)$slaveAddress;
@@ -38,10 +38,12 @@ namespace Carica\Firmata\I2C {
     }
 
     /**
-     * @param string $data
+     * @param string|NULL $data
      */
     private function setData($data) {
-      if (is_array($data)) {
+      if (NULL == $data) {
+        $this->_data = NULL;
+      } elseif (is_array($data)) {
         array_unshift($data, 'C*');
         $this->_data = call_user_func_array('pack', $data);
       } else {
@@ -60,11 +62,10 @@ namespace Carica\Firmata\I2C {
         $this->_slaveAddress,
         $this->_mode << 3
       );
-      $data .= self::encodeBytes($this->_data);
-      $data .= pack(
-        'C',
-        Firmata\Board::END_SYSEX
-      );
+      if (NULL !==$this->_data) {
+        $data .= self::encodeBytes($this->_data);
+      }
+      $data .= pack('C', Firmata\Board::END_SYSEX);
       $this->board()->stream()->write($data);
     }
   }
