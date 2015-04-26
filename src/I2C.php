@@ -145,12 +145,10 @@ namespace Carica\Firmata {
      * @param int $slaveAddress
      * @param int $byteCount
      * @param callable $listener
-     * @return Deferred
      */
     public function startReading($slaveAddress, $byteCount, callable $listener) {
       $this->ensureConfiguration();
       $this->stopReading($slaveAddress);
-      $defer = new Deferred();
       $this->events()->on(
         'reply-'.$slaveAddress,
         function ($bytes) use ($slaveAddress, $listener, $byteCount) {
@@ -165,7 +163,6 @@ namespace Carica\Firmata {
         $this->_board, $slaveAddress, self::MODE_CONTINOUS_READ, $byteCount
       );
       $request->send();
-      return $defer;
     }
 
     /**
