@@ -13,7 +13,7 @@ namespace Carica\Firmata\I2C {
      * @covers Carica\Firmata\I2C\Request
      */
     public function testSendReadRequest() {
-      $expected = "\xF0\x76\x02\x00\x37\x00\xF7";
+      $expected = "\xF0\x76\x02\x08\x37\x00\xF7";
       $request = new Request(
         $this->getBoardWithStreamFixture($expected),
         2,
@@ -22,6 +22,7 @@ namespace Carica\Firmata\I2C {
       );
       $request->send();
     }
+
     /**
      * @covers Carica\Firmata\I2C\Request
      */
@@ -46,6 +47,33 @@ namespace Carica\Firmata\I2C {
         3,
         Firmata\I2C::MODE_WRITE,
         [0xFF, 0x00, 0xF0]
+      );
+      $request->send();
+    }
+
+    /**
+     * @covers Carica\Firmata\I2C\Request
+     */
+    public function testSendStartReadingRequest() {
+      $expected = "\xF0\x76\x02\x10\x37\x00\xF7";
+      $request = new Request(
+        $this->getBoardWithStreamFixture($expected),
+        2,
+        Firmata\I2C::MODE_CONTINOUS_READ,
+        7
+      );
+      $request->send();
+    }
+
+    /**
+     * @covers Carica\Firmata\I2C\Request
+     */
+    public function testStopStartReadingRequest() {
+      $expected = "\xF0\x76\x02\x18\xF7";
+      $request = new Request(
+        $this->getBoardWithStreamFixture($expected),
+        2,
+        Firmata\I2C::MODE_STOP_READING
       );
       $request->send();
     }

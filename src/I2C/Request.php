@@ -34,6 +34,7 @@ namespace Carica\Firmata\I2C {
     ) {
       parent::__construct($board);
       $this->_slaveAddress = (int)$slaveAddress;
+      $this->_mode = (int)$mode;
       $this->setData($data);
     }
 
