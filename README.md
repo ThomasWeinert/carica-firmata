@@ -35,7 +35,7 @@ ports to tcp.
 Installation
 ------------
 
-Carica Firmata is avaiable on [Packagist](https://packagist.org/packages/carica/firmata). Use Composer to add it as an
+Carica Firmata is available on [Packagist](https://packagist.org/packages/carica/firmata). Use Composer to add it as an
 dependency into your own projects.
 
 Carica\Firmata\Pin
