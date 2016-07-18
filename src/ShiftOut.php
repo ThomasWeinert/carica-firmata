@@ -1,12 +1,9 @@
 <?php
 namespace Carica\Firmata {
 
-  use Carica\Io\Event;
   use Carica\Io\Device;
   
   class ShiftOut implements Device\ShiftOut {
-
-    use Event\Emitter\Aggregation;
 
     /**
      * @var Pin
