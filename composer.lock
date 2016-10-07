@@ -1,10 +1,11 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8e44b0d94df5b789c614019dcc66e033",
+    "hash": "1bbf1ed998ba5a662098d3b853656f23",
+    "content-hash": "f10a1f1a7c589eddf3743b8e93dce642",
     "packages": [
         {
             "name": "carica/io",
@@ -12,16 +13,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ThomasWeinert/carica-io.git",
-                "reference": "e9631f8e54875b4180d929fb7bc81d9ca37f2fb9"
+                "reference": "feb7aa35141443859fc8da37208ce3f9ac989858"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ThomasWeinert/carica-io/zipball/e9631f8e54875b4180d929fb7bc81d9ca37f2fb9",
-                "reference": "e9631f8e54875b4180d929fb7bc81d9ca37f2fb9",
+                "url": "https://api.github.com/repos/ThomasWeinert/carica-io/zipball/feb7aa35141443859fc8da37208ce3f9ac989858",
+                "reference": "feb7aa35141443859fc8da37208ce3f9ac989858",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4"
+                "php": ">=5.6"
             },
             "type": "library",
             "autoload": {
@@ -45,7 +46,7 @@
                 "asynchronous-io",
                 "non-blocking-io"
             ],
-            "time": "2015-04-24 09:09:39"
+            "time": "2016-10-07 09:49:30"
         }
     ],
     "packages-dev": [],
