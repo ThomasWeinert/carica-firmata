@@ -9,35 +9,36 @@ namespace Carica\Firmata {
   class I2CTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\I2C
+     * @covers \Carica\Firmata\I2C
      */
     public function testConfigure() {
       $expected = [
         0xF0, 0x78, 0x00, 0x00, 0xF7
       ];
       $i2c = new I2C(
-        $this->getBoardWithStreamFixture($expected)
+        $this->getBoardWithStreamFixture($expected), 0x02
       );
       $i2c->configure();
     }
 
     /**
-     * @covers Carica\Firmata\I2C
+     * @covers \Carica\Firmata\I2C
      */
     public function testRead() {
       $i2c = new I2C(
         $this->getBoardWithStreamFixture(
           [0xF0, 0x78, 0x00, 0x00, 0xF7],
           "\xF0\x76\x02\x08\x37\x00\xF7"
-        )
+        ),
+        0x02
       );
-      $defer = $i2c->read(0x02, 7);
-      $this->assertInstanceOf('Carica\Io\Deferred', $defer);
+      $defer = $i2c->read(7);
+      $this->assertInstanceOf(Io\Deferred::class, $defer);
     }
 
     public function getBoardWithStreamFixture($data, $secondData = NULL) {
-      $emitter = new \Carica\Io\Event\Emitter;
-      $stream = $this->getMock('Carica\\Io\\Stream');
+      $emitter = new Io\Event\Emitter;
+      $stream = $this->getMockBuilder(Io\Stream::class)->getMock();
       if (func_num_args() > 1) {
         $assertion = $stream
           ->expects($this->any())
@@ -54,7 +55,7 @@ namespace Carica\Firmata {
           ->with($data);
       }
       $board = $this
-        ->getMockBuilder('Carica\\Firmata\\Board')
+        ->getMockBuilder(Board::class)
         ->disableOriginalConstructor()
         ->getMock();
       $board

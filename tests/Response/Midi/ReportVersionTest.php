@@ -10,7 +10,7 @@ namespace Carica\Firmata\Response\Midi {
   class ReportVersionTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Response\Midi\ReportVersion
+     * @covers \Carica\Firmata\Response\Midi\ReportVersion
      */
     public function testConstructor() {
       $message = new ReportVersion([0xF9, 0x15, 0x2A]);

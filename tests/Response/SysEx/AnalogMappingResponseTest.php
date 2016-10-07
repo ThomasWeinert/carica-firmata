@@ -9,7 +9,7 @@ namespace Carica\Firmata\Response\SysEx {
   class AnalogMappingResponseTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Response\SysEx\AnalogMappingResponse
+     * @covers \Carica\Firmata\Response\SysEx\AnalogMappingResponse
      */
     public function testConstructor() {
       $response = new AnalogMappingResponse(

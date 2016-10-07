@@ -10,7 +10,7 @@ namespace Carica\Firmata\Response\SysEx {
   class QueryFirmwareTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Response\SysEx\QueryFirmware
+     * @covers \Carica\Firmata\Response\SysEx\QueryFirmware
      */
     public function testConstructor() {
       $version = new QueryFirmware(

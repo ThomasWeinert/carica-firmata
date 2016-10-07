@@ -12,7 +12,7 @@ namespace Carica\Firmata\Response\SysEx {
   class CapabilityResponseTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Response\SysEx\CapabilityResponse
+     * @covers \Carica\Firmata\Response\SysEx\CapabilityResponse
      */
     public function testConstructor() {
       $response = new CapabilityResponse(
@@ -159,7 +159,7 @@ namespace Carica\Firmata\Response\SysEx {
     }
 
     /**
-     * @covers Carica\Firmata\Response\SysEx\CapabilityResponse
+     * @covers \Carica\Firmata\Response\SysEx\CapabilityResponse
      */
     public function testConstructorWithAnalogDefault() {
       $response = new CapabilityResponse(

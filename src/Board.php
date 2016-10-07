@@ -10,7 +10,7 @@ namespace Carica\Firmata {
    *
    * @property-read Version $version
    * @property-read Version $firmware
-   * @property-read Pins $pins
+   * @property Pins $pins
    */
   class Board
     implements Event\HasEmitter {

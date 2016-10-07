@@ -10,11 +10,11 @@ namespace Carica\Firmata\Rest {
   class PinsTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Rest\Pins
+     * @covers \Carica\Firmata\Rest\Pins
      */
     public function testWithInactiveBoard() {
       $board = $this
-        ->getMockBuilder('Carica\\Firmata\\Board')
+        ->getMockBuilder(Firmata\Board::class)
         ->disableOriginalConstructor()
         ->getMock();
       $board
@@ -32,11 +32,11 @@ namespace Carica\Firmata\Rest {
     }
 
     /**
-     * @covers Carica\Firmata\Rest\Pins
+     * @covers \Carica\Firmata\Rest\Pins
      */
     public function testWithActiveBoard() {
       $pin = $this
-        ->getMockBuilder('Carica\\Firmata\\Pin')
+        ->getMockBuilder(Firmata\Pin::class)
         ->disableOriginalConstructor()
         ->getMock();
       $pin
@@ -51,7 +51,7 @@ namespace Carica\Firmata\Rest {
         );
 
       $board = $this
-        ->getMockBuilder('Carica\\Firmata\\Board')
+        ->getMockBuilder(Firmata\Board::class)
         ->disableOriginalConstructor()
         ->getMock();
       $board
@@ -71,13 +71,13 @@ namespace Carica\Firmata\Rest {
         );
 
       $pinHandler = $this
-        ->getMockBuilder('Carica\\Firmata\\Rest\\Pin')
+        ->getMockBuilder(Firmata\Rest\Pin::class)
         ->disableOriginalConstructor()
         ->getMock();
       $pinHandler
         ->expects($this->once())
         ->method('appendPin')
-        ->with($this->isInstanceOf('DOMElement'), 23);
+        ->with($this->isInstanceOf(\DOMElement::class), 23);
 
       $handler = new Pins($board);
       $handler->pinHandler($pinHandler);
@@ -90,15 +90,15 @@ namespace Carica\Firmata\Rest {
     }
 
     /**
-     * @covers Carica\Firmata\Rest\Pins
+     * @covers \Carica\Firmata\Rest\Pins
      */
     public function testPinHandlerGetAfterSet() {
       $pinHandler = $this
-        ->getMockBuilder('Carica\\Firmata\\Rest\\Pin')
+        ->getMockBuilder(Firmata\Rest\Pin::class)
         ->disableOriginalConstructor()
         ->getMock();
       $board = $this
-        ->getMockBuilder('Carica\\Firmata\\Board')
+        ->getMockBuilder(Firmata\Board::class)
         ->disableOriginalConstructor()
         ->getMock();
 
@@ -108,25 +108,25 @@ namespace Carica\Firmata\Rest {
     }
 
     /**
-     * @covers Carica\Firmata\Rest\Pins
+     * @covers \Carica\Firmata\Rest\Pins
      */
     public function testPinHandlerGetImplicitCreate() {
       $board = $this
-        ->getMockBuilder('Carica\\Firmata\\Board')
+        ->getMockBuilder(Firmata\Board::class)
         ->disableOriginalConstructor()
         ->getMock();
 
       $handler = new Pins($board);
-      $this->assertInstanceOf('Carica\\Firmata\\Rest\\Pin', $handler->pinHandler());
+      $this->assertInstanceOf(Firmata\Rest\Pin::class, $handler->pinHandler());
     }
 
     private function getRequestFixture() {
       $connection = $this
-        ->getMockBuilder('Carica\\Io\\Network\\Http\\Connection')
+        ->getMockBuilder(Io\Network\Http\Connection::class)
         ->disableOriginalConstructor()
         ->getMock();
       $request = $this
-        ->getMockBuilder('Carica\\Io\\Network\\Http\\Request')
+        ->getMockBuilder(Io\Network\Http\Request::class)
         ->disableOriginalConstructor()
         ->getMock();
       $request

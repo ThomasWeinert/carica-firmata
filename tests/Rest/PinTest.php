@@ -10,11 +10,11 @@ namespace Carica\Firmata\Rest {
   class PinTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\Pin
      */
     public function testWithInactiveBoard() {
       $board = $this
-        ->getMockBuilder('Carica\\Firmata\\Board')
+        ->getMockBuilder(Firmata\Board::class)
         ->disableOriginalConstructor()
         ->getMock();
       $board
@@ -32,7 +32,7 @@ namespace Carica\Firmata\Rest {
     }
 
     /**
-     * @covers Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\Pin
      */
     public function testWithActiveBoard() {
       $handler = new Pin($this->getBoardFixture());
@@ -45,7 +45,7 @@ namespace Carica\Firmata\Rest {
     }
 
     /**
-     * @covers Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\Pin
      */
     public function testWithDigitalPin() {
       $pin = $this->getPinFixture(
@@ -70,7 +70,7 @@ namespace Carica\Firmata\Rest {
     }
 
     /**
-     * @covers Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\Pin
      */
     public function testWithAnalogPin() {
       $pin = $this->getPinFixture(
@@ -95,7 +95,7 @@ namespace Carica\Firmata\Rest {
     }
 
     /**
-     * @covers Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\Pin
      */
     public function testPinModeChange() {
       $request = $this->getRequestFixture(array('mode' => 'pwm'));
@@ -109,7 +109,7 @@ namespace Carica\Firmata\Rest {
     }
 
     /**
-     * @covers Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\Pin
      */
     public function testPinModeInvalidModeIsIgnored() {
       $request = $this->getRequestFixture(array('mode' => 'invalid_mode'));
@@ -122,7 +122,7 @@ namespace Carica\Firmata\Rest {
     }
 
     /**
-     * @covers Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\Pin
      */
     public function testPinDigitalChange() {
       $request = $this->getRequestFixture(array('digital' => 'yes'));
@@ -136,7 +136,7 @@ namespace Carica\Firmata\Rest {
     }
 
     /**
-     * @covers Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\Pin
      */
     public function testPinAnalogChange() {
       $request = $this->getRequestFixture(array('analog' => '0.5'));
@@ -150,7 +150,7 @@ namespace Carica\Firmata\Rest {
     }
 
     /**
-     * @covers Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\Pin
      */
     public function testPinValueChange() {
       $request = $this->getRequestFixture(array('value' => '128'));
@@ -169,7 +169,7 @@ namespace Carica\Firmata\Rest {
 
     private function getBoardFixture(array $pins = array()) {
       $board = $this
-        ->getMockBuilder('Carica\\Firmata\\Board')
+        ->getMockBuilder(Firmata\Board::class)
         ->disableOriginalConstructor()
         ->getMock();
       $board
@@ -192,7 +192,7 @@ namespace Carica\Firmata\Rest {
 
     private function getPinFixture($data = array()) {
       $pin = $this
-        ->getMockBuilder('Carica\\Firmata\\Pin')
+        ->getMockBuilder(Firmata\Pin::class)
         ->disableOriginalConstructor()
         ->getMock();
       $pin
@@ -215,11 +215,11 @@ namespace Carica\Firmata\Rest {
 
     private function getRequestFixture($query = array()) {
       $connection = $this
-        ->getMockBuilder('Carica\\Io\\Network\\Http\\Connection')
+        ->getMockBuilder(Io\Network\Http\Connection::class)
         ->disableOriginalConstructor()
         ->getMock();
       $request = $this
-        ->getMockBuilder('Carica\\Io\\Network\\Http\\Request')
+        ->getMockBuilder(Io\Network\Http\Request::class)
         ->disableOriginalConstructor()
         ->getMock();
       $request

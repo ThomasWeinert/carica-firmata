@@ -7,7 +7,7 @@ namespace Carica\Firmata {
   class VersionTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Version
+     * @covers \Carica\Firmata\Version
      */
     public function testConstructor() {
       $version = new Version(2, 3);
@@ -16,7 +16,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Version
+     * @covers \Carica\Firmata\Version
      */
     public function testConstructorWithAllArguments() {
       $version = new Version(2, 3, 'Success');
@@ -24,7 +24,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Version
+     * @covers \Carica\Firmata\Version
      */
     public function testToString() {
       $version = new Version(2, 3, 'Success');
@@ -32,7 +32,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Version
+     * @covers \Carica\Firmata\Version
      */
     public function testGetPropertyWithIvalidPropertyName() {
       $version = new Version(2, 3, 'Success');
@@ -41,7 +41,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Version
+     * @covers \Carica\Firmata\Version
      */
     public function testSetProperty() {
       $version = new Version(2, 3, 'Success');

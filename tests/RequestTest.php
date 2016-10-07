@@ -7,11 +7,11 @@ namespace Carica\Firmata {
   class RequestTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Request
+     * @covers \Carica\Firmata\Request
      */
     public function testConstrutor() {
       $board = $this
-        ->getMockBuilder('Carica\\Firmata\\Board')
+        ->getMockBuilder(Board::class)
         ->disableOriginalConstructor()
         ->getMock();
       $request = new Request_TestProxy($board);
@@ -19,7 +19,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Request
+     * @covers \Carica\Firmata\Request
      */
     public function testEncodeBytes() {
       $this->assertSame(

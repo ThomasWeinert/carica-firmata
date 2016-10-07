@@ -7,7 +7,7 @@ namespace Carica\Firmata {
   class ResponseTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Response
+     * @covers \Carica\Firmata\Response
      */
     public function testReadPropertyCommand() {
       $response = new Response_TestProxy(0x42, [0x42, 0x00, 0x00]);
@@ -15,7 +15,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Response
+     * @covers \Carica\Firmata\Response
      */
     public function testReadInvalidPropertyExpectingException() {
       $response = new Response_TestProxy(0x42, [0x42, 0x00, 0x00]);
@@ -24,7 +24,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Response
+     * @covers \Carica\Firmata\Response
      */
     public function testGetRawData() {
       $response = new Response_TestProxy(0x42, [0x42, 0x01, 0x02]);
@@ -35,7 +35,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Response
+     * @covers \Carica\Firmata\Response
      */
     public function testDecodeBytes() {
       $this->assertSame(

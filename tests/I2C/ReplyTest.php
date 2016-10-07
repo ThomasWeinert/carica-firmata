@@ -10,7 +10,7 @@ namespace Carica\Firmata\I2C {
   class ReplyTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\I2C\Reply
+     * @covers \Carica\Firmata\I2C\Reply
      */
     public function testConstructor() {
       $reply = new Reply(

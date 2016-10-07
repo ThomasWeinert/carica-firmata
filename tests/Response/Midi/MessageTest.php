@@ -10,7 +10,7 @@ namespace Carica\Firmata\Response\Midi {
   class MessageTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Response\Midi\Message
+     * @covers \Carica\Firmata\Response\Midi\Message
      * @dataProvider provideMessageExamples
      */
     public function testConstructor($command, $port, $value, $bytes) {

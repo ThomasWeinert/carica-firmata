@@ -2,13 +2,16 @@
 
 namespace Carica\Firmata {
 
+  use Carica\Io\Event\Emitter;
+  use Carica\Io\Stream;
+
   include_once(__DIR__ . '/Bootstrap.php');
 
   class PinTest extends \PHPUnit_Framework_TestCase {
 
-    /*
-     * @covers Carica\Firmata\Pin::__construct
-     * @covers Carica\Firmata\Pin::attachEvents
+    /**
+     * @covers \Carica\Firmata\Pin::__construct
+     * @covers \Carica\Firmata\Pin::attachEvents
      */
     public function testConstructor() {
       $board = $this->getBoardFixture();
@@ -19,8 +22,9 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Pin::__isset
+     * @covers \Carica\Firmata\Pin::__isset
      * @dataProvider providePinProperties
+     * @param string $propertyName
      */
     public function testPropertyIsset($propertyName) {
       $pin = new Pin($this->getBoardFixture(), 12, array(Pin::MODE_OUTPUT => 1));
@@ -28,33 +32,33 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Pin::__isset
+     * @covers \Carica\Firmata\Pin::__isset
      */
     public function testPropertyIssetWithInvalidPropertyExpectingFalse() {
       $pin = new Pin($this->getBoardFixture(), 12, array(Pin::MODE_OUTPUT => 1));
       $this->assertFalse(isset($pin->INVALID_PROPERTY));
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__set
+    /**
+     * @covers \Carica\Firmata\Pin::__set
      */
     public function testSetInvalidPropertyExpectingException() {
       $pin = new Pin($this->getBoardFixture(), 12, array(Pin::MODE_OUTPUT => 1));
-      $this->setExpectedException('LogicException');
+      $this->setExpectedException(\LogicException::class);
       $pin->INVALID_PROPERTY = 'trigger';
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__get
+    /**
+     * @covers \Carica\Firmata\Pin::__get
      */
     public function testGetInvalidPropertyExpectingException() {
       $pin = new Pin($this->getBoardFixture(), 12, array(Pin::MODE_OUTPUT => 1));
-      $this->setExpectedException('LogicException');
+      $this->setExpectedException(\LogicException::class);
       $dummy = $pin->INVALID_PROPERTY;
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__get
+    /**
+     * @covers \Carica\Firmata\Pin::__get
      */
     public function testGetBoard() {
       $board = $this->getBoardFixture();
@@ -62,35 +66,35 @@ namespace Carica\Firmata {
       $this->assertSame($board, $pin->board);
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__set
+    /**
+     * @covers \Carica\Firmata\Pin::__set
      */
     public function testSetBoardExpectingException() {
       $board = $this->getBoardFixture();
       $pin = new Pin($board, 12, array(Pin::MODE_OUTPUT => 1));
-      $this->setExpectedException('LogicException');
+      $this->setExpectedException(\LogicException::class);
       $pin->board = $board;
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__get
+    /**
+     * @covers \Carica\Firmata\Pin::__get
      */
     public function testGetPin() {
       $pin = new Pin($this->getBoardFixture(), 12, array(Pin::MODE_OUTPUT => 1));
       $this->assertEquals(12, $pin->pin);
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__set
+    /**
+     * @covers \Carica\Firmata\Pin::__set
      */
     public function testSetPinExpectingException() {
       $pin = new Pin($this->getBoardFixture(), 12, array(Pin::MODE_OUTPUT => 1));
-      $this->setExpectedException('LogicException');
+      $this->setExpectedException(\LogicException::class);
       $pin->pin = 13;
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__get
+    /**
+     * @covers \Carica\Firmata\Pin::__get
      */
     public function testGetSupports() {
       $pin = new Pin(
@@ -99,27 +103,27 @@ namespace Carica\Firmata {
       $this->assertEquals(array(Pin::MODE_OUTPUT => 1, Pin::MODE_ANALOG => 1023), $pin->supports);
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__set
+    /**
+     * @covers \Carica\Firmata\Pin::__set
      */
     public function testSetSupportsExpectingException() {
       $pin = new Pin($this->getBoardFixture(), 12, array(Pin::MODE_OUTPUT => 1));
-      $this->setExpectedException('LogicException');
+      $this->setExpectedException(\LogicException::class);
       $pin->supports = array();
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__get
+    /**
+     * @covers \Carica\Firmata\Pin::__get
      */
     public function testGetMode() {
       $pin = new Pin($this->getBoardFixture(), 12, array(Pin::MODE_OUTPUT => 1, Pin::MODE_ANALOG => 1023));
       $this->assertEquals(array(Pin::MODE_OUTPUT => 1, Pin::MODE_ANALOG => 1023), $pin->supports);
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__set
-     * @covers Carica\Firmata\Pin::__get
-     * @covers Carica\Firmata\Pin::setMode
+    /**
+     * @covers \Carica\Firmata\Pin::__set
+     * @covers \Carica\Firmata\Pin::__get
+     * @covers \Carica\Firmata\Pin::setMode
      */
     public function testSetMode() {
       $board = $this->getBoardFixture();
@@ -133,10 +137,10 @@ namespace Carica\Firmata {
       $this->assertEquals(Pin::MODE_OUTPUT, $pin->mode);
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__set
-     * @covers Carica\Firmata\Pin::__get
-     * @covers Carica\Firmata\Pin::setMode
+    /**
+     * @covers \Carica\Firmata\Pin::__set
+     * @covers \Carica\Firmata\Pin::__get
+     * @covers \Carica\Firmata\Pin::setMode
      */
     public function testSetModeTwoTimeOnlySentOneTime() {
       $board = $this->getBoardFixture();
@@ -151,9 +155,9 @@ namespace Carica\Firmata {
       $this->assertEquals(Pin::MODE_ANALOG, $pin->mode);
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__set
-     * @covers Carica\Firmata\Pin::setMode
+    /**
+     * @covers \Carica\Firmata\Pin::__set
+     * @covers \Carica\Firmata\Pin::setMode
      */
     public function testSetModeWithUnsupportedModeExpectingException() {
       $board = $this->getBoardFixture();
@@ -162,13 +166,13 @@ namespace Carica\Firmata {
         ->method('pinMode');
 
       $pin = new Pin($board, 12, array(Pin::MODE_OUTPUT => 1));
-      $this->setExpectedException('\Carica\Firmata\Exception\UnsupportedMode');
+      $this->setExpectedException(Exception\UnsupportedMode::class);
       $pin->mode = Pin::MODE_ANALOG;
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__set
-     * @covers Carica\Firmata\Pin::setDigital
+    /**
+     * @covers \Carica\Firmata\Pin::__set
+     * @covers \Carica\Firmata\Pin::setDigital
      */
     public function testSetAnalogValue() {
       $board = $this->getBoardFixture();
@@ -184,9 +188,9 @@ namespace Carica\Firmata {
       $this->assertEquals(128, $pin->value);
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__set
-     * @covers Carica\Firmata\Pin::setDigital
+    /**
+     * @covers \Carica\Firmata\Pin::__set
+     * @covers \Carica\Firmata\Pin::setDigital
      */
     public function testSetAnalogValueWithNegativeExpectingMinimum() {
       $board = $this->getBoardFixture();
@@ -201,9 +205,9 @@ namespace Carica\Firmata {
       $this->assertEquals(0, $pin->value);
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__set
-     * @covers Carica\Firmata\Pin::setDigital
+    /**
+     * @covers \Carica\Firmata\Pin::__set
+     * @covers \Carica\Firmata\Pin::setDigital
      */
     public function testSetAnalogValueWithTooLargeValueExpectingMaximum() {
       $board = $this->getBoardFixture();
@@ -218,9 +222,9 @@ namespace Carica\Firmata {
       $this->assertEquals(255, $pin->value);
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__set
-     * @covers Carica\Firmata\Pin::setDigital
+    /**
+     * @covers \Carica\Firmata\Pin::__set
+     * @covers \Carica\Firmata\Pin::setDigital
      */
     public function testSetDigitalValue() {
       $board = $this->getBoardFixture();
@@ -236,9 +240,9 @@ namespace Carica\Firmata {
       $this->assertEquals(Board::DIGITAL_HIGH, $pin->value);
     }
 
-    /*
-     * @covers Carica\Firmata\Pin::__set
-     * @covers Carica\Firmata\Pin::setValue
+    /**
+     * @covers \Carica\Firmata\Pin::__set
+     * @covers \Carica\Firmata\Pin::setValue
      */
     public function testSetValue() {
       $board = $this->getBoardFixture();
@@ -253,8 +257,8 @@ namespace Carica\Firmata {
       $this->assertEquals(128, $pin->value);
     }
 
-      /*
-     * @covers Carica\Firmata\Pin
+    /**
+     * @covers \Carica\Firmata\Pin
      */
     public function testEventPinState() {
       $board = new Board($this->getStreamFixture());
@@ -264,8 +268,8 @@ namespace Carica\Firmata {
       $this->assertEquals(0.25, $pin->analog, '', 0.01);
     }
 
-    /*
-     * @covers Carica\Firmata\Pin
+    /**
+     * @covers \Carica\Firmata\Pin
      */
     public function testEventAnalogRead() {
       $board = new Board($this->getStreamFixture());
@@ -274,8 +278,8 @@ namespace Carica\Firmata {
       $this->assertEquals(0.5, $pin->analog, '', 0.01);
     }
 
-    /*
-     * @covers Carica\Firmata\Pin
+    /**
+     * @covers \Carica\Firmata\Pin
      */
     public function testEventDigitalRead() {
       $board = new Board($this->getStreamFixture());
@@ -284,8 +288,8 @@ namespace Carica\Firmata {
       $this->assertTrue($pin->digital);
     }
 
-    /*
-     * @covers Carica\Firmata\Pin
+    /**
+     * @covers \Carica\Firmata\Pin
      */
     public function testSupportsExpectingTrue() {
       $board = $this->getBoardFixture();
@@ -295,8 +299,8 @@ namespace Carica\Firmata {
       );
     }
 
-    /*
-     * @covers Carica\Firmata\Pin
+    /**
+     * @covers \Carica\Firmata\Pin
      */
     public function testSupportsExpectingFalse() {
       $board = $this->getBoardFixture();
@@ -307,7 +311,7 @@ namespace Carica\Firmata {
     }
     
     /**
-     * @covers Carica\Firmata\Pin
+     * @covers \Carica\Firmata\Pin
      */
     public function testPinOnChange() {
       $board = $this->getBoardFixture();
@@ -324,28 +328,32 @@ namespace Carica\Firmata {
 
     /*****************
      * Fixtures
-     *****************/
+     ****************/
 
-    private function getStreamFixture(\Carica\Io\Event\Emitter $events = NULL) {
-      $stream = $this->getMock('Carica\\Io\\Stream');
+    /**
+     * @param Emitter $events
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getStreamFixture(Emitter $events = NULL) {
+      $stream = $this->getMockBuilder(Stream::class)->getMock();
       $stream
         ->expects($this->any())
         ->method('events')
         ->will(
-          $this->returnValue($events ?: new \Carica\Io\Event\Emitter())
+          $this->returnValue($events ?: new Emitter())
         );
       return $stream;
     }
 
     private function getBoardFixture() {
       $board = $this
-        ->getMockBuilder('Carica\\Firmata\\Board')
+        ->getMockBuilder(Board::class)
         ->disableOriginalConstructor()
         ->getMock();
       $board
         ->expects($this->any())
         ->method('events')
-        ->will($this->returnValue($this->getMock('Carica\\Io\\Event\\Emitter')));
+        ->will($this->returnValue($this->getMockBuilder(Emitter::class)->getMock()));
       return $board;
     }
 

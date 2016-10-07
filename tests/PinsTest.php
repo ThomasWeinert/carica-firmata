@@ -7,7 +7,7 @@ namespace Carica\Firmata {
   class PinsTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Pins::__construct
+     * @covers \Carica\Firmata\Pins::__construct
      */
     public function testConstructor() {
       $pins = new Pins(
@@ -18,8 +18,8 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Pins::setAnalogMapping
-     * @covers Carica\Firmata\Pins::getPinByChannel
+     * @covers \Carica\Firmata\Pins::setAnalogMapping
+     * @covers \Carica\Firmata\Pins::getPinByChannel
      */
     public function testAnalogMappingWithValidChannel() {
       $pins = new Pins(
@@ -31,8 +31,8 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Pins::setAnalogMapping
-     * @covers Carica\Firmata\Pins::getPinByChannel
+     * @covers \Carica\Firmata\Pins::setAnalogMapping
+     * @covers \Carica\Firmata\Pins::getPinByChannel
      */
     public function testAnalogMappingWithInvalidChannelExpectingNegativeOne() {
       $pins = new Pins(
@@ -44,7 +44,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Pins::getIterator
+     * @covers \Carica\Firmata\Pins::getIterator
      */
     public function testIterator() {
       $pins = new Pins(
@@ -58,7 +58,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Pins::count
+     * @covers \Carica\Firmata\Pins::count
      */
     public function testCountableExpectingZero() {
       $pins = new Pins(
@@ -69,7 +69,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Pins::count
+     * @covers \Carica\Firmata\Pins::count
      */
     public function testCountableExpectingTwo() {
       $pins = new Pins(
@@ -83,7 +83,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Pins::offsetExists
+     * @covers \Carica\Firmata\Pins::offsetExists
      */
     public function testArrayAccessOffsetExistsExpectingTrue() {
       $pins = new Pins(
@@ -94,7 +94,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Pins::offsetExists
+     * @covers \Carica\Firmata\Pins::offsetExists
      */
     public function testArrayAccessOffsetExistsExpectingFalse() {
       $pins = new Pins(
@@ -105,51 +105,51 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @covers Carica\Firmata\Pins::offsetGet
+     * @covers \Carica\Firmata\Pins::offsetGet
      */
     public function testArrayAccessOffsetGet() {
       $pins = new Pins(
         $board = $this->getBoardFixture(),
         array(42 => array(Pin::MODE_OUTPUT))
       );
-      $this->assertInstanceOf('Carica\\Firmata\\Pin', $pins[42]);
+      $this->assertInstanceOf(Pin::class, $pins[42]);
     }
 
     /**
-     * @covers Carica\Firmata\Pins::offsetGet
+     * @covers \Carica\Firmata\Pins::offsetGet
      */
     public function testArrayAccessOffsetGetWithInvalidOffsetExpectingException() {
       $pins = new Pins(
         $this->getBoardFixture(), array()
       );
       $this->setExpectedException(
-        'Carica\\Firmata\\Exception\\NonExistingPin'
+        \Carica\Firmata\Exception\NonExistingPin::class
       );
       $pins[42];
     }
 
     /**
-     * @covers Carica\Firmata\Pins::offsetSet
+     * @covers \Carica\Firmata\Pins::offsetSet
      */
     public function testArrayAccessOffsetSetExpectingException() {
       $pins = new Pins(
         $this->getBoardFixture(), array()
       );
       $this->setExpectedException(
-        'LogicException'
+        \LogicException::class
       );
       $pins[] = '';
     }
 
     /**
-     * @covers Carica\Firmata\Pins::offsetUnset
+     * @covers \Carica\Firmata\Pins::offsetUnset
      */
     public function testArrayAccessOffsetUnsetExpectingException() {
       $pins = new Pins(
         $this->getBoardFixture(), array()
       );
       $this->setExpectedException(
-        'LogicException'
+        \LogicException::class
       );
       unset($pins[42]);
     }
@@ -160,7 +160,7 @@ namespace Carica\Firmata {
 
     private function getBoardFixture() {
       $board = $this
-        ->getMockBuilder('Carica\\Firmata\\Board')
+        ->getMockBuilder(Board::class)
         ->disableOriginalConstructor()
         ->getMock();
       return $board;

@@ -10,18 +10,18 @@ namespace Carica\Firmata {
   class PulseInTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\PulseIn
+     * @covers \Carica\Firmata\PulseIn
      */
     public function testPulsInTrigger() {
-      $stream = $this->getMock('Carica\Io\Stream');
+      $stream = $this->getMockBuilder(Io\Stream::class)->getMock();
       $stream
         ->expects($this->once())
         ->method('write')
         ->with("\xF0\x74\x03\x01\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x0f\x00\x42\x00\x40\x00\xF7");
 
-      $events = new \Carica\Io\Event\Emitter();
+      $events = new Io\Event\Emitter();
       $board = $this
-        ->getMockBuilder('Carica\Firmata\Board')
+        ->getMockBuilder(Board::class)
         ->disableOriginalConstructor()
         ->getMock();
       $board

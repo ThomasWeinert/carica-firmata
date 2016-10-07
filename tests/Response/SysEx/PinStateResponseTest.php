@@ -11,7 +11,7 @@ namespace Carica\Firmata\Response\SysEx {
   class PinStateResponseTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @covers Carica\Firmata\Response\SysEx\PinStateResponse
+     * @covers \Carica\Firmata\Response\SysEx\PinStateResponse
      * @dataProvider providePinStateExamples
      */
     public function testConstructor($pin, $mode, $value, $bytes) {
