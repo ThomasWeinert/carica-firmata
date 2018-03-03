@@ -37,27 +37,26 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @param mixed $data
-     * @param null $secondData
+     * @param array $data
      * @return \PHPUnit\Framework\MockObject\MockObject|Board
      */
-    public function getBoardWithStreamFixture($data, $secondData = NULL) {
+    public function getBoardWithStreamFixture(...$data) {
       $emitter = new Io\Event\Emitter;
       $stream = $this->getMockBuilder(Io\Stream::class)->getMock();
-      if (func_num_args() > 1) {
+      if (\count($data) > 1) {
         $assertion = $stream
           ->expects($this->any())
           ->method('write');
         $arguments = [];
-        foreach (func_get_args() as $bytes) {
+        foreach ($data as $bytes) {
           $arguments[] = [$bytes];
         }
-        call_user_func_array([$assertion, 'withConsecutive'], $arguments);
+        $assertion->withConsecutive(...$arguments);
       } else {
         $stream
           ->expects($this->once())
           ->method('write')
-          ->with($data);
+          ->with($data[0]);
       }
       $board = $this
         ->getMockBuilder(Board::class)

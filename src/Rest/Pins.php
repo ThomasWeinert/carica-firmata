@@ -27,10 +27,11 @@ namespace Carica\Firmata\Rest {
     /**
      * Make the class Callable
      *
+     * @param array $arguments
      * @return Http\Response
      */
-    public function __invoke() {
-      return call_user_func_array(array($this, 'handle'), func_get_args());
+    public function __invoke(...$arguments) {
+      return $this->handle(...$arguments);
     }
 
     /**
