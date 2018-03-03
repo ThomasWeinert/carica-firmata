@@ -20,7 +20,7 @@ install: composer install
 
 script: php phpunit.phar --configuration phpunit.xml.dist tests
 
-notifications
+notifications:
   webhooks:
     urls:
       - https://webhooks.gitter.im/e/f0abd75c9ea61d414afa
