@@ -6,13 +6,15 @@ namespace Carica\Firmata\Rest {
 
   use Carica\Io;
   use Carica\Firmata;
+  use PHPUnit\Framework\MockObject\MockObject;
 
-  class PinsTest extends \PHPUnit_Framework_TestCase {
+  class PinsTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\Rest\Pins
      */
     public function testWithInactiveBoard() {
+      /** @var MockObject|Firmata\Board $board */
       $board = $this
         ->getMockBuilder(Firmata\Board::class)
         ->disableOriginalConstructor()
@@ -50,6 +52,7 @@ namespace Carica\Firmata\Rest {
           )
         );
 
+      /** @var MockObject|Firmata\Board $board */
       $board = $this
         ->getMockBuilder(Firmata\Board::class)
         ->disableOriginalConstructor()
@@ -97,6 +100,7 @@ namespace Carica\Firmata\Rest {
         ->getMockBuilder(Firmata\Rest\Pin::class)
         ->disableOriginalConstructor()
         ->getMock();
+      /** @var MockObject|Firmata\Board $board */
       $board = $this
         ->getMockBuilder(Firmata\Board::class)
         ->disableOriginalConstructor()
@@ -111,6 +115,7 @@ namespace Carica\Firmata\Rest {
      * @covers \Carica\Firmata\Rest\Pins
      */
     public function testPinHandlerGetImplicitCreate() {
+      /** @var MockObject|Firmata\Board $board */
       $board = $this
         ->getMockBuilder(Firmata\Board::class)
         ->disableOriginalConstructor()
@@ -121,6 +126,7 @@ namespace Carica\Firmata\Rest {
     }
 
     private function getRequestFixture() {
+      /** @var MockObject|Io\Network\Http\Connection $connection */
       $connection = $this
         ->getMockBuilder(Io\Network\Http\Connection::class)
         ->disableOriginalConstructor()

@@ -4,10 +4,9 @@ namespace Carica\Firmata\I2C {
 
   include_once(__DIR__ . '/../Bootstrap.php');
 
-  use Carica\Io;
   use Carica\Firmata;
 
-  class ReplyTest extends \PHPUnit_Framework_TestCase {
+  class ReplyTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\I2C\Reply

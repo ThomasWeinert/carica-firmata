@@ -7,10 +7,11 @@ namespace Carica\Firmata {
   use Carica\Io\Event\Emitter;
   use Carica\Io\Stream;
   use Carica\Io\Stream\Tcp;
+  use PHPUnit\Framework\MockObject\MockObject;
 
   include_once(__DIR__ . '/Bootstrap.php');
 
-  class BoardTest extends \PHPUnit_Framework_TestCase {
+  class BoardTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\Board::__construct
@@ -84,8 +85,8 @@ namespace Carica\Firmata {
      */
     public function testGetPropertyWithUnknownPropertyName() {
       $board = new Board($this->getStreamFixture());
-      $this->setExpectedException('LogicException');
-      $dummy = $board->INVALID_PROPERTY;
+      $this->expectException(\LogicException::class);
+      $board->INVALID_PROPERTY;
     }
 
     /**
@@ -93,7 +94,7 @@ namespace Carica\Firmata {
      */
     public function testSetPropertyVersionExpectingException() {
       $board = new Board($this->getStreamFixture());
-      $this->setExpectedException(\LogicException::class);
+      $this->expectException(\LogicException::class);
       $board->version = 'trigger';
     }
 
@@ -102,7 +103,7 @@ namespace Carica\Firmata {
      */
     public function testSetPropertyFirmwareExpectingException() {
       $board = new Board($this->getStreamFixture());
-      $this->setExpectedException(\LogicException::class);
+      $this->expectException(\LogicException::class);
       $board->firmware = 'trigger';
     }
 
@@ -111,7 +112,7 @@ namespace Carica\Firmata {
      */
     public function testSetPropertyWithUnknownPropertyName() {
       $board = new Board($this->getStreamFixture());
-      $this->setExpectedException(\LogicException::class);
+      $this->expectException(\LogicException::class);
       $board->INVALID_PROPERTY = 'trigger';
     }
 
@@ -125,6 +126,7 @@ namespace Carica\Firmata {
         ->method('once')
         ->with('error', $this->isInstanceOf('Closure'));
 
+      /** @var MockObject|Tcp $stream */
       $stream = $this->getMockBuilder(Tcp::class)->getMock();
       $stream
         ->expects($this->any())
@@ -146,6 +148,7 @@ namespace Carica\Firmata {
     public function testActivateStreamErrorRejectsPromise() {
       $events = new Emitter();
 
+      /** @var MockObject|Tcp $stream */
       $stream = $this->getMockBuilder(Tcp::class)->getMock();
       $stream
         ->expects($this->any())
@@ -175,6 +178,7 @@ namespace Carica\Firmata {
     public function testActivateWithSimpleStartUp() {
       $events = new Emitter();
 
+      /** @var MockObject|Tcp $stream */
       $stream = $this->getMockBuilder(Tcp::class)->getMock();
       $stream
         ->expects($this->any())

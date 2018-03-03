@@ -7,7 +7,7 @@ namespace Carica\Firmata {
 
   include_once(__DIR__ . '/Bootstrap.php');
 
-  class PinTest extends \PHPUnit_Framework_TestCase {
+  class PinTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\Pin::__construct
@@ -44,7 +44,7 @@ namespace Carica\Firmata {
      */
     public function testSetInvalidPropertyExpectingException() {
       $pin = new Pin($this->getBoardFixture(), 12, array(Pin::MODE_OUTPUT => 1));
-      $this->setExpectedException(\LogicException::class);
+      $this->expectException(\LogicException::class);
       $pin->INVALID_PROPERTY = 'trigger';
     }
 
@@ -53,8 +53,8 @@ namespace Carica\Firmata {
      */
     public function testGetInvalidPropertyExpectingException() {
       $pin = new Pin($this->getBoardFixture(), 12, array(Pin::MODE_OUTPUT => 1));
-      $this->setExpectedException(\LogicException::class);
-      $dummy = $pin->INVALID_PROPERTY;
+      $this->expectException(\LogicException::class);
+      $pin->INVALID_PROPERTY;
     }
 
     /**
@@ -72,7 +72,7 @@ namespace Carica\Firmata {
     public function testSetBoardExpectingException() {
       $board = $this->getBoardFixture();
       $pin = new Pin($board, 12, array(Pin::MODE_OUTPUT => 1));
-      $this->setExpectedException(\LogicException::class);
+      $this->expectException(\LogicException::class);
       $pin->board = $board;
     }
 
@@ -89,7 +89,7 @@ namespace Carica\Firmata {
      */
     public function testSetPinExpectingException() {
       $pin = new Pin($this->getBoardFixture(), 12, array(Pin::MODE_OUTPUT => 1));
-      $this->setExpectedException(\LogicException::class);
+      $this->expectException(\LogicException::class);
       $pin->pin = 13;
     }
 
@@ -108,7 +108,7 @@ namespace Carica\Firmata {
      */
     public function testSetSupportsExpectingException() {
       $pin = new Pin($this->getBoardFixture(), 12, array(Pin::MODE_OUTPUT => 1));
-      $this->setExpectedException(\LogicException::class);
+      $this->expectException(\LogicException::class);
       $pin->supports = array();
     }
 
@@ -166,7 +166,7 @@ namespace Carica\Firmata {
         ->method('pinMode');
 
       $pin = new Pin($board, 12, array(Pin::MODE_OUTPUT => 1));
-      $this->setExpectedException(Exception\UnsupportedMode::class);
+      $this->expectException(Exception\UnsupportedMode::class);
       $pin->mode = Pin::MODE_ANALOG;
     }
 
@@ -332,7 +332,7 @@ namespace Carica\Firmata {
 
     /**
      * @param Emitter $events
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|Stream
      */
     private function getStreamFixture(Emitter $events = NULL) {
       $stream = $this->getMockBuilder(Stream::class)->getMock();
@@ -345,6 +345,9 @@ namespace Carica\Firmata {
       return $stream;
     }
 
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject|Board
+     */
     private function getBoardFixture() {
       $board = $this
         ->getMockBuilder(Board::class)

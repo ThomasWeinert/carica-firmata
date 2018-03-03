@@ -6,7 +6,7 @@ namespace Carica\Firmata\Response\SysEx {
 
   use Carica\Firmata;
 
-  class AnalogMappingResponseTest extends \PHPUnit_Framework_TestCase {
+  class AnalogMappingResponseTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\Response\SysEx\AnalogMappingResponse

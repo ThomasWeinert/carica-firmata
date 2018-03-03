@@ -2,14 +2,17 @@
 
 namespace Carica\Firmata {
 
+  use PHPUnit\Framework\MockObject\MockObject;
+
   include_once(__DIR__ . '/Bootstrap.php');
 
-  class RequestTest extends \PHPUnit_Framework_TestCase {
+  class RequestTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\Request
      */
     public function testConstrutor() {
+      /** @var MockObject|Board $board */
       $board = $this
         ->getMockBuilder(Board::class)
         ->disableOriginalConstructor()

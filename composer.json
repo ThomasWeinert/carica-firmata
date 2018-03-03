@@ -12,8 +12,8 @@
     }
   ],
   "require": {
-    "php": ">=5.4",
-    "carica/io": "dev-master"
+    "php": ">=7.1",
+    "carica/io": "^1.0"
   },
   "provide": {
     "carica/io-devices" : "0.0.1"

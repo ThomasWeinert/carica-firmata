@@ -7,7 +7,7 @@ namespace Carica\Firmata\I2C {
   use Carica\Io;
   use Carica\Firmata;
 
-  class RequestTest extends \PHPUnit_Framework_TestCase {
+  class RequestTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\I2C\Request
@@ -78,6 +78,10 @@ namespace Carica\Firmata\I2C {
       $request->send();
     }
 
+    /**
+     * @param $data
+     * @return \PHPUnit\Framework\MockObject\MockObject|Firmata\Board
+     */
     public function getBoardWithStreamFixture($data) {
       $stream = $this->getMockBuilder(Io\Stream::class)->getMock();
       $stream

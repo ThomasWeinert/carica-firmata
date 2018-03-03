@@ -4,7 +4,7 @@ namespace Carica\Firmata {
 
   include_once(__DIR__ . '/Bootstrap.php');
 
-  class VersionTest extends \PHPUnit_Framework_TestCase {
+  class VersionTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\Version
@@ -36,8 +36,8 @@ namespace Carica\Firmata {
      */
     public function testGetPropertyWithIvalidPropertyName() {
       $version = new Version(2, 3, 'Success');
-      $this->setExpectedException('LogicException');
-      $dummy = $version->INVALID;
+      $this->expectException(\LogicException::class);
+      $version->INVALID;
     }
 
     /**
@@ -45,7 +45,7 @@ namespace Carica\Firmata {
      */
     public function testSetProperty() {
       $version = new Version(2, 3, 'Success');
-      $this->setExpectedException('LogicException');
+      $this->expectException(\LogicException::class);
       $version->major = 'fail';
     }
   }

@@ -4,10 +4,7 @@ namespace Carica\Firmata\Response\SysEx {
 
   include_once(__DIR__ . '/../../Bootstrap.php');
 
-  use Carica\Io;
-  use Carica\Firmata;
-
-  class QueryFirmwareTest extends \PHPUnit_Framework_TestCase {
+  class QueryFirmwareTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\Response\SysEx\QueryFirmware

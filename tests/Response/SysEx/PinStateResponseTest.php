@@ -2,13 +2,11 @@
 
 namespace Carica\Firmata\Response\SysEx {
 
-  use Carica\Firmata\Response\SysEx\PinStateResponse;
-
   include_once(__DIR__ . '/../../Bootstrap.php');
 
   use Carica\Firmata;
 
-  class PinStateResponseTest extends \PHPUnit_Framework_TestCase {
+  class PinStateResponseTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\Response\SysEx\PinStateResponse

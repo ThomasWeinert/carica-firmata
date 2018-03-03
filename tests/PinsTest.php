@@ -4,7 +4,7 @@ namespace Carica\Firmata {
 
   include_once(__DIR__ . '/Bootstrap.php');
 
-  class PinsTest extends \PHPUnit_Framework_TestCase {
+  class PinsTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\Pins::__construct
@@ -122,7 +122,7 @@ namespace Carica\Firmata {
       $pins = new Pins(
         $this->getBoardFixture(), array()
       );
-      $this->setExpectedException(
+      $this->expectException(
         \Carica\Firmata\Exception\NonExistingPin::class
       );
       $pins[42];
@@ -135,7 +135,7 @@ namespace Carica\Firmata {
       $pins = new Pins(
         $this->getBoardFixture(), array()
       );
-      $this->setExpectedException(
+      $this->expectException(
         \LogicException::class
       );
       $pins[] = '';
@@ -148,7 +148,7 @@ namespace Carica\Firmata {
       $pins = new Pins(
         $this->getBoardFixture(), array()
       );
-      $this->setExpectedException(
+      $this->expectException(
         \LogicException::class
       );
       unset($pins[42]);
@@ -158,6 +158,9 @@ namespace Carica\Firmata {
      * Fixtures
      *****************/
 
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject|Board
+     */
     private function getBoardFixture() {
       $board = $this
         ->getMockBuilder(Board::class)

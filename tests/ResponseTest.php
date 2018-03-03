@@ -4,7 +4,7 @@ namespace Carica\Firmata {
 
   include_once(__DIR__ . '/Bootstrap.php');
 
-  class ResponseTest extends \PHPUnit_Framework_TestCase {
+  class ResponseTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\Response
@@ -19,8 +19,8 @@ namespace Carica\Firmata {
      */
     public function testReadInvalidPropertyExpectingException() {
       $response = new Response_TestProxy(0x42, [0x42, 0x00, 0x00]);
-      $this->setExpectedException('LogicException');
-      $dummy = $response->INVALID_PROPERTY;
+      $this->expectException(\LogicException::class);
+      $response->INVALID_PROPERTY;
     }
 
     /**

@@ -6,7 +6,7 @@ namespace Carica\Firmata {
 
   include_once(__DIR__ . '/Bootstrap.php');
 
-  class I2CTest extends \PHPUnit_Framework_TestCase {
+  class I2CTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\I2C
@@ -36,6 +36,11 @@ namespace Carica\Firmata {
       $this->assertInstanceOf(Io\Deferred::class, $defer);
     }
 
+    /**
+     * @param mixed $data
+     * @param null $secondData
+     * @return \PHPUnit\Framework\MockObject\MockObject|Board
+     */
     public function getBoardWithStreamFixture($data, $secondData = NULL) {
       $emitter = new Io\Event\Emitter;
       $stream = $this->getMockBuilder(Io\Stream::class)->getMock();

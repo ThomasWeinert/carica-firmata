@@ -2,14 +2,11 @@
 
 namespace Carica\Firmata\Response\SysEx {
 
-  use Carica\Firmata\Response\SysEx\CapabilityResponse;
-
   include_once(__DIR__ . '/../../Bootstrap.php');
 
-  use Carica\Io;
   use Carica\Firmata;
 
-  class CapabilityResponseTest extends \PHPUnit_Framework_TestCase {
+  class CapabilityResponseTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\Response\SysEx\CapabilityResponse

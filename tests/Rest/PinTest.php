@@ -6,13 +6,15 @@ namespace Carica\Firmata\Rest {
 
   use Carica\Io;
   use Carica\Firmata;
+  use PHPUnit\Framework\MockObject\MockObject;
 
-  class PinTest extends \PHPUnit_Framework_TestCase {
+  class PinTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\Rest\Pin
      */
     public function testWithInactiveBoard() {
+      /** @var MockObject|Firmata\Board $board */
       $board = $this
         ->getMockBuilder(Firmata\Board::class)
         ->disableOriginalConstructor()
@@ -105,7 +107,7 @@ namespace Carica\Firmata\Rest {
         ->method('__set')
         ->with('mode', Firmata\Pin::MODE_PWM);
       $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
-      $response = $handler($request, array('pin' => 0));
+      $handler($request, array('pin' => 0));
     }
 
     /**
@@ -118,7 +120,7 @@ namespace Carica\Firmata\Rest {
         ->expects($this->never())
         ->method('__set');
       $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
-      $response = $handler($request, array('pin' => 0));
+      $handler($request, array('pin' => 0));
     }
 
     /**
@@ -132,7 +134,7 @@ namespace Carica\Firmata\Rest {
         ->method('__set')
         ->with('digital', Firmata\Board::DIGITAL_HIGH);
       $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
-      $response = $handler($request, array('pin' => 0));
+      $handler($request, array('pin' => 0));
     }
 
     /**
@@ -146,7 +148,7 @@ namespace Carica\Firmata\Rest {
         ->method('__set')
         ->with('analog', $this->equalTo(0.5, 0.01));
       $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
-      $response = $handler($request, array('pin' => 0));
+      $handler($request, array('pin' => 0));
     }
 
     /**
@@ -160,13 +162,17 @@ namespace Carica\Firmata\Rest {
         ->method('__set')
         ->with('value', 128);
       $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
-      $response = $handler($request, array('pin' => 0));
+      $handler($request, array('pin' => 0));
     }
 
     /************************
      * Fixtures
      ***********************/
 
+    /**
+     * @param array $pins
+     * @return \PHPUnit\Framework\MockObject\MockObject|Firmata\Board
+     */
     private function getBoardFixture(array $pins = array()) {
       $board = $this
         ->getMockBuilder(Firmata\Board::class)
@@ -214,6 +220,7 @@ namespace Carica\Firmata\Rest {
     }
 
     private function getRequestFixture($query = array()) {
+      /** @var MockObject|Io\Network\Http\Connection $connection */
       $connection = $this
         ->getMockBuilder(Io\Network\Http\Connection::class)
         ->disableOriginalConstructor()

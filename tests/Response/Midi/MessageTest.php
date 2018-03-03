@@ -4,10 +4,7 @@ namespace Carica\Firmata\Response\Midi {
 
   include_once(__DIR__ . '/../../Bootstrap.php');
 
-  use Carica\Io;
-  use Carica\Firmata;
-
-  class MessageTest extends \PHPUnit_Framework_TestCase {
+  class MessageTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\Response\Midi\Message

@@ -6,8 +6,9 @@ namespace Carica\Firmata {
 
   use Carica\Io;
   use Carica\Firmata;
+  use PHPUnit\Framework\MockObject\MockObject;
 
-  class PulseInTest extends \PHPUnit_Framework_TestCase {
+  class PulseInTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @covers \Carica\Firmata\PulseIn
@@ -20,6 +21,7 @@ namespace Carica\Firmata {
         ->with("\xF0\x74\x03\x01\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x0f\x00\x42\x00\x40\x00\xF7");
 
       $events = new Io\Event\Emitter();
+      /** @var MockObject|Firmata\Board $board */
       $board = $this
         ->getMockBuilder(Board::class)
         ->disableOriginalConstructor()
