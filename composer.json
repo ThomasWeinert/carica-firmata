@@ -13,7 +13,7 @@
   ],
   "require": {
     "php": ">=7.1",
-    "carica/io": "^1.0"
+    "carica/io": "^1.1"
   },
   "provide": {
     "carica/io-devices" : "0.0.1"
