@@ -184,7 +184,7 @@ namespace Carica\Firmata {
       $pin = new Pin($board, 12, array(Pin::MODE_PWM => 255));
       $pin->analog = 0.5;
       $pin->analog = 0.5;
-      $this->assertEquals(0.5, $pin->analog, '', 0.01);
+      $this->assertEqualsWithDelta(0.5, $pin->analog, 0.01);
       $this->assertEquals(128, $pin->value);
     }
 
@@ -201,7 +201,7 @@ namespace Carica\Firmata {
 
       $pin = new Pin($board, 12, array(Pin::MODE_PWM => 255));
       $pin->analog = -0.5;
-      $this->assertEquals(0, $pin->analog, '', 0.01);
+      $this->assertEqualsWithDelta(0, $pin->analog, 0.01);
       $this->assertEquals(0, $pin->value);
     }
 
@@ -218,7 +218,7 @@ namespace Carica\Firmata {
 
       $pin = new Pin($board, 12, array(Pin::MODE_PWM => 255));
       $pin->analog = 99;
-      $this->assertEquals(1, $pin->analog, '', 0.01);
+      $this->assertEqualsWithDelta(1, $pin->analog, 0.01);
       $this->assertEquals(255, $pin->value);
     }
 
@@ -265,7 +265,7 @@ namespace Carica\Firmata {
       $pin = new Pin($board, 12, array(Pin::MODE_OUTPUT => 1, Pin::MODE_ANALOG => 1023));
       $board->events()->emit('pin-state-12', Pin::MODE_ANALOG, 255);
       $this->assertEquals(Pin::MODE_ANALOG, $pin->mode);
-      $this->assertEquals(0.25, $pin->analog, '', 0.01);
+      $this->assertEqualsWithDelta(0.25, $pin->analog, 0.01);
     }
 
     /**
@@ -275,7 +275,7 @@ namespace Carica\Firmata {
       $board = new Board($this->getStreamFixture());
       $pin = new Pin($board, 12, array(Pin::MODE_ANALOG => 1023));
       $board->events()->emit('analog-read-12', 512);
-      $this->assertEquals(0.5, $pin->analog, '', 0.01);
+      $this->assertEqualsWithDelta(0.5, $pin->analog, 0.01);
     }
 
     /**
@@ -309,7 +309,7 @@ namespace Carica\Firmata {
         $pin->supports(Pin::MODE_PWM)
       );
     }
-    
+
     /**
      * @covers \Carica\Firmata\Pin
      */

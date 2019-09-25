@@ -32,10 +32,6 @@ namespace Carica\Firmata {
      */
     public function testIsActiveExpectingFalse() {
       $stream = $this->getStreamFixture();
-      $stream
-        ->expects($this->once())
-        ->method('isOpen')
-        ->will($this->returnValue(FALSE));
       $board = new Board($stream);
       $this->assertFalse($board->isActive());
     }

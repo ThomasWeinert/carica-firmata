@@ -1,20 +1,22 @@
 language: php
 
 php:
-  - 7.1
-  - 7.1snapshot
   - 7.2
   - 7.2snapshot
+  - 7.3
+  - 7.3snapshot
+  - 7.4snapshot
   - nightly
 
 matrix:
   allow_failures:
+    - php: 7.4snapshot
     - php: nightly
 
 before_install:
   - composer self-update
   - composer clear-cache
-  - wget https://phar.phpunit.de/phpunit.phar
+  - wget -O phpunit.phar https://phar.phpunit.de/phpunit-8.3.phar
 
 install: composer install
 

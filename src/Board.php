@@ -171,7 +171,7 @@ namespace Carica\Firmata {
       }
       $this->_stream->events()->once(
         'error',
-        static function ($message) use ($activation) {
+        function ($message) use ($activation) {
           $this->deactivate();
           $activation->reject($message);
         }

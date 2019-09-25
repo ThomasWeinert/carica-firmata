@@ -59,13 +59,14 @@ namespace Carica\Firmata\Rest {
         $boardNode->setAttribute('active', 'yes');
         $boardNode->setAttribute('firmata', (string)$this->_board->version);
         $pinId = isset($parameters['pin']) ? (int)$parameters['pin'] : -1;
-        if (isset($this->_board->pins[$pinId])) {
-          $pin = $this->_board->pins[$pinId];
+        $pins = $this->_board->pins;
+        if (isset($pins[$pinId])) {
+          $pin = $pins[$pinId];
           if (isset($request->query['mode'])) {
             $this->setPinMode($pin, $request->query['mode']);
           }
           if (isset($request->query['digital'])) {
-            $pin->digital = $request->query['digital'] == 'yes' ? TRUE : FALSE;
+            $pin->digital = $request->query['digital'] === 'yes';
           } elseif (isset($request->query['analog'])) {
             $pin->analog = (float)$request->query['analog'];
           } elseif (isset($request->query['value'])) {
@@ -97,9 +98,10 @@ namespace Carica\Firmata\Rest {
      * @param int $pinId
      */
     public function appendPin(\DOMElement $parent, $pinId) {
-      if (isset($this->_board->pins[$pinId])) {
+      $pins = $this->_board->pins;
+      if (isset($pins[$pinId])) {
         $dom = $parent->ownerDocument;
-        $pin = $this->_board->pins[$pinId];
+        $pin = $pins[$pinId];
         $parent->appendChild($pinNode = $dom->createElement('pin'));
         $pinNode->setAttribute('number', $pin->pin);
         $modes = array();
