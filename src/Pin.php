@@ -17,7 +17,7 @@ namespace Carica\Firmata {
    * @property bool $digital Get/set the pin value using an boolean value
    */
   class Pin
-    implements 
+    implements
       Io\Event\HasEmitter,
       Io\Device\Pin {
 
@@ -210,7 +210,7 @@ namespace Carica\Firmata {
         sprintf('Property %s::$%s can not be written', get_class($this), $name)
       );
     }
-    
+
     public function getMode() {
       return $this->_mode;
     }
@@ -239,7 +239,7 @@ namespace Carica\Firmata {
 
     /**
      * Return the current state (low/high) of the pin as boolean
-     * @return bool 
+     * @return bool
      */
     public function getDigital() {
       return ($this->_value == Board::DIGITAL_HIGH);
@@ -290,8 +290,7 @@ namespace Carica\Firmata {
     }
 
     /**
-     * Setter method for the analog property. Allows to set change the value on the pin.
-     * @param float $value between 0 and 1
+     * @param int $value
      */
     public function setValue($value) {
       $value = (int)$value;

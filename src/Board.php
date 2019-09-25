@@ -3,6 +3,7 @@
 namespace Carica\Firmata {
 
   use Carica\Io;
+  use Carica\Io\Deferred\Promise;
   use Carica\Io\Event;
 
   /**
@@ -10,7 +11,7 @@ namespace Carica\Firmata {
    *
    * @property-read Version $version
    * @property-read Version $firmware
-   * @property Pins $pins
+   * @property Pins|Pin[] $pins
    */
   class Board
     implements Event\HasEmitter {
@@ -18,37 +19,45 @@ namespace Carica\Firmata {
     use Event\Emitter\Aggregation;
     use Event\Loop\Aggregation;
 
-    const PIN_MODE = 0xF4;
-    const REPORT_DIGITAL = 0xD0;
-    const REPORT_ANALOG = 0xC0;
-    const DIGITAL_MESSAGE = 0x90;
-    const START_SYSEX = 0xF0;
-    const END_SYSEX = 0xF7;
-    const QUERY_FIRMWARE = 0x79;
-    const REPORT_VERSION = 0xF9;
-    const ANALOG_MESSAGE = 0xE0;
-    const CAPABILITY_QUERY = 0x6B;
-    const CAPABILITY_RESPONSE = 0x6C;
-    const PIN_STATE_QUERY = 0x6D;
-    const PIN_STATE_RESPONSE = 0x6E;
-    const EXTENDED_ANALOG = 0x6F;
-    const ANALOG_MAPPING_QUERY = 0x69;
-    const ANALOG_MAPPING_RESPONSE = 0x6A;
-    const STRING_DATA = 0x71;
-    const SYSTEM_RESET = 0xFF;
+    public const PIN_MODE = 0xF4;
+    public const REPORT_DIGITAL = 0xD0;
+    public const REPORT_ANALOG = 0xC0;
+    public const DIGITAL_MESSAGE = 0x90;
+    public const START_SYSEX = 0xF0;
+    public const END_SYSEX = 0xF7;
+    public const QUERY_FIRMWARE = 0x79;
+    public const REPORT_VERSION = 0xF9;
+    public const ANALOG_MESSAGE = 0xE0;
+    public const CAPABILITY_QUERY = 0x6B;
+    public const CAPABILITY_RESPONSE = 0x6C;
+    public const PIN_STATE_QUERY = 0x6D;
+    public const PIN_STATE_RESPONSE = 0x6E;
+    public const EXTENDED_ANALOG = 0x6F;
+    public const ANALOG_MAPPING_QUERY = 0x69;
+    public const ANALOG_MAPPING_RESPONSE = 0x6A;
+    public const STRING_DATA = 0x71;
+    public const SYSTEM_RESET = 0xFF;
 
-    const DIGITAL_LOW = 0;
-    const DIGITAL_HIGH = 1;
+    public const DIGITAL_LOW = 0;
+    public const DIGITAL_HIGH = 1;
+
+    // States for the activation steps
+    public const ACTIVATION_STARTED = 'activation_started';
+    public const FETCHING_VERSION = 'fetch_version';
+    public const FETCHING_FIRMWARE = 'fetch_firmware';
+    public const FETCHING_CAPABILITIES = 'fetch_capabilities';
+    public const FETCHING_ANALOG_MAPPING = 'fetch_analog_mapping';
+    public const ACTIVATION_FINISHED = 'activation_finished';
 
     /**
      * @var \Carica\Firmata\Pins
      */
-    private $_pins = NULL;
+    private $_pins;
 
     /**
-     * @var \Carica\Io\Stream
+     * @var Io\Stream
      */
-    private $_stream = NULL;
+    private $_stream;
 
     /**
      * @var array Data Buffer
@@ -58,19 +67,38 @@ namespace Carica\Firmata {
     /**
      * @var bool Set to true after here was a version byte on the buffer
      */
-    private $_bufferVersionReceived = false;
+    private $_bufferVersionReceived = FALSE;
 
     /**
      * Firmata version information
+     *
      * @var Version
      */
-    private $_version = NULL;
+    private $_version;
 
     /**
      * Firmware version information
+     *
      * @var Version
      */
-    private $_firmware= NULL;
+    private $_firmware;
+
+    /**
+     * @var mixed
+     */
+    private $_heartBeat;
+    /**
+     * @var int
+     */
+    private $_heartBeatInterval = 5000;
+    /**
+     * @var int
+     */
+    private $_activationTry = 0;
+    /**
+     * @var bool
+     */
+    private $_isActivated = FALSE;
 
 
     /**
@@ -82,11 +110,11 @@ namespace Carica\Firmata {
       $this->_stream = $stream;
       $this->_stream->events()->on(
         'read-data',
-        function($data) {
-          if (count($this->_buffer) == 0) {
+        function ($data) {
+          if (\count($this->_buffer) === 0) {
             $data = ltrim($data, pack('C', 0));
           }
-          $bytes = array_slice(unpack("C*", "\0".$data), 1);
+          $bytes = \array_slice(unpack('C*', "\0".$data), 1);
           foreach ($bytes as $byte) {
             $this->handleData($byte);
           }
@@ -99,8 +127,8 @@ namespace Carica\Firmata {
      *
      * @return boolean
      */
-    public function isActive() {
-      return $this->stream()->isOpen();
+    public function isActive(): bool {
+      return $this->_isActivated && $this->stream()->isOpen();
     }
 
     /**
@@ -108,7 +136,7 @@ namespace Carica\Firmata {
      *
      * @return Io\Stream
      */
-    public function stream() {
+    public function stream(): Io\Stream {
       return $this->_stream;
     }
 
@@ -118,7 +146,7 @@ namespace Carica\Firmata {
      * @param Pins $pins
      * @return Pins
      */
-    public function pins(Pins $pins = NULL) {
+    public function pins(Pins $pins = NULL): Pins {
       if (isset($pins)) {
         $this->_pins = $pins;
       } elseif (NULL === $this->_pins) {
@@ -132,59 +160,113 @@ namespace Carica\Firmata {
      * Activate the board, assign the needed callbacks
      *
      * @param Callable|NULL $callback
-     * @return Io\Deferred\Promise
+     * @return Promise
      */
-    public function activate(Callable $callback = NULL) {
-      $defer = new Io\Deferred();
+    public function activate(Callable $callback = NULL): Promise {
+      $this->_isActivated = FALSE;
+      $this->_activationTry = 1;
+      $activation = new Io\Deferred();
       if (isset($callback)) {
-        $defer->always($callback);
+        $activation->always($callback);
       }
       $this->_stream->events()->once(
         'error',
-        function($message) use ($defer) {
-          $defer->reject($message);
+        static function ($message) use ($activation) {
+          $this->deactivate();
+          $activation->reject($message);
         }
       );
-      if ($this->stream()->open()) {
-        $board = $this;
-        $board->reportVersion(
-          function() use ($board, $defer) {
-            $board->queryFirmware(
-              function() use ($board, $defer) {
-                $board->queryCapabilities(
-                  function() use ($board, $defer) {
-                    $board->queryAnalogMapping(
-                      function() use ($defer) {
-                        $defer->resolve();
-                      }
-                    );
-                  }
-                );
-              }
-            );
-          }
+      $this->connect($activation);
+      if (!($this->_heartBeat)) {
+        $this->_heartBeat = $this->loop()->setInterval(
+          function () use ($activation) {
+            if (!$this->_heartBeat) {
+              return;
+            }
+            if (!$this->isActive()) {
+              $activation->notify(self::ACTIVATION_STARTED, ++$this->_activationTry);
+              $activation->restart();
+              $this->connect($activation);
+            }
+          },
+          $this->_heartBeatInterval
         );
       }
-      return $defer->promise();
+      return $activation->promise();
+    }
+
+    public function deactivate(): void {
+      $this->_isActivated = FALSE;
+      if ($this->_heartBeat) {
+        $this->loop()->remove($this->_heartBeat);
+        $this->_heartBeat = NULL;
+      }
+      if ($this->stream()->isOpen()) {
+        $this->stream()->close();
+      }
+    }
+
+    private function connect(Io\Deferred $defer): void {
+      if (!$this->stream()->isOpen()) {
+        $this->stream()->open();
+      }
+      $board = $this;
+      $defer->notify(self::FETCHING_VERSION);
+      $board->reportVersion(
+        function () use ($defer) {
+          $defer->notify(self::FETCHING_FIRMWARE);
+          $this->queryFirmware(
+            function () use ($defer) {
+              $defer->notify(self::FETCHING_CAPABILITIES);
+              $this->queryCapabilities(
+                function () use ($defer) {
+                  $defer->notify(self::FETCHING_ANALOG_MAPPING);
+                  $this->queryAnalogMapping(
+                    function () use ($defer) {
+                      $this->_isActivated = TRUE;
+                      $defer->notify(self::ACTIVATION_FINISHED, $this->_activationTry);
+                      $defer->resolve();
+                    }
+                  );
+                }
+              );
+            }
+          );
+        }
+      );
     }
 
     /**
      * Provide some properties
      *
      * @param string $name
-     * @throws \LogicException
      * @return mixed
+     * @throws \LogicException
      */
     public function __get($name) {
       switch ($name) {
       case 'version' :
-        return isset($this->_version) ? $this->_version : new Version(0,0);
+        return $this->_version ?? new Version(0, 0);
       case 'firmware' :
-        return isset($this->_firmware) ? $this->_firmware : new Version(0,0);
+        return $this->_firmware ?? new Version(0, 0);
       case 'pins' :
         return $this->pins();
       }
       throw new \LogicException(sprintf('Unknown property %s::$%s', __CLASS__, $name));
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function __isset($name) {
+      switch ($name) {
+      case 'version' :
+      case 'firmware' :
+      case 'pins' :
+        return TRUE;
+      }
+      return FALSE;
     }
 
     /**
@@ -212,36 +294,36 @@ namespace Carica\Firmata {
     /**
      * @param int $byte
      */
-    private function handleData($byte) {
+    private function handleData($byte): void {
       if (!$this->_bufferVersionReceived) {
-        if ($byte !== Board::REPORT_VERSION) {
+        if ($byte !== self::REPORT_VERSION) {
           return;
-        } else {
-          $this->_bufferVersionReceived = TRUE;
         }
+        $this->_bufferVersionReceived = TRUE;
       }
       $byteCount = count($this->_buffer);
-      if ($byte == 0 && $byteCount == 0) {
+      if ($byte === 0 && $byteCount === 0) {
         return;
-      } else {
-        $this->_buffer[] = $byte;
-        ++$byteCount;
       }
+      $this->_buffer[] = $byte;
+      ++$byteCount;
       if ($byteCount > 0) {
         $first = reset($this->_buffer);
         $last = end($this->_buffer);
-        if ($first === Board::START_SYSEX &&
-            $last === Board::END_SYSEX) {
+        if (
+          $first === self::START_SYSEX &&
+          $last === self::END_SYSEX
+        ) {
           if ($byteCount > 2) {
             $this->handleExtendedMessage(
               $this->_buffer[1], array_slice($this->_buffer, 2, -1)
             );
           }
-          $this->_buffer = array();
-        } elseif ($byteCount == 3 && $first !== Board::START_SYSEX) {
+          $this->_buffer = [];
+        } elseif ($byteCount === 3 && $first !== self::START_SYSEX) {
           $command = ($first < 240) ? ($first & 0xF0) : $first;
           $this->handleMessage($command, $this->_buffer);
-          $this->_buffer = array();
+          $this->_buffer = [];
         }
       }
     }
@@ -253,7 +335,7 @@ namespace Carica\Firmata {
      * @param array $rawData
      *
      */
-    private function handleMessage($command, $rawData) {
+    private function handleMessage($command, $rawData): void {
       switch ($command) {
       case self::REPORT_VERSION :
         $this->handleVersionMessage(
@@ -279,7 +361,7 @@ namespace Carica\Firmata {
     /**
      * @param Response\Midi\ReportVersion $response
      */
-    private function handleVersionMessage(Response\Midi\ReportVersion $response) {
+    private function handleVersionMessage(Response\Midi\ReportVersion $response): void {
       $this->_version = new Version($response->major, $response->minor);
       for ($i = 0; $i < 16; $i++) {
         $this->stream()->write([self::REPORT_DIGITAL | $i, 1]);
@@ -293,7 +375,7 @@ namespace Carica\Firmata {
      *
      * @param Response\Midi\Message $response
      */
-    private function handleAnalogMessage(Response\Midi\Message $response) {
+    private function handleAnalogMessage(Response\Midi\Message $response): void {
       if (0 <= ($pinNumber = $this->pins->getPinByChannel($response->port))) {
         $this->events()->emit('analog-read-'.$pinNumber, $response->value);
         $this->events()->emit('analog-read', ['pin' => $pinNumber, 'value' => $response->value]);
@@ -305,16 +387,17 @@ namespace Carica\Firmata {
      *
      * @param Response\Midi\Message $response
      */
-    private function handleDigitalMessage(Response\Midi\Message $response) {
+    private function handleDigitalMessage(Response\Midi\Message $response): void {
       $firstPin = 8 * $response->port;
       for ($i = 0; $i < 8; $i++) {
         $pinNumber = $firstPin + $i;
         if (isset($this->pins[$pinNumber])) {
+          /** @var Pin $pin */
           $pin = $this->pins[$pinNumber];
-          if ($pin->getMode() == Pin::MODE_INPUT) {
+          if ($pin->getMode() === Pin::MODE_INPUT) {
             $value = ($response->value >> ($i & 0x07)) & 0x01;
           } else {
-            $value = $pin->getValue();
+            $value = $pin->getDigital();
           }
           $this->events()->emit('digital-read-'.$pinNumber, $value);
           $this->events()->emit('digital-read', ['pin' => $pinNumber, 'value' => $value]);
@@ -329,7 +412,7 @@ namespace Carica\Firmata {
      * @param array $rawData
      *
      */
-    private function handleExtendedMessage($command, $rawData) {
+    private function handleExtendedMessage($command, $rawData): void {
       switch ($command) {
       case self::STRING_DATA :
         $this->events()->emit('string', Response::decodeBytes($rawData));
@@ -363,7 +446,7 @@ namespace Carica\Firmata {
     /**
      * Reset board
      */
-    public function reset() {
+    public function reset(): void {
       $this->stream()->write([self::SYSTEM_RESET]);
     }
 
@@ -378,7 +461,7 @@ namespace Carica\Firmata {
     public function reportVersion(Callable $callback) {
       $this->stream()->write([self::REPORT_VERSION]);
       $interval = $this->loop()->setInterval(
-        function() {
+        function () {
           static $counter = 0;
           if (!$this->_bufferVersionReceived && ++$counter < 30) {
             $this->stream()->write([self::REPORT_VERSION]);
@@ -412,7 +495,7 @@ namespace Carica\Firmata {
      *
      * @param callable $callback
      */
-    public function queryCapabilities(Callable $callback) {
+    public function queryCapabilities(Callable $callback): void {
       $this->events()->once('capability-query', $callback);
       $this->stream()->write([self::START_SYSEX, self::CAPABILITY_QUERY, self::END_SYSEX]);
     }
@@ -422,7 +505,7 @@ namespace Carica\Firmata {
      *
      * @param callable $callback
      */
-    public function queryAnalogMapping(Callable  $callback) {
+    public function queryAnalogMapping(Callable $callback): void {
       $this->events()->once('analog-mapping-query', $callback);
       $this->stream()->write([self::START_SYSEX, self::ANALOG_MAPPING_QUERY, self::END_SYSEX]);
     }
@@ -433,7 +516,7 @@ namespace Carica\Firmata {
      * @param integer $pin 0-16
      * @param callable $callback
      */
-    public function queryPinState($pin, Callable $callback) {
+    public function queryPinState($pin, Callable $callback): void {
       $this->events()->once('pin-state-'.$pin, $callback);
       $this->stream()->write([self::START_SYSEX, self::PIN_STATE_QUERY, $pin, self::END_SYSEX]);
     }
@@ -441,7 +524,7 @@ namespace Carica\Firmata {
     /**
      * Query the status of each pin, this will update all pin objects
      */
-    public function queryAllPinStates() {
+    public function queryAllPinStates(): void {
       foreach ($this->pins as $index => $pin) {
         $this->stream()->write([self::START_SYSEX, self::PIN_STATE_QUERY, $index, self::END_SYSEX]);
       }
@@ -453,7 +536,7 @@ namespace Carica\Firmata {
      * @param integer $pin 0-16
      * @param Callable $callback
      */
-    public function analogRead($pin, Callable $callback) {
+    public function analogRead($pin, Callable $callback): void {
       $this->events()->on('analog-read-'.$pin, $callback);
     }
 
@@ -463,7 +546,7 @@ namespace Carica\Firmata {
      * @param integer $pin 0-16
      * @param callable $callback
      */
-    public function digitalRead($pin, Callable $callback) {
+    public function digitalRead($pin, Callable $callback): void {
       $this->events()->on('digital-read-'.$pin, $callback);
     }
 
@@ -474,14 +557,13 @@ namespace Carica\Firmata {
      * @param integer $pin
      * @param integer $value
      */
-    public function analogWrite($pin, $value) {
-      /** @noinspection PhpUndefinedMethodInspection */
+    public function analogWrite($pin, $value): void {
       $this->pins[$pin]->setValue($value);
       if ($pin > 15 || $value > 255) {
         $bytes = [self::START_SYSEX, self::EXTENDED_ANALOG, $pin];
         do {
           $bytes[] = $value & 0x7F;
-          $value = $value >> 7;
+          $value >>= 7;
         } while ($value > 0);
         $bytes[] = self::END_SYSEX;
       } else {
@@ -539,17 +621,17 @@ namespace Carica\Firmata {
       $this->pins[$pin]->setMode($mode);
       $this->stream()->write([self::PIN_MODE, $pin, $this->mapPinModeFirmataMode($mode)]);
     }
-    
+
 
     /**
      * Add a callback function to be notified if the pin mode or value changes
-     * 
+     *
      * @param callable $callback
      */
     public function onChange(callable $callback) {
       $this->events()->on('change', $callback);
     }
-    
+
     private function mapPinModeFirmataMode($pinMode) {
       $map = [
         Pin::MODE_INPUT => 0x00,
@@ -558,9 +640,9 @@ namespace Carica\Firmata {
         Pin::MODE_PWM => 0x03,
         Pin::MODE_SERVO => 0x04,
         Pin::MODE_SHIFT => 0x05,
-        Pin::MODE_I2C => 0x06 
+        Pin::MODE_I2C => 0x06
       ];
-      return (isset($map[$pinMode])) ? $map[$pinMode] : false;
+      return (isset($map[$pinMode])) ? $map[$pinMode] : FALSE;
     }
   }
 }
