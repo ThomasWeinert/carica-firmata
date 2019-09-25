@@ -33,9 +33,6 @@ $board
     }
   );
 
-
-if ($board->isActive()) {
-  $loop->run();
-}
+$loop->run();
 
 

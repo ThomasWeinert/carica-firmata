@@ -12,9 +12,9 @@ $board
   ->activate()
   ->done(
     // after the board got activated
-    function () use ($board, $loop) {
+    static function () use ($board, $loop) {
       // output the version
-      echo "Firmata ".$board->version." active\n";
+      echo 'Firmata '.$board->version." active\n";
 
       // get pin 13 (most boards already have an led on this pin)
       $pin = $board->pins[13];
@@ -23,7 +23,7 @@ $board
 
       // add an callback to the event loop that is called every second
       $loop->setInterval(
-        function () use ($pin) {
+        static function() use ($pin) {
           // toggle the pin (digital) value
           $pin->digital = !$pin->digital;
           // output the current status
@@ -34,7 +34,7 @@ $board
     }
   )
   ->fail(
-    function ($error) {
+    static function ($error) {
       echo $error."\n";
     }
   );

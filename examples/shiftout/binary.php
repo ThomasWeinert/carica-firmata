@@ -17,7 +17,7 @@ $board
         $board->pins[12],
         $board->pins[11]
       );
-      
+
       $loop->setInterval(
         function () use ($shiftOut) {
           static $number = 0;
@@ -36,7 +36,5 @@ $board
     }
   );
 
-if ($board->isActive()) {
-  $loop->run();
-}
+$loop->run();
 

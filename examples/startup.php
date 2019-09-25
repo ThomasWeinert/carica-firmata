@@ -8,32 +8,35 @@ $loop = Io\Event\Loop\Factory::get();
 
 $board->events()->on(
   'reportversion',
-  function () use ($board) {
+  static function () use ($board) {
     echo 'Firmata version: '.$board->version."\n";
   }
 );
 $board->events()->on(
   'queryfirmware',
-  function () use ($board) {
+  static function () use ($board) {
     echo 'Firmware version: '.$board->firmware."\n";
   }
 );
 
 $board
   ->activate()
+  ->progress(
+    static function($step, $try = NULL) {
+      echo 'Activation Step: ', $step, (isset($try) ? ' #'.$try : ''), "\n";
+    }
+  )
   ->done(
-    function () {
+    static function () {
       echo "activated\n";
     }
   )
   ->fail(
-    function ($error) {
+    static function ($error) {
       echo $error."\n";
     }
   );
 
-if ($board->isActive()) {
-  $loop->run();
-}
+$loop->run();
 
 

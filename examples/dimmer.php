@@ -9,7 +9,7 @@ $loop = Io\Event\Loop\Factory::get();
 $board
   ->activate()
   ->done(
-    function () use ($board, $loop) {
+    static function () use ($board, $loop) {
       echo "Firmata ".$board->version." active\n";
 
       $dimmerPin = 14;
@@ -35,6 +35,4 @@ $board
     }
   );
 
-if ($board->isActive()) {
-  $loop->run();
-}
+$loop->run();

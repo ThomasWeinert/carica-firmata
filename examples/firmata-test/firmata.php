@@ -11,13 +11,17 @@ $route->match('/pins/{pin}', new Firmata\Rest\Pin($board));
 $route->startsWith('/files', new Http\Route\Directory(__DIR__));
 $route->match('/', new Http\Route\File(__DIR__.'/index.html'));
 
+echo "Start board:\n";
 $board
   ->activate()
   ->done(
     function () use ($board, $route) {
+      echo "...activated.\n";
       $board->queryAllPinStates();
+      echo "Start HTTP server:\n";
       $server = new Carica\Io\Network\Http\Server($route);
       $server->listen(8080);
+      echo "...started.\n";
     }
   )
   ->fail(

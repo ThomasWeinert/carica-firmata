@@ -9,15 +9,15 @@ $loop = Io\Event\Loop\Factory::get();
 $board
   ->activate()
   ->done(
-    function () use ($board, $loop) {
-      echo "Firmata ".$board->version." active\n";
+    static function () use ($board, $loop) {
+      echo 'Firmata '.$board->version." active\n";
 
       $led = 9;
       $board->pinMode($led, Firmata\Pin::MODE_PWM);
       echo "PIN: $led\n";
 
       $loop->setInterval(
-        function () use ($board, $led) {
+        static function () use ($board, $led) {
           static $brightness = 0, $step = 5;
           echo 'LED: '.$brightness."\n";
           $board->analogWrite($led, $brightness);
@@ -36,7 +36,5 @@ $board
     }
   );
 
-if ($board->isActive()) {
-  $loop->run();
-}
+$loop->run();
 
