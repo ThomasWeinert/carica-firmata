@@ -27,8 +27,14 @@ $board
     }
   )
   ->done(
-    static function () {
+    static function () use ($board) {
       echo "activated\n";
+      $board->events()->on(
+        Firmata\Board::EVENT_REACTIVATE,
+        static function() {
+           echo "reactivated\n";
+        }
+      );
     }
   )
   ->fail(

@@ -177,7 +177,7 @@ namespace Carica\Firmata {
      * @param Callable|NULL $callback
      * @return Promise
      */
-    public function activate(Callable $callback = NULL): Promise {
+    public function activate(Callable $callback = NULL, $withHeartBeat = TRUE): Promise {
       $this->_isActivated = FALSE;
       $this->_activationTry = 1;
       $activation = new Io\Deferred();
@@ -194,14 +194,24 @@ namespace Carica\Firmata {
       $this->connect($activation);
       if (!($this->_heartBeat)) {
         $this->_heartBeat = $this->loop()->setInterval(
-          function () use ($activation) {
+          function () use ($withHeartBeat, &$activation) {
             if (!$this->_heartBeat) {
               return;
             }
             ++$this->_heartBeatMissed;
-            if ($this->_heartBeatMissed > 3 || !$this->isActive()) {
+            if ($activation->state() === Io\Deferred::STATE_PENDING) {
               $activation->notify(self::ACTIVATION_STARTED, ++$this->_activationTry);
-              $activation->restart();
+              $this->connect($activation);
+            } elseif ($withHeartBeat && $this->_heartBeatMissed > 3) {
+              $this->stream()->close();
+              $activation = new Io\Deferred();
+              $activation
+                ->done(
+                  function() {
+                    $this->_activationTry = 1;
+                    $this->events()->emit(self::EVENT_REACTIVATE);
+                  }
+                );
               $this->connect($activation);
             }
           },
