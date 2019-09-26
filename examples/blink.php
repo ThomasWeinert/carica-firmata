@@ -4,6 +4,8 @@ $board = require(__DIR__.'/bootstrap.php');
 use Carica\Io;
 use Carica\Firmata;
 
+const LED_PIN = 9;
+
 // create the event loop
 $loop = Io\Event\Loop\Factory::get();
 
@@ -17,7 +19,7 @@ $board
       echo 'Firmata '.$board->version." active\n";
 
       // get pin 13 (most boards already have an led on this pin)
-      $pin = $board->pins[13];
+      $pin = $board->pins[LED_PIN];
       // set the mode of pin 13 to digital output
       $pin->mode = Firmata\Pin::MODE_OUTPUT;
 
@@ -34,7 +36,8 @@ $board
     }
   )
   ->fail(
-    static function ($error) {
+    static function ($error) use ($loop) {
+      $loop->stop();
       echo $error."\n";
     }
   );

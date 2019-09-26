@@ -32,8 +32,9 @@ $board
     }
   )
   ->fail(
-    static function ($error) {
+    static function ($error) use ($loop) {
       echo $error."\n";
+      $loop->stop();
     }
   );
 

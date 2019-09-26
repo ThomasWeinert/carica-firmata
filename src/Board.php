@@ -94,6 +94,10 @@ namespace Carica\Firmata {
     /**
      * @var int
      */
+    private $_heartBeatMissed = 0;
+    /**
+     * @var int
+     */
     private $_activationTry = 0;
     /**
      * @var bool
@@ -183,7 +187,8 @@ namespace Carica\Firmata {
             if (!$this->_heartBeat) {
               return;
             }
-            if (!$this->isActive()) {
+            ++$this->_heartBeatMissed;
+            if ($this->_heartBeatMissed > 3 || !$this->isActive()) {
               $activation->notify(self::ACTIVATION_STARTED, ++$this->_activationTry);
               $activation->restart();
               $this->connect($activation);
@@ -336,6 +341,7 @@ namespace Carica\Firmata {
      *
      */
     private function handleMessage($command, $rawData): void {
+      $this->_heartBeatMissed = 0;
       switch ($command) {
       case self::REPORT_VERSION :
         $this->handleVersionMessage(
