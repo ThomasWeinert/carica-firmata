@@ -7,13 +7,13 @@ use Carica\Firmata;
 $loop = Io\Event\Loop\Factory::get();
 
 $board->events()->on(
-  'reportversion',
+  Firmata\Board::EVENT_REPORTVERSION,
   static function () use ($board) {
     echo 'Firmata version: '.$board->version."\n";
   }
 );
 $board->events()->on(
-  'queryfirmware',
+  Firmata\Board::EVENT_QUERYFIRMWARE,
   static function () use ($board) {
     echo 'Firmware version: '.$board->firmware."\n";
   }

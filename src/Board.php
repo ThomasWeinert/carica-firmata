@@ -49,6 +49,17 @@ namespace Carica\Firmata {
     public const FETCHING_ANALOG_MAPPING = 'fetch_analog_mapping';
     public const ACTIVATION_FINISHED = 'activation_finished';
 
+    public const EVENT_REACTIVATE = 'reactivate';
+    public const EVENT_RESPONSE = 'response';
+    public const EVENT_REPORTVERSION = 'reportversion';
+    public const EVENT_ANALOG_READ = 'analog-read';
+    public const EVENT_DIGITAL_READ = 'digital-read';
+    public const EVENT_RECIEVE_STRING = 'string';
+    public const EVENT_QUERYFIRMWARE = 'queryfirmware';
+    public const EVENT_CAPABILITY_QUERY = 'capability-query';
+    public const EVENT_PIN_STATE = 'pin-state';
+    public const EVENT_ANALOG_MAPPING_QUERY = 'analog-mapping-query';
+
     /**
      * @var \Carica\Firmata\Pins
      */
@@ -359,7 +370,7 @@ namespace Carica\Firmata {
         );
         return;
       default :
-        $this->events()->emit('response', new Response($command, $rawData));
+        $this->events()->emit(self::EVENT_RESPONSE, new Response($command, $rawData));
         return;
       }
     }
@@ -373,7 +384,7 @@ namespace Carica\Firmata {
         $this->stream()->write([self::REPORT_DIGITAL | $i, 1]);
         $this->stream()->write([self::REPORT_ANALOG | $i, 1]);
       }
-      $this->events()->emit('reportversion');
+      $this->events()->emit(self::EVENT_REPORTVERSION);
     }
 
     /**
@@ -383,8 +394,8 @@ namespace Carica\Firmata {
      */
     private function handleAnalogMessage(Response\Midi\Message $response): void {
       if (0 <= ($pinNumber = $this->pins->getPinByChannel($response->port))) {
-        $this->events()->emit('analog-read-'.$pinNumber, $response->value);
-        $this->events()->emit('analog-read', ['pin' => $pinNumber, 'value' => $response->value]);
+        $this->events()->emit(self::EVENT_ANALOG_READ.'-'.$pinNumber, $response->value);
+        $this->events()->emit(self::EVENT_ANALOG_READ, ['pin' => $pinNumber, 'value' => $response->value]);
       }
     }
 
@@ -405,8 +416,8 @@ namespace Carica\Firmata {
           } else {
             $value = $pin->getDigital();
           }
-          $this->events()->emit('digital-read-'.$pinNumber, $value);
-          $this->events()->emit('digital-read', ['pin' => $pinNumber, 'value' => $value]);
+          $this->events()->emit(self::EVENT_DIGITAL_READ.'-'.$pinNumber, $value);
+          $this->events()->emit(self::EVENT_DIGITAL_READ, ['pin' => $pinNumber, 'value' => $value]);
         }
       }
     }
@@ -421,30 +432,30 @@ namespace Carica\Firmata {
     private function handleExtendedMessage($command, $rawData): void {
       switch ($command) {
       case self::STRING_DATA :
-        $this->events()->emit('string', Response::decodeBytes($rawData));
+        $this->events()->emit(self::EVENT_RECIEVE_STRING, Response::decodeBytes($rawData));
         return;
       case self::QUERY_FIRMWARE :
         $response = new Response\SysEx\QueryFirmware($rawData);
         $this->_firmware = new Version($response->major, $response->minor, $response->name);
-        $this->events()->emit('queryfirmware');
+        $this->events()->emit(self::EVENT_QUERYFIRMWARE);
         return;
       case self::CAPABILITY_RESPONSE :
         $response = new Response\SysEx\CapabilityResponse($rawData);
         $this->pins(new Pins($this, $response->pins));
-        $this->events()->emit('capability-query');
+        $this->events()->emit(self::EVENT_CAPABILITY_QUERY);
         return;
       case self::PIN_STATE_RESPONSE :
         $response = new Response\SysEx\PinStateResponse($rawData);
-        $this->events()->emit('pin-state-'.$response->pin, $response->mode, $response->value);
-        $this->events()->emit('pin-state', $response->pin, $response->mode, $response->value);
+        $this->events()->emit(self::EVENT_PIN_STATE.'-'.$response->pin, $response->mode, $response->value);
+        $this->events()->emit(self::EVENT_PIN_STATE, $response->pin, $response->mode, $response->value);
         return;
       case self::ANALOG_MAPPING_RESPONSE :
         $response = new Response\SysEx\AnalogMappingResponse($rawData);
         $this->pins->setAnalogMapping($response->channels);
-        $this->events()->emit('analog-mapping-query');
+        $this->events()->emit(self::EVENT_ANALOG_MAPPING_QUERY);
         return;
       default :
-        $this->events()->emit('response', new Response($command, $rawData));
+        $this->events()->emit(self::EVENT_RESPONSE, new Response($command, $rawData));
         return;
       }
     }
@@ -476,7 +487,7 @@ namespace Carica\Firmata {
         1000
       );
       $this->events()->once(
-        'reportversion',
+        self::EVENT_REPORTVERSION,
         function () use ($interval, $callback) {
           $this->loop()->remove($interval);
           if (isset($callback)) {
@@ -492,7 +503,7 @@ namespace Carica\Firmata {
      * @param callable $callback
      */
     public function queryFirmware(Callable $callback) {
-      $this->events()->once('queryfirmware', $callback);
+      $this->events()->once(self::EVENT_QUERYFIRMWARE, $callback);
       $this->stream()->write([self::START_SYSEX, self::QUERY_FIRMWARE, self::END_SYSEX]);
     }
 
@@ -502,7 +513,7 @@ namespace Carica\Firmata {
      * @param callable $callback
      */
     public function queryCapabilities(Callable $callback): void {
-      $this->events()->once('capability-query', $callback);
+      $this->events()->once(self::EVENT_CAPABILITY_QUERY, $callback);
       $this->stream()->write([self::START_SYSEX, self::CAPABILITY_QUERY, self::END_SYSEX]);
     }
 
@@ -512,7 +523,7 @@ namespace Carica\Firmata {
      * @param callable $callback
      */
     public function queryAnalogMapping(Callable $callback): void {
-      $this->events()->once('analog-mapping-query', $callback);
+      $this->events()->once(self::EVENT_ANALOG_MAPPING_QUERY, $callback);
       $this->stream()->write([self::START_SYSEX, self::ANALOG_MAPPING_QUERY, self::END_SYSEX]);
     }
 
