@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "carica/io",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ThomasWeinert/carica-io.git",
-                "reference": "2c253c96ad56500f91b7486693c8c797481a25de"
+                "reference": "1cae6a33a1cb543d670a2385d1de480754e979a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ThomasWeinert/carica-io/zipball/2c253c96ad56500f91b7486693c8c797481a25de",
-                "reference": "2c253c96ad56500f91b7486693c8c797481a25de",
+                "url": "https://api.github.com/repos/ThomasWeinert/carica-io/zipball/1cae6a33a1cb543d670a2385d1de480754e979a3",
+                "reference": "1cae6a33a1cb543d670a2385d1de480754e979a3",
                 "shasum": ""
             },
             "require": {
@@ -45,7 +45,7 @@
                 "asynchronous-io",
                 "non-blocking-io"
             ],
-            "time": "2019-09-25T17:40:10+00:00"
+            "time": "2019-09-25T19:05:13+00:00"
         }
     ],
     "packages-dev": [],
