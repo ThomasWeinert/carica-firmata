@@ -8,24 +8,17 @@ if (@include(__DIR__ . '/configuration.php')) {
   if (!defined('CARICA_FIRMATA_SERIAL_BAUD')) {
     define('CARICA_FIRMATA_SERIAL_BAUD', 57600);
   }
+  $loop = Io\Event\Loop\Factory::get();
 
   switch (CARICA_FIRMATA_MODE) {
     case 'tcp':
       return new Firmata\Board(
-        new Io\Stream\Tcp(CARICA_FIRMATA_TCP_SERVER, CARICA_FIRMATA_TCP_PORT)
-      );
-      break;
-    case 'serial-dio':
-      return new Firmata\Board(
-        new Io\Stream\Serial\Dio(
-          CARICA_FIRMATA_SERIAL_DEVICE,
-          CARICA_FIRMATA_SERIAL_BAUD
-        )
+        new Io\Stream\TCPStream($loop, CARICA_FIRMATA_TCP_SERVER, CARICA_FIRMATA_TCP_PORT)
       );
       break;
     case 'serial':
       return new Firmata\Board(
-        Io\Stream\Serial\Factory::create(CARICA_FIRMATA_SERIAL_DEVICE, CARICA_FIRMATA_SERIAL_BAUD)
+        new Io\Stream\SerialStream($loop, CARICA_FIRMATA_SERIAL_DEVICE, CARICA_FIRMATA_SERIAL_BAUD)
       );
     default:
       die('Invalid CARICA_FIRMATA_MODE:' . CARICA_FIRMATA_MODE);

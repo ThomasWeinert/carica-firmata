@@ -2,20 +2,24 @@
 
 namespace Carica\Firmata\Rest {
 
-  use Carica\Io\Network\Http;
   use Carica\Firmata;
+  use Carica\Firmata\Board as FirmataBoard;
+  use Carica\Firmata\Exception\UnsupportedMode;
+  use Carica\Io\Network\HTTP\Request as HTTPRequest;
+  use Carica\Io\Network\HTTP\Response as HTTPResponse;
+  use DOMElement;
 
-  class Pin {
+  class PinHandler {
 
     /**
-     * @var Firmata\Board
+     * @var FirmataBoard
      */
     private $_board;
 
     /**
      * @var array
      */
-    private $_modeStrings = array(
+    private $_modeStrings = [
       Firmata\Pin::MODE_INPUT => 'input',
       Firmata\Pin::MODE_OUTPUT => 'output',
       Firmata\Pin::MODE_ANALOG => 'analog',
@@ -23,36 +27,29 @@ namespace Carica\Firmata\Rest {
       Firmata\Pin::MODE_SERVO => 'servo',
       Firmata\Pin::MODE_SHIFT => 'shift',
       Firmata\Pin::MODE_I2C => 'i2c'
-    );
+    ];
 
     /**
      * @var array
      */
-    private $_modeMap = NULL;
+    private $_modeMap;
 
     /**
-     * @param Firmata\Board $board
+     * @param FirmataBoard $board
      */
-    public function __construct(Firmata\Board $board) {
+    public function __construct(FirmataBoard $board) {
       $this->_modeMap = array_flip($this->_modeStrings);
       $this->_board = $board;
     }
 
     /**
-     * @return Http\Response
-     */
-    public function __invoke(...$arguments) {
-      return $this->handle(...$arguments);
-    }
-
-    /**
-     * @param Http\Request $request
+     * @param HTTPRequest $request
      * @param array $parameters
-     * @return Http\Response
+     * @return HTTPResponse
      */
-    public function handle(Http\Request $request, array $parameters) {
+    public function __invoke(HTTPRequest $request, array $parameters): HTTPResponse {
       $response = $request->createResponse();
-      $response->content = new Http\Response\Content\Xml;
+      $response->content = new HTTPResponse\Content\XML();
       $dom = $response->content->document;
       $dom->appendChild($boardNode = $dom->createElement('board'));
       if ($this->_board->isActive()) {
@@ -62,15 +59,16 @@ namespace Carica\Firmata\Rest {
         $pins = $this->_board->pins;
         if (isset($pins[$pinId])) {
           $pin = $pins[$pinId];
-          if (isset($request->query['mode'])) {
-            $this->setPinMode($pin, $request->query['mode']);
+          $query = $request->query;
+          if (isset($query['mode'])) {
+            $this->setPinMode($pin, $query['mode']);
           }
-          if (isset($request->query['digital'])) {
-            $pin->digital = $request->query['digital'] === 'yes';
-          } elseif (isset($request->query['analog'])) {
-            $pin->analog = (float)$request->query['analog'];
-          } elseif (isset($request->query['value'])) {
-            $pin->value = (int)$request->query['value'];
+          if (isset($query['digital'])) {
+            $pin->digital = $query['digital'] === 'yes';
+          } elseif (isset($query['analog'])) {
+            $pin->analog = (float)$query['analog'];
+          } elseif (isset($query['value'])) {
+            $pin->value = (int)$query['value'];
           }
           $this->appendPin($boardNode, $pinId);
         }
@@ -84,27 +82,27 @@ namespace Carica\Firmata\Rest {
      * @param Firmata\Pin $pin
      * @param string $modeString
      */
-    private function setPinMode(Firmata\Pin $pin, $modeString) {
+    private function setPinMode(Firmata\Pin $pin, string $modeString): void {
       if (isset($this->_modeMap[$modeString])) {
         try {
-          $pin->mode = $this->_modeMap[$modeString];
-        } catch (Firmata\Exception\UnsupportedMode $e) {
+          $pin->setMode($this->_modeMap[$modeString]);
+        } catch (UnsupportedMode $e) {
         }
       }
     }
 
     /**
-     * @param \DOMElement $parent
+     * @param DOMElement $parent
      * @param int $pinId
      */
-    public function appendPin(\DOMElement $parent, $pinId) {
+    public function appendPin(DOMElement $parent, int $pinId): void {
       $pins = $this->_board->pins;
       if (isset($pins[$pinId])) {
         $dom = $parent->ownerDocument;
         $pin = $pins[$pinId];
         $parent->appendChild($pinNode = $dom->createElement('pin'));
         $pinNode->setAttribute('number', $pin->pin);
-        $modes = array();
+        $modes = [];
         foreach ($pin->supports as $mode => $resolution) {
           $modes[] = $this->getModeString($mode);
         }
@@ -129,8 +127,8 @@ namespace Carica\Firmata\Rest {
      * @param string $mode
      * @return string
      */
-    private function getModeString($mode) {
-      return isset($this->_modeStrings[$mode]) ? $this->_modeStrings[$mode] : 'unknown';
+    private function getModeString(string $mode): string {
+      return $this->_modeStrings[$mode] ?? 'unknown';
     }
   }
 }

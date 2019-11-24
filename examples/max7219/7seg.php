@@ -9,11 +9,11 @@ $loop = Io\Event\Loop\Factory::get();
 $board
   ->activate()
   ->done(
-    function () use ($board, $loop) {
-      echo "Firmata ".$board->version." active\n";
+    static function () use ($board, $loop) {
+      echo 'Firmata '.$board->version." active\n";
 
       $digits = 8;
-      $maximum = pow(10, $digits) - 0;
+      $maximum = (10 ** $digits) - 0;
 
       $max = new Firmata\ShiftOut(
         $board->pins[8],
@@ -33,7 +33,7 @@ $board
       $max->write([0x0C, 0x01]);
 
       $loop->setInterval(
-        function () use ($max, $maximum) {
+        static function () use ($max, $maximum) {
           static $number = 0;
 
           if (--$number < 0) {
@@ -55,7 +55,7 @@ $board
     }
   )
   ->fail(
-    function ($error) {
+    static function ($error) {
       echo $error."\n";
     }
   );

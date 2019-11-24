@@ -7,19 +7,19 @@ use Carica\Io\Network\Http;
 
 $route = new Carica\Io\Network\Http\Route();
 $route->match('/pins', new Firmata\Rest\Pins($board));
-$route->match('/pins/{pin}', new Firmata\Rest\Pin($board));
+$route->match('/pins/{pin}', new Firmata\Rest\PinHandler($board));
 
 $board
   ->activate()
   ->done(
-    function () use ($board, $route) {
+    static function () use ($board, $route) {
       $board->queryAllPinStates();
-      $server = new Carica\Io\Network\Http\Server($route);
+      $server = new Carica\Io\Network\Http\Server($board->loop(), $route);
       $server->listen(8080);
     }
   )
   ->fail(
-    function ($error) {
+    static function ($error) {
       echo $error."\n";
     }
   );

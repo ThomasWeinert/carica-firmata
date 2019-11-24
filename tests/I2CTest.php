@@ -3,15 +3,17 @@
 namespace Carica\Firmata {
 
   use Carica\Io;
+  use PHPUnit\Framework\MockObject\MockObject;
+  use PHPUnit\Framework\TestCase;
 
-  include_once(__DIR__ . '/Bootstrap.php');
+  include_once(__DIR__.'/Bootstrap.php');
 
-  class I2CTest extends \PHPUnit\Framework\TestCase {
+  class I2CTest extends TestCase {
 
     /**
      * @covers \Carica\Firmata\I2C
      */
-    public function testConfigure() {
+    public function testConfigure(): void {
       $expected = [
         0xF0, 0x78, 0x00, 0x00, 0xF7
       ];
@@ -24,7 +26,7 @@ namespace Carica\Firmata {
     /**
      * @covers \Carica\Firmata\I2C
      */
-    public function testRead() {
+    public function testRead(): void {
       $i2c = new I2C(
         $this->getBoardWithStreamFixture(
           [0xF0, 0x78, 0x00, 0x00, 0xF7],
@@ -38,20 +40,19 @@ namespace Carica\Firmata {
 
     /**
      * @param array $data
-     * @return \PHPUnit\Framework\MockObject\MockObject|Board
+     * @return MockObject|Board
      */
     public function getBoardWithStreamFixture(...$data) {
-      $emitter = new Io\Event\Emitter;
+      $emitter = new Io\Event\Emitter();
       $stream = $this->getMockBuilder(Io\Stream::class)->getMock();
-      if (\count($data) > 1) {
-        $assertion = $stream
-          ->expects($this->any())
-          ->method('write');
+      if (count($data) > 1) {
         $arguments = [];
         foreach ($data as $bytes) {
           $arguments[] = [$bytes];
         }
-        $assertion->withConsecutive(...$arguments);
+        $stream
+          ->method('write')
+          ->withConsecutive(...$arguments);
       } else {
         $stream
           ->expects($this->once())
@@ -63,13 +64,11 @@ namespace Carica\Firmata {
         ->disableOriginalConstructor()
         ->getMock();
       $board
-        ->expects($this->any())
         ->method('stream')
-        ->will($this->returnValue($stream));
+        ->willReturn($stream);
       $board
-        ->expects($this->any())
         ->method('events')
-        ->will($this->returnValue($emitter));
+        ->willReturn($emitter);
       return $board;
     }
 

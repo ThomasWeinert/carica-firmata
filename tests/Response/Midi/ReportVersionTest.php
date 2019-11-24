@@ -2,14 +2,16 @@
 
 namespace Carica\Firmata\Response\Midi {
 
-  include_once(__DIR__ . '/../../Bootstrap.php');
+  use PHPUnit\Framework\TestCase;
 
-  class ReportVersionTest extends \PHPUnit\Framework\TestCase {
+  include_once(__DIR__.'/../../Bootstrap.php');
+
+  class ReportVersionTest extends TestCase {
 
     /**
      * @covers \Carica\Firmata\Response\Midi\ReportVersion
      */
-    public function testConstructor() {
+    public function testConstructor(): void {
       $message = new ReportVersion([0xF9, 0x15, 0x2A]);
       $this->assertEquals(
         0xF9, $message->command

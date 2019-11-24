@@ -10,7 +10,7 @@ $board
   ->activate()
   ->done(
     static function () use ($board, $loop) {
-      echo "Firmata ".$board->version." active\n";
+      echo 'Firmata '.$board->version." active\n";
 
       $dimmerPin = 14;
       $ledPin = 9;
@@ -19,7 +19,7 @@ $board
 
       $board->analogRead(
         $dimmerPin,
-        function () use ($board, $dimmerPin, $ledPin) {
+        static function () use ($board, $dimmerPin, $ledPin) {
           $dimmed = 1 - round($board->pins[$dimmerPin]->analog, 1);
           $barLength = round(70 * $dimmed);
           echo str_pad(round($dimmed * 1000), 4, 0, STR_PAD_LEFT), ' ';
@@ -30,7 +30,7 @@ $board
     }
   )
   ->fail(
-    function ($error) {
+    static function ($error) {
       echo $error."\n";
     }
   );

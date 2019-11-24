@@ -2,11 +2,13 @@
 
 namespace Carica\Firmata\Exception {
 
-  include_once(__DIR__ . '/../Bootstrap.php');
+  use PHPUnit\Framework\TestCase;
 
-  class NonExistingPinTest extends \PHPUnit\Framework\TestCase {
+  include_once(__DIR__.'/../Bootstrap.php');
 
-    public function testConstructor() {
+  class NonExistingPinTest extends TestCase {
+
+    public function testConstructor(): void {
       $exception = new NonExistingPin(42);
       $this->assertEquals(
         'Pin 42 does not exists.',

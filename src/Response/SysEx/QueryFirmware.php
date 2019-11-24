@@ -8,25 +8,25 @@ namespace Carica\Firmata\Response\SysEx {
    * Class QueryFirmware
    *
    * @property string $name
-   * @property integer $major
-   * @property integer $minor
+   * @property int $major
+   * @property int $minor
    */
   class QueryFirmware extends Firmata\Response {
 
     /**
      * @var string
      */
-    private $_name = '';
+    private $_name;
 
     /**
      * @var int
      */
-    private $_major = 0;
+    private $_major;
 
     /**
      * @var int
      */
-    private $_minor = 0;
+    private $_minor;
 
     /**
      * @param array $bytes

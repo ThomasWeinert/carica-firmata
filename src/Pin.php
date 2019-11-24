@@ -3,6 +3,7 @@
 namespace Carica\Firmata {
 
   use Carica\Io;
+  use LogicException;
 
   /**
    * Represents a single pin on the board.
@@ -12,7 +13,7 @@ namespace Carica\Firmata {
    * @property-read array $supports array of pin modes and maimum values
    * @property-read int $maximum Maximum value of the current mode
    * @property int $mode Get/set the pin mode
-   * @property int $value Get/set the pin value using an analog integer value
+   * @property int $value Get/set the pin value using an analog int value
    * @property float $analog Get/set the pin value using a float between 0 and 1
    * @property bool $digital Get/set the pin value using an boolean value
    */
@@ -23,26 +24,30 @@ namespace Carica\Firmata {
 
     use Io\Event\Emitter\Aggregation;
 
+    public const EVENT_CHANGE = 'change';
+    public const EVENT_CHANGE_VALUE = 'change-value';
+    public const EVENT_CHANGE_MODE = 'change-mode';
+
     /**
      * @var Board
      */
-    private $_board = NULL;
+    private $_board;
     /**
-     * @var integer
+     * @var int
      */
-    private $_pin = 0;
+    private $_pin;
     /**
      * Array of supported modes and resolutions
      *
-     * @var array(integer => integer)
+     * @var array(int => int)
      */
-    private $_supports = array();
+    private $_supports;
     /**
-     * @var integer
+     * @var int
      */
-    private $_mode = self::MODE_UNKNOWN;
+    private $_mode;
     /**
-     * @var integer
+     * @var int
      */
     private $_value = 0;
 
@@ -62,36 +67,36 @@ namespace Carica\Firmata {
      * about the supported modes.
      *
      * @param Board $board
-     * @param integer $pin
+     * @param int $pin
      * @param array $supports Array
      */
-    public function __construct(Board $board, $pin, array $supports) {
+    public function __construct(Board $board, int $pin, array $supports) {
       $this->_board = $board;
       $this->_pin = (int)$pin;
       $this->_supports = $supports;
       $modes = array_keys($supports);
-      $this->_mode = isset($modes[0]) ? $modes[0] : self::MODE_UNKNOWN;
+      $this->_mode = $modes[0] ?? self::MODE_UNKNOWN;
       $this->attachEvents();
     }
 
-    private function attachEvents() {
+    private function attachEvents(): void {
       $that = $this;
       if ($events = $this->board->events()) {
         $events->on(
-          'pin-state-'.$this->_pin,
+          Board::EVENT_PIN_STATE.'-'.$this->_pin,
           function ($mode, $value) {
             $this->onUpdatePinState($mode, $value);
           }
         );
         $events->on(
-          'analog-read-'.$this->_pin,
-          function ($value) use ($that) {
+          Board::EVENT_ANALOG_READ.'-'.$this->_pin,
+          static function ($value) use ($that) {
             $that->onUpdateValue($value);
           }
         );
         $events->on(
-          'digital-read-'.$this->_pin,
-          function ($value) use ($that) {
+          Board::EVENT_DIGITAL_READ.'-'.$this->_pin,
+          static function ($value) use ($that) {
             $that->onUpdateValue($value);
           }
         );
@@ -101,36 +106,36 @@ namespace Carica\Firmata {
     /**
      * Callback function for pin state updates from the board.
      *
-     * @param integer $mode
-     * @param integer $value
+     * @param int $mode
+     * @param int $value
      */
-    private function onUpdatePinState($mode, $value) {
+    private function onUpdatePinState(int $mode, int $value): void {
       $this->_modeInitialized = TRUE;
       $this->_valueInitialized = TRUE;
-      if ($this->_mode != $mode || $this->_value != $value) {
-        if ($this->_mode != $mode) {
+      if ($this->_mode !== $mode || $this->_value !== $value) {
+        if ($this->_mode !== $mode) {
           $this->_mode = $mode;
-          $this->emitEvent('change-mode', $this);
+          $this->emitEvent(self::EVENT_CHANGE_MODE, $this);
         }
-        if ($this->_value != $value) {
+        if ($this->_value !== $value) {
           $this->_value = $value;
-          $this->emitEvent('change-value', $this);
+          $this->emitEvent(self::EVENT_CHANGE_VALUE, $this);
         }
-        $this->emitEvent('change', $this);
+        $this->emitEvent(self::EVENT_CHANGE, $this);
       }
     }
 
     /**
      * Callback function for pin value changes sent from the board.
      *
-     * @param integer $value
+     * @param int $value
      */
-    private function onUpdateValue($value) {
+    private function onUpdateValue(int $value) {
       $this->_valueInitialized = TRUE;
-      if ($this->_value != $value) {
+      if ($this->_value !== $value) {
         $this->_value = $value;
-        $this->emitEvent('change-value', $this);
-        $this->emitEvent('change', $this);
+        $this->emitEvent(self::EVENT_CHANGE_VALUE, $this);
+        $this->emitEvent(self::EVENT_CHANGE, $this);
       }
     }
 
@@ -140,7 +145,7 @@ namespace Carica\Firmata {
      * @param string $name
      * @return boolean
      */
-    public function __isset($name) {
+    public function __isset($name): bool {
       switch ($name) {
       case 'board' :
       case 'pin' :
@@ -159,7 +164,7 @@ namespace Carica\Firmata {
      * Getter mapping for the object properties
      *
      * @param string $name
-     * @throws \LogicException
+     * @throws LogicException
      * @return mixed
      */
     public function __get($name) {
@@ -181,7 +186,7 @@ namespace Carica\Firmata {
       case 'analog' :
         return $this->getAnalog();
       }
-      throw new \LogicException(sprintf('Unknown property %s::$%s', get_class($this), $name));
+      throw new LogicException(sprintf('Unknown property %s::$%s', get_class($this), $name));
     }
 
     /**
@@ -189,7 +194,8 @@ namespace Carica\Firmata {
      *
      * @param string $name
      * @param mixed $value
-     * @throws \LogicException
+     * @throws LogicException
+     * @throws Exception\UnsupportedMode
      */
     public function __set($name, $value) {
       switch ($name) {
@@ -206,43 +212,42 @@ namespace Carica\Firmata {
         $this->setAnalog($value);
         return;
       }
-      throw new \LogicException(
+      throw new LogicException(
         sprintf('Property %s::$%s can not be written', get_class($this), $name)
       );
     }
 
-    public function getMode() {
+    public function getMode(): int {
       return $this->_mode;
     }
 
     /**
      * Setter method for the mode property.
      *
-     * @param integer $mode
+     * @param int $mode
      *
      * @throws Exception\UnsupportedMode
      */
-    public function setMode($mode) {
-      $mode = (int)$mode;
+    public function setMode(int $mode): void {
       if (!array_key_exists($mode, $this->_supports)) {
         throw new Exception\UnsupportedMode($this->_pin, $mode);
       }
-      if ($this->_modeInitialized && $this->_mode == $mode) {
+      if ($this->_modeInitialized && $this->_mode === $mode) {
         return;
       }
       $this->_mode = $mode;
       $this->_modeInitialized = TRUE;
       $this->_board->pinMode($this->_pin, $mode);
-      $this->emitEvent('change-mode', $this);
-      $this->emitEvent('change', $this);
+      $this->emitEvent(self::EVENT_CHANGE_MODE, $this);
+      $this->emitEvent(self::EVENT_CHANGE, $this);
     }
 
     /**
      * Return the current state (low/high) of the pin as boolean
      * @return bool
      */
-    public function getDigital() {
-      return ($this->_value == Board::DIGITAL_HIGH);
+    public function getDigital(): bool {
+      return ($this->_value === Board::DIGITAL_HIGH);
     }
 
     /**
@@ -251,34 +256,32 @@ namespace Carica\Firmata {
      *
      * @param bool $isActive
      */
-    public function setDigital($isActive) {
-      $value = (boolean)$isActive ? Board::DIGITAL_HIGH : Board::DIGITAL_LOW;
-      if ($this->_valueInitialized && $this->_value == $value) {
+    public function setDigital(bool $isActive): void {
+      $value = $isActive ? Board::DIGITAL_HIGH : Board::DIGITAL_LOW;
+      if ($this->_valueInitialized && $this->_value === $value) {
         return;
       }
       $this->_value = $value;
       $this->_valueInitialized = TRUE;
       $this->_board->digitalWrite($this->_pin, $value);
-      $this->emitEvent('change-value', $this);
-      $this->emitEvent('change', $this);
+      $this->emitEvent(self::EVENT_CHANGE_VALUE, $this);
+      $this->emitEvent(self::EVENT_CHANGE, $this);
     }
 
     /**
      * Getter method for the anlog value
      * @return float between 0 and 1
      */
-    public function getAnalog() {
+    public function getAnalog(): float {
       return ($this->maximum > 0) ? $this->_value / $this->maximum : 0;
     }
 
     /**
      * Setter method for the analog property. Allows to set change the value on the pin.
      *
-     * @param $percent
-     *
-     * @internal param float $value between 0 and 1
+     * @param float $percent between 0 and 1
      */
-    public function setAnalog($percent) {
+    public function setAnalog(float $percent): void {
       $resolution = $this->maximum;
       $value = round($percent * $resolution);
       if ($value < 0) {
@@ -292,42 +295,41 @@ namespace Carica\Firmata {
     /**
      * @param int $value
      */
-    public function setValue($value) {
-      $value = (int)$value;
-      if ($this->_valueInitialized && $this->_value == $value) {
+    public function setValue(int $value) {
+      if ($this->_valueInitialized && $this->_value === $value) {
         return;
       }
       $this->_value = $value;
       $this->_valueInitialized = TRUE;
       $this->_board->analogWrite($this->_pin, $value);
-      $this->emitEvent('change-value', $this);
-      $this->emitEvent('change', $this);
+      $this->emitEvent(self::EVENT_CHANGE_VALUE, $this);
+      $this->emitEvent(self::EVENT_CHANGE, $this);
     }
 
     /**
      * Return the maximum value of the current mode
      *
-     * @return integer
+     * @return int
      */
-    public function getMaximum() {
+    public function getMaximum(): int {
       return $this->_supports[$this->_mode];
     }
 
     /**
      * Does the pin support the given mode
      *
-     * @param integer $mode
+     * @param int $mode
      * @return boolean
      */
-    public function supports($mode) {
+    public function supports(int $mode): bool {
       return array_key_exists($mode, $this->_supports);
     }
 
     /**
      * @param callable $callback
      */
-    public function onChange(callable $callback) {
-      $this->events()->on('change', $callback);
+    public function onChange(callable $callback): void {
+      $this->events()->on(self::EVENT_CHANGE, $callback);
     }
   }
 }

@@ -2,16 +2,17 @@
 
 namespace Carica\Firmata\Response\SysEx {
 
-  include_once(__DIR__ . '/../../Bootstrap.php');
+  include_once(__DIR__.'/../../Bootstrap.php');
 
   use Carica\Firmata;
+  use PHPUnit\Framework\TestCase;
 
-  class CapabilityResponseTest extends \PHPUnit\Framework\TestCase {
+  class CapabilityResponseTest extends TestCase {
 
     /**
      * @covers \Carica\Firmata\Response\SysEx\CapabilityResponse
      */
-    public function testConstructor() {
+    public function testConstructor(): void {
       $response = new CapabilityResponse(
         $data = [
           0x7f, // pin 0
@@ -39,114 +40,114 @@ namespace Carica\Firmata\Response\SysEx {
         ]
       );
       $this->assertEquals(
-        array(
-          array(), // pin 0
-          array(), // pin 1
-          array( // pin 2
+        [
+          [], // pin 0
+          [], // pin 1
+          [ // pin 2
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_SERVO => 359
-          ),
-          array( // pin 3
-            Firmata\Pin::MODE_INPUT => 1,
-            Firmata\Pin::MODE_OUTPUT => 1,
-            Firmata\Pin::MODE_PWM => 255,
-            Firmata\Pin::MODE_SERVO => 359
-          ),
-          array( // pin 4
-            Firmata\Pin::MODE_INPUT => 1,
-            Firmata\Pin::MODE_OUTPUT => 1,
-            Firmata\Pin::MODE_SERVO => 359
-          ),
-          array( // pin 5
+          ],
+          [ // pin 3
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_PWM => 255,
             Firmata\Pin::MODE_SERVO => 359
-          ),
-          array( // pin 6
+          ],
+          [ // pin 4
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_SERVO => 359
+          ],
+          [ // pin 5
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_PWM => 255,
             Firmata\Pin::MODE_SERVO => 359
-          ),
-          array( // pin 7
-            Firmata\Pin::MODE_INPUT => 1,
-            Firmata\Pin::MODE_OUTPUT => 1,
-            Firmata\Pin::MODE_SERVO => 359
-          ),
-          array( // pin 8
-            Firmata\Pin::MODE_INPUT => 1,
-            Firmata\Pin::MODE_OUTPUT => 1,
-            Firmata\Pin::MODE_SERVO => 359
-          ),
-          array( // pin 9
+          ],
+          [ // pin 6
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_PWM => 255,
             Firmata\Pin::MODE_SERVO => 359
-          ),
-          array( // pin 10
+          ],
+          [ // pin 7
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_SERVO => 359
+          ],
+          [ // pin 8
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_SERVO => 359
+          ],
+          [ // pin 9
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_PWM => 255,
             Firmata\Pin::MODE_SERVO => 359
-          ),
-          array( // pin 11
+          ],
+          [ // pin 10
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_PWM => 255,
             Firmata\Pin::MODE_SERVO => 359
-          ),
-          array( // pin 12
+          ],
+          [ // pin 11
+            Firmata\Pin::MODE_INPUT => 1,
+            Firmata\Pin::MODE_OUTPUT => 1,
+            Firmata\Pin::MODE_PWM => 255,
+            Firmata\Pin::MODE_SERVO => 359
+          ],
+          [ // pin 12
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_SERVO => 359
-          ),
-          array( // pin 13
+          ],
+          [ // pin 13
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_SERVO => 359
-          ),
-          array( // pin 14 a0
+          ],
+          [ // pin 14 a0
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_ANALOG => 1023
-          ),
-          array( // pin 15 a1
+          ],
+          [ // pin 15 a1
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_ANALOG => 1023
-          ),
-          array( // pin 16 a2
+          ],
+          [ // pin 16 a2
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_ANALOG => 1023
-          ),
-          array( // pin 17 a3
+          ],
+          [ // pin 17 a3
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_ANALOG => 1023
-          ),
-          array( // pin 18 a4
+          ],
+          [ // pin 18 a4
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_ANALOG => 1023,
             Firmata\Pin::MODE_I2C => 1
-          ),
-          array( // pin 19 a5
+          ],
+          [ // pin 19 a5
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_ANALOG => 1023,
             Firmata\Pin::MODE_I2C => 1
-          ),
-          array( // pin 20 a6
+          ],
+          [ // pin 20 a6
             Firmata\Pin::MODE_ANALOG => 1023
-          ),
-          array( // pin 21 a7
+          ],
+          [ // pin 21 a7
             Firmata\Pin::MODE_ANALOG => 1023
-          ),
-        ),
+          ],
+        ],
         $response->pins
       );
       $this->assertEquals(
@@ -158,7 +159,7 @@ namespace Carica\Firmata\Response\SysEx {
     /**
      * @covers \Carica\Firmata\Response\SysEx\CapabilityResponse
      */
-    public function testConstructorWithAnalogDefault() {
+    public function testConstructorWithAnalogDefault(): void {
       $response = new CapabilityResponse(
         $data = [
           0x7f, // pin 0
@@ -167,15 +168,15 @@ namespace Carica\Firmata\Response\SysEx {
         ]
       );
       $this->assertEquals(
-        array(
-          array(), // pin 0
-          array(), // pin 1
-          array( // pin with analog fallback
+        [
+          [], // pin 0
+          [], // pin 1
+          [ // pin with analog fallback
             Firmata\Pin::MODE_INPUT => 1,
             Firmata\Pin::MODE_OUTPUT => 1,
             Firmata\Pin::MODE_ANALOG => 1023
-          )
-        ),
+          ]
+        ],
         $response->pins
       );
     }

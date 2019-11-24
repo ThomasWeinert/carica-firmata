@@ -31,7 +31,7 @@ $board
     }
   )
   ->fail(
-    function ($error) {
+    static function ($error) {
       echo $error."\n";
     }
   );

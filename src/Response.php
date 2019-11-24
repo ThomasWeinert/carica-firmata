@@ -2,28 +2,31 @@
 
 namespace Carica\Firmata {
 
+  use LogicException;
+
   /**
    * An response send by the arduino board, this is an abstract superclass, all
    * responses have an command and data, the command is handles here.
    *
-   * @property integer $command
+   * @property int $command
    */
   class Response {
 
     /**
      * @var int
      */
-    private $_command = 0x00;
+    private $_command;
 
     /**
      * @var array
      */
-    private $_bytes = [];
+    private $_bytes;
 
     /**
      * @param string $command
+     * @param array $bytes
      */
-    public function __construct($command, $bytes) {
+    public function __construct($command, array $bytes) {
       $this->_command = $command;
       $this->_bytes = $bytes;
     }
@@ -31,29 +34,49 @@ namespace Carica\Firmata {
     /**
      * @return int
      */
-    public function getCommand() {
+    public function getCommand(): int {
       return $this->_command;
     }
 
     /**
      * @return array
      */
-    public function getRawData() {
+    public function getRawData(): array {
       return $this->_bytes;
     }
 
     /**
      * @param string $name
      * @return int
-     * @throws \LogicException
+     * @throws LogicException
+     */
+    public function __isset($name) {
+      return $name === 'command';
+    }
+
+    /**
+     * @param string $name
+     * @return int
+     * @throws LogicException
      */
     public function __get($name) {
-      switch ($name) {
-      case 'command' :
+      if ($name === 'command') {
         return $this->getCommand();
       }
-      throw new \LogicException(
+      throw new LogicException(
         sprintf('Unknown property %s::$%s', get_class($this), $name)
+      );
+    }
+
+    public function __set($name, $value) {
+      throw new LogicException(
+        sprintf('Property %s::$%s can not be written', get_class($this), $name)
+      );
+    }
+
+    public function __unset($name) {
+      throw new LogicException(
+        sprintf('Property %s::$%s can not be written', get_class($this), $name)
       );
     }
 
@@ -63,7 +86,7 @@ namespace Carica\Firmata {
      * @param array $bytes
      * @return string
      */
-    public static function decodeBytes($bytes) {
+    public static function decodeBytes($bytes): string {
       $length = count($bytes);
       $result = '';
       for ($i = 0; $i < $length - 1; $i += 2) {

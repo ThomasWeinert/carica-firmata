@@ -2,167 +2,180 @@
 
 namespace Carica\Firmata\Rest {
 
-  include_once(__DIR__ . '/../Bootstrap.php');
+  include_once(__DIR__.'/../Bootstrap.php');
 
-  use Carica\Io;
   use Carica\Firmata;
+  use Carica\Firmata\Board as FirmataBoard;
+  use Carica\Io\Network\HTTP\Connection as HTTPConnection;
+  use Carica\Io\Network\HTTP\Request as HTTPRequest;
+  use Carica\Io\Network\HTTP\Response as HTTPResponse;
+  use Carica\Io\Network\HTTP\Response\Content\XML as XMLResponseContent;
   use PHPUnit\Framework\MockObject\MockObject;
+  use PHPUnit\Framework\TestCase;
 
-  class PinTest extends \PHPUnit\Framework\TestCase {
+  class PinTest extends TestCase {
 
     /**
-     * @covers \Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\PinHandler
      */
-    public function testWithInactiveBoard() {
-      /** @var MockObject|Firmata\Board $board */
+    public function testWithInactiveBoard(): void {
+      /** @var MockObject|FirmataBoard $board */
       $board = $this
-        ->getMockBuilder(Firmata\Board::class)
+        ->getMockBuilder(FirmataBoard::class)
         ->disableOriginalConstructor()
         ->getMock();
       $board
         ->expects($this->once())
         ->method('isActive')
-        ->will($this->returnValue(FALSE));
+        ->willReturn(FALSE);
 
-      $handler = new Pin($board);
-      $response = $handler($this->getRequestFixture(), array());
+      $handler = new PinHandler($board);
+      $response = $handler($this->getRequestFixture(), []);
 
+      /** @var XMLResponseContent $content */
+      $content = $response->content;
       $this->assertXmlStringEqualsXmlString(
         '<?xml version="1.0" encoding="utf-8"?><board active="no"/>',
-        $response->content->document->saveXml()
+        $content->document->saveXML()
       );
     }
 
     /**
-     * @covers \Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\PinHandler
      */
-    public function testWithActiveBoard() {
-      $handler = new Pin($this->getBoardFixture());
-      $response = $handler($this->getRequestFixture(), array());
+    public function testWithActiveBoard(): void {
+      $handler = new PinHandler($this->getBoardFixture());
+      $response = $handler($this->getRequestFixture(), []);
 
+      /** @var XMLResponseContent $content */
+      $content = $response->content;
       $this->assertXmlStringEqualsXmlString(
         '<?xml version="1.0" encoding="utf-8"?><board active="yes" firmata="21.42"/>',
-        $response->content->document->saveXml()
+        $content->document->saveXML()
       );
     }
 
     /**
-     * @covers \Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\PinHandler
      */
-    public function testWithDigitalPin() {
+    public function testWithDigitalPin(): void {
       $pin = $this->getPinFixture(
-        array(
+        [
           'pin' => 42,
           'mode' => Firmata\Pin::MODE_OUTPUT,
-          'digital' => true,
+          'digital' => TRUE,
           'value' => 0x01,
-          'supports' => array(Firmata\Pin::MODE_OUTPUT => 1)
-        )
+          'supports' => [Firmata\Pin::MODE_OUTPUT => 1]
+        ]
       );
-      $handler = new Pin($this->getBoardFixture(array(42 => $pin)));
-      $response = $handler($this->getRequestFixture(), array('pin' => 42));
+      $handler = new PinHandler($this->getBoardFixture([42 => $pin]));
+      $response = $handler($this->getRequestFixture(), ['pin' => 42]);
 
+      /** @var XMLResponseContent $content */
+      $content = $response->content;
       $this->assertXmlStringEqualsXmlString(
         '<?xml version="1.0" encoding="utf-8"?>'.
         '<board active="yes" firmata="21.42">'.
-          '<pin number="42" supports="output" mode="output" digital="yes" value="1"/>'.
+        '<pin number="42" supports="output" mode="output" digital="yes" value="1"/>'.
         '</board>',
-        $response->content->document->saveXml()
+        $content->document->saveXML()
       );
     }
 
     /**
-     * @covers \Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\PinHandler
      */
-    public function testWithAnalogPin() {
+    public function testWithAnalogPin(): void {
       $pin = $this->getPinFixture(
-        array(
+        [
           'pin' => 42,
           'mode' => Firmata\Pin::MODE_ANALOG,
           'analog' => 23,
           'value' => 23,
-          'supports' => array(Firmata\Pin::MODE_ANALOG => 1023)
-        )
+          'supports' => [Firmata\Pin::MODE_ANALOG => 1023]
+        ]
       );
-      $handler = new Pin($this->getBoardFixture(array(42 => $pin)));
-      $response = $handler($this->getRequestFixture(), array('pin' => 42));
+      $handler = new PinHandler($this->getBoardFixture([42 => $pin]));
+      $response = $handler($this->getRequestFixture(), ['pin' => 42]);
 
+      /** @var XMLResponseContent $content */
+      $content = $response->content;
       $this->assertXmlStringEqualsXmlString(
         '<?xml version="1.0" encoding="utf-8"?>'.
         '<board active="yes" firmata="21.42">'.
-          '<pin number="42" supports="analog" mode="analog" analog="23" value="23"/>'.
+        '<pin number="42" supports="analog" mode="analog" analog="23" value="23"/>'.
         '</board>',
-        $response->content->document->saveXml()
+        $content->document->saveXML()
       );
     }
 
     /**
-     * @covers \Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\PinHandler
      */
-    public function testPinModeChange() {
-      $request = $this->getRequestFixture(array('mode' => 'pwm'));
+    public function testPinModeChange(): void {
+      $request = $this->getRequestFixture(['mode' => 'pwm']);
       $pin = $this->getPinFixture();
       $pin
         ->expects($this->once())
-        ->method('__set')
-        ->with('mode', Firmata\Pin::MODE_PWM);
-      $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
-      $handler($request, array('pin' => 0));
+        ->method('setMode')
+        ->with(Firmata\Pin::MODE_PWM);
+      $handler = new PinHandler($this->getBoardFixture([0 => $pin]));
+      $handler($request, ['pin' => 0]);
     }
 
     /**
-     * @covers \Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\PinHandler
      */
-    public function testPinModeInvalidModeIsIgnored() {
-      $request = $this->getRequestFixture(array('mode' => 'invalid_mode'));
+    public function testPinModeInvalidModeIsIgnored(): void {
+      $request = $this->getRequestFixture(['mode' => 'invalid_mode']);
       $pin = $this->getPinFixture();
       $pin
         ->expects($this->never())
         ->method('__set');
-      $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
-      $handler($request, array('pin' => 0));
+      $handler = new PinHandler($this->getBoardFixture([0 => $pin]));
+      $handler($request, ['pin' => 0]);
     }
 
     /**
-     * @covers \Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\PinHandler
      */
-    public function testPinDigitalChange() {
-      $request = $this->getRequestFixture(array('digital' => 'yes'));
+    public function testPinDigitalChange(): void {
+      $request = $this->getRequestFixture(['digital' => 'yes']);
       $pin = $this->getPinFixture();
       $pin
         ->expects($this->once())
         ->method('__set')
-        ->with('digital', Firmata\Board::DIGITAL_HIGH);
-      $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
-      $handler($request, array('pin' => 0));
+        ->with('digital', FirmataBoard::DIGITAL_HIGH);
+      $handler = new PinHandler($this->getBoardFixture([0 => $pin]));
+      $handler($request, ['pin' => 0]);
     }
 
     /**
-     * @covers \Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\PinHandler
      */
-    public function testPinAnalogChange() {
-      $request = $this->getRequestFixture(array('analog' => '0.5'));
+    public function testPinAnalogChange(): void {
+      $request = $this->getRequestFixture(['analog' => '0.5']);
       $pin = $this->getPinFixture();
       $pin
         ->expects($this->once())
         ->method('__set')
         ->with('analog', $this->equalTo(0.5, 0.01));
-      $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
-      $handler($request, array('pin' => 0));
+      $handler = new PinHandler($this->getBoardFixture([0 => $pin]));
+      $handler($request, ['pin' => 0]);
     }
 
     /**
-     * @covers \Carica\Firmata\Rest\Pin
+     * @covers \Carica\Firmata\Rest\PinHandler
      */
-    public function testPinValueChange() {
-      $request = $this->getRequestFixture(array('value' => '128'));
+    public function testPinValueChange(): void {
+      $request = $this->getRequestFixture(['value' => '128']);
       $pin = $this->getPinFixture();
       $pin
         ->expects($this->once())
         ->method('__set')
         ->with('value', 128);
-      $handler = new Pin($this->getBoardFixture(array(0 => $pin)));
-      $handler($request, array('pin' => 0));
+      $handler = new PinHandler($this->getBoardFixture([0 => $pin]));
+      $handler($request, ['pin' => 0]);
     }
 
     /************************
@@ -171,77 +184,75 @@ namespace Carica\Firmata\Rest {
 
     /**
      * @param array $pins
-     * @return \PHPUnit\Framework\MockObject\MockObject|Firmata\Board
+     * @return MockObject|FirmataBoard
      */
-    private function getBoardFixture(array $pins = array()) {
+    private function getBoardFixture(array $pins = []): MockObject {
       $board = $this
-        ->getMockBuilder(Firmata\Board::class)
+        ->getMockBuilder(FirmataBoard::class)
         ->disableOriginalConstructor()
         ->getMock();
       $board
         ->expects($this->once())
         ->method('isActive')
-        ->will($this->returnValue(TRUE));
+        ->willReturn(TRUE);
       $board
-        ->expects($this->any())
         ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('version', '21.42'),
-              array('pins', $pins)
-            )
-          )
+        ->willReturnMap(
+          [
+            ['version', '21.42'],
+            ['pins', $pins]
+          ]
         );
       return $board;
     }
 
-    private function getPinFixture($data = array()) {
+    /**
+     * @param array $data
+     * @return MockObject|Firmata\Pin
+     */
+    private function getPinFixture($data = []): MockObject {
       $pin = $this
         ->getMockBuilder(Firmata\Pin::class)
         ->disableOriginalConstructor()
         ->getMock();
       $pin
-        ->expects($this->any())
         ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('pin', isset($data['pin']) ? $data['pin'] : 0),
-              array('mode', isset($data['mode']) ? $data['mode'] : 0x00),
-              array('digital', isset($data['digital']) ? $data['digital'] : FALSE),
-              array('analog', isset($data['analog']) ? $data['analog'] : 0),
-              array('value', isset($data['value']) ? $data['value'] : 0),
-              array('supports', isset($data['supports']) ? $data['supports'] : array()),
-            )
-          )
+        ->willReturnMap(
+          [
+            ['pin', $data['pin'] ?? 0],
+            ['mode', $data['mode'] ?? 0x00],
+            ['digital', $data['digital'] ?? FALSE],
+            ['analog', $data['analog'] ?? 0],
+            ['value', $data['value'] ?? 0],
+            ['supports', $data['supports'] ?? []],
+          ]
         );
       return $pin;
     }
 
-    private function getRequestFixture($query = array()) {
-      /** @var MockObject|Io\Network\Http\Connection $connection */
+    /**
+     * @param array $query
+     * @return MockObject|HTTPRequest
+     */
+    private function getRequestFixture(array $query = []): MockObject {
+      /** @var MockObject|HTTPConnection $connection */
       $connection = $this
-        ->getMockBuilder(Io\Network\Http\Connection::class)
+        ->getMockBuilder(HTTPConnection::class)
         ->disableOriginalConstructor()
         ->getMock();
       $request = $this
-        ->getMockBuilder(Io\Network\Http\Request::class)
+        ->getMockBuilder(HTTPRequest::class)
         ->disableOriginalConstructor()
         ->getMock();
       $request
-        ->expects($this->any())
         ->method('createResponse')
-        ->will($this->returnValue(new Io\Network\Http\Response($connection)));
+        ->willReturn(new HTTPResponse($connection));
       $request
-        ->expects($this->any())
         ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('query', $query)
-            )
-          )
+        ->willReturnMap(
+          [
+            ['query', $query]
+          ]
         );
       return $request;
     }

@@ -7,13 +7,14 @@ namespace Carica\Firmata {
   use Carica\Io;
   use Carica\Firmata;
   use PHPUnit\Framework\MockObject\MockObject;
+  use PHPUnit\Framework\TestCase;
 
-  class PulseInTest extends \PHPUnit\Framework\TestCase {
+  class PulseInTest extends TestCase {
 
     /**
      * @covers \Carica\Firmata\PulseIn
      */
-    public function testPulsInTrigger() {
+    public function testPulsInTrigger(): void {
       $stream = $this->getMockBuilder(Io\Stream::class)->getMock();
       $stream
         ->expects($this->once())
@@ -27,18 +28,16 @@ namespace Carica\Firmata {
         ->disableOriginalConstructor()
         ->getMock();
       $board
-        ->expects($this->any())
         ->method('events')
-        ->will($this->returnValue($events));
+        ->willReturn($events);
       $board
-        ->expects($this->any())
         ->method('stream')
-        ->will($this->returnValue($stream));
+        ->willReturn($stream);
 
       $pulse = new PulseIn($board);
       $actualDuration = null;
       $pulse(3)->done(
-        function($duration) use (&$actualDuration) {
+        static function($duration) use (&$actualDuration) {
           $actualDuration = $duration;
         }
       );

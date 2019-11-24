@@ -2,16 +2,17 @@
 
 namespace Carica\Firmata\I2C {
 
-  include_once(__DIR__ . '/../Bootstrap.php');
+  include_once(__DIR__.'/../Bootstrap.php');
 
   use Carica\Firmata;
+  use PHPUnit\Framework\TestCase;
 
-  class ReplyTest extends \PHPUnit\Framework\TestCase {
+  class ReplyTest extends TestCase {
 
     /**
      * @covers \Carica\Firmata\I2C\Reply
      */
-    public function testConstructor() {
+    public function testConstructor(): void {
       $reply = new Reply(
         Firmata\I2C::REPLY,
         [

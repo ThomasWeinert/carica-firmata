@@ -2,14 +2,16 @@
 
 namespace Carica\Firmata {
 
+  use PHPUnit\Framework\TestCase;
+
   include_once(__DIR__ . '/Bootstrap.php');
 
-  class ResponseTest extends \PHPUnit\Framework\TestCase {
+  class ResponseTest extends TestCase {
 
     /**
      * @covers \Carica\Firmata\Response
      */
-    public function testReadPropertyCommand() {
+    public function testReadPropertyCommand(): void {
       $response = new Response_TestProxy(0x42, [0x42, 0x00, 0x00]);
       $this->assertEquals(0x42, $response->command);
     }
@@ -17,7 +19,7 @@ namespace Carica\Firmata {
     /**
      * @covers \Carica\Firmata\Response
      */
-    public function testReadInvalidPropertyExpectingException() {
+    public function testReadInvalidPropertyExpectingException(): void {
       $response = new Response_TestProxy(0x42, [0x42, 0x00, 0x00]);
       $this->expectException(\LogicException::class);
       $response->INVALID_PROPERTY;
@@ -26,7 +28,7 @@ namespace Carica\Firmata {
     /**
      * @covers \Carica\Firmata\Response
      */
-    public function testGetRawData() {
+    public function testGetRawData(): void {
       $response = new Response_TestProxy(0x42, [0x42, 0x01, 0x02]);
       $this->assertEquals(
         [0x42, 0x01, 0x02],

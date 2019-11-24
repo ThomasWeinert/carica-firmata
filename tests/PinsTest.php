@@ -2,17 +2,22 @@
 
 namespace Carica\Firmata {
 
-  include_once(__DIR__ . '/Bootstrap.php');
+  use Carica\Firmata\Exception\NonExistingPin;
+  use LogicException;
+  use PHPUnit\Framework\MockObject\MockObject;
+  use PHPUnit\Framework\TestCase;
 
-  class PinsTest extends \PHPUnit\Framework\TestCase {
+  include_once(__DIR__.'/Bootstrap.php');
+
+  class PinsTest extends TestCase {
 
     /**
      * @covers \Carica\Firmata\Pins::__construct
      */
-    public function testConstructor() {
+    public function testConstructor(): void {
       $pins = new Pins(
         $this->getBoardFixture(),
-        array(42 => array(Pin::MODE_OUTPUT))
+        [42 => [Pin::MODE_OUTPUT]]
       );
       $this->assertCount(1, $pins);
     }
@@ -21,12 +26,12 @@ namespace Carica\Firmata {
      * @covers \Carica\Firmata\Pins::setAnalogMapping
      * @covers \Carica\Firmata\Pins::getPinByChannel
      */
-    public function testAnalogMappingWithValidChannel() {
+    public function testAnalogMappingWithValidChannel(): void {
       $pins = new Pins(
         $this->getBoardFixture(),
-        array(42 => array(Pin::MODE_ANALOG))
+        [42 => [Pin::MODE_ANALOG]]
       );
-      $pins->setAnalogMapping(array(21 => 42));
+      $pins->setAnalogMapping([21 => 42]);
       $this->assertEquals(42, $pins->getPinByChannel(21));
     }
 
@@ -34,25 +39,25 @@ namespace Carica\Firmata {
      * @covers \Carica\Firmata\Pins::setAnalogMapping
      * @covers \Carica\Firmata\Pins::getPinByChannel
      */
-    public function testAnalogMappingWithInvalidChannelExpectingNegativeOne() {
+    public function testAnalogMappingWithInvalidChannelExpectingNegativeOne(): void {
       $pins = new Pins(
         $this->getBoardFixture(),
-        array(42 => array(Pin::MODE_ANALOG))
+        [42 => [Pin::MODE_ANALOG]]
       );
-      $pins->setAnalogMapping(array(21 => 42));
+      $pins->setAnalogMapping([21 => 42]);
       $this->assertEquals(-1, $pins->getPinByChannel(23));
     }
 
     /**
      * @covers \Carica\Firmata\Pins::getIterator
      */
-    public function testIterator() {
+    public function testIterator(): void {
       $pins = new Pins(
         $board = $this->getBoardFixture(),
-        array(42 => array(Pin::MODE_OUTPUT))
+        [42 => [Pin::MODE_OUTPUT]]
       );
       $this->assertEquals(
-        array(42 => new Pin($board, 42, array(Pin::MODE_OUTPUT))),
+        [42 => new Pin($board, 42, [Pin::MODE_OUTPUT])],
         iterator_to_array($pins)
       );
     }
@@ -60,7 +65,7 @@ namespace Carica\Firmata {
     /**
      * @covers \Carica\Firmata\Pins::count
      */
-    public function testCountableExpectingZero() {
+    public function testCountableExpectingZero(): void {
       $pins = new Pins(
         $board = $this->getBoardFixture(),
         []
@@ -71,7 +76,7 @@ namespace Carica\Firmata {
     /**
      * @covers \Carica\Firmata\Pins::count
      */
-    public function testCountableExpectingTwo() {
+    public function testCountableExpectingTwo(): void {
       $pins = new Pins(
         $board = $this->getBoardFixture(),
         [
@@ -85,10 +90,10 @@ namespace Carica\Firmata {
     /**
      * @covers \Carica\Firmata\Pins::offsetExists
      */
-    public function testArrayAccessOffsetExistsExpectingTrue() {
+    public function testArrayAccessOffsetExistsExpectingTrue(): void {
       $pins = new Pins(
         $board = $this->getBoardFixture(),
-        array(42 => array(Pin::MODE_OUTPUT))
+        [42 => [Pin::MODE_OUTPUT]]
       );
       $this->assertTrue(isset($pins[42]));
     }
@@ -96,10 +101,10 @@ namespace Carica\Firmata {
     /**
      * @covers \Carica\Firmata\Pins::offsetExists
      */
-    public function testArrayAccessOffsetExistsExpectingFalse() {
+    public function testArrayAccessOffsetExistsExpectingFalse(): void {
       $pins = new Pins(
         $board = $this->getBoardFixture(),
-        array(42 => array(Pin::MODE_OUTPUT))
+        [42 => [Pin::MODE_OUTPUT]]
       );
       $this->assertFalse(isset($pins[23]));
     }
@@ -107,10 +112,10 @@ namespace Carica\Firmata {
     /**
      * @covers \Carica\Firmata\Pins::offsetGet
      */
-    public function testArrayAccessOffsetGet() {
+    public function testArrayAccessOffsetGet(): void {
       $pins = new Pins(
         $board = $this->getBoardFixture(),
-        array(42 => array(Pin::MODE_OUTPUT))
+        [42 => [Pin::MODE_OUTPUT]]
       );
       $this->assertInstanceOf(Pin::class, $pins[42]);
     }
@@ -118,12 +123,12 @@ namespace Carica\Firmata {
     /**
      * @covers \Carica\Firmata\Pins::offsetGet
      */
-    public function testArrayAccessOffsetGetWithInvalidOffsetExpectingException() {
+    public function testArrayAccessOffsetGetWithInvalidOffsetExpectingException(): void {
       $pins = new Pins(
-        $this->getBoardFixture(), array()
+        $this->getBoardFixture(), []
       );
       $this->expectException(
-        \Carica\Firmata\Exception\NonExistingPin::class
+        NonExistingPin::class
       );
       $pins[42];
     }
@@ -131,25 +136,26 @@ namespace Carica\Firmata {
     /**
      * @covers \Carica\Firmata\Pins::offsetSet
      */
-    public function testArrayAccessOffsetSetExpectingException() {
+    public function testArrayAccessOffsetSetExpectingException(): void {
       $pins = new Pins(
-        $this->getBoardFixture(), array()
+        $this->getBoardFixture(), []
       );
       $this->expectException(
-        \LogicException::class
+        LogicException::class
       );
+      /** @noinspection OnlyWritesOnParameterInspection */
       $pins[] = '';
     }
 
     /**
      * @covers \Carica\Firmata\Pins::offsetUnset
      */
-    public function testArrayAccessOffsetUnsetExpectingException() {
+    public function testArrayAccessOffsetUnsetExpectingException(): void {
       $pins = new Pins(
-        $this->getBoardFixture(), array()
+        $this->getBoardFixture(), []
       );
       $this->expectException(
-        \LogicException::class
+        LogicException::class
       );
       unset($pins[42]);
     }
@@ -159,7 +165,7 @@ namespace Carica\Firmata {
      *****************/
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Board
+     * @return MockObject|Board
      */
     private function getBoardFixture() {
       $board = $this

@@ -2,16 +2,17 @@
 
 namespace Carica\Firmata\Response\SysEx {
 
-  include_once(__DIR__ . '/../../Bootstrap.php');
+  include_once(__DIR__.'/../../Bootstrap.php');
 
   use Carica\Firmata;
+  use PHPUnit\Framework\TestCase;
 
-  class AnalogMappingResponseTest extends \PHPUnit\Framework\TestCase {
+  class AnalogMappingResponseTest extends TestCase {
 
     /**
      * @covers \Carica\Firmata\Response\SysEx\AnalogMappingResponse
      */
-    public function testConstructor() {
+    public function testConstructor(): void {
       $response = new AnalogMappingResponse(
         [
           // pin 0 to 13
@@ -21,7 +22,7 @@ namespace Carica\Firmata\Response\SysEx {
         ]
       );
       $this->assertEquals(
-        array(
+        [
           0 => 14,
           1 => 15,
           2 => 16,
@@ -30,11 +31,11 @@ namespace Carica\Firmata\Response\SysEx {
           5 => 19,
           6 => 20,
           7 => 21
-        ),
+        ],
         $response->channels
       );
       $this->assertEquals(
-        array(
+        [
           14 => 0,
           15 => 1,
           16 => 2,
@@ -43,7 +44,7 @@ namespace Carica\Firmata\Response\SysEx {
           19 => 5,
           20 => 6,
           21 => 7
-        ),
+        ],
         $response->pins
       );
       $this->assertEquals(

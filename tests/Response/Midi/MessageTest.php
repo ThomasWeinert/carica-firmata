@@ -2,15 +2,21 @@
 
 namespace Carica\Firmata\Response\Midi {
 
-  include_once(__DIR__ . '/../../Bootstrap.php');
+  use PHPUnit\Framework\TestCase;
 
-  class MessageTest extends \PHPUnit\Framework\TestCase {
+  include_once(__DIR__.'/../../Bootstrap.php');
+
+  class MessageTest extends TestCase {
 
     /**
-     * @covers \Carica\Firmata\Response\Midi\Message
+     * @covers       \Carica\Firmata\Response\Midi\Message
      * @dataProvider provideMessageExamples
+     * @param int $command
+     * @param int $port
+     * @param int $value
+     * @param array $bytes
      */
-    public function testConstructor($command, $port, $value, $bytes) {
+    public function testConstructor($command, $port, $value, $bytes): void {
       $message = new Message(
         $command,
         $bytes
@@ -26,11 +32,11 @@ namespace Carica\Firmata\Response\Midi {
       );
     }
 
-    public function provideMessageExamples() {
-      return array(
-        array(0xE0, 1, 0x00, [0xE0 | 0x01, 0x00, 0x00]),
-        array(0xE0, 2, 0x01, [0xE0 | 0x02, 0x01, 0x00])
-      );
+    public function provideMessageExamples(): array {
+      return [
+        [0xE0, 1, 0x00, [0xE0 | 0x01, 0x00, 0x00]],
+        [0xE0, 2, 0x01, [0xE0 | 0x02, 0x01, 0x00]]
+      ];
     }
   }
 }

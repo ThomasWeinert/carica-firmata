@@ -2,41 +2,50 @@
 
 namespace Carica\Firmata\Rest {
 
-  include_once(__DIR__ . '/../Bootstrap.php');
+  include_once(__DIR__.'/../Bootstrap.php');
 
+  use ArrayIterator;
+  use Carica\Firmata\Board as FirmataBoard;
   use Carica\Io;
   use Carica\Firmata;
+  use Carica\Io\Network\HTTP\Connection as HTTPConnection;
+  use Carica\Io\Network\HTTP\Request as HTTPRequest;
+  use Carica\Io\Network\HTTP\Response\Content\XML as XMLResponseContent;
+  use DOMElement;
   use PHPUnit\Framework\MockObject\MockObject;
+  use PHPUnit\Framework\TestCase;
 
-  class PinsTest extends \PHPUnit\Framework\TestCase {
+  class PinsTest extends TestCase {
 
     /**
      * @covers \Carica\Firmata\Rest\Pins
      */
-    public function testWithInactiveBoard() {
-      /** @var MockObject|Firmata\Board $board */
+    public function testWithInactiveBoard(): void {
+      /** @var MockObject|FirmataBoard $board */
       $board = $this
-        ->getMockBuilder(Firmata\Board::class)
+        ->getMockBuilder(FirmataBoard::class)
         ->disableOriginalConstructor()
         ->getMock();
       $board
         ->expects($this->once())
         ->method('isActive')
-        ->will($this->returnValue(FALSE));
+        ->willReturn(FALSE);
 
       $handler = new Pins($board);
-      $response = $handler($this->getRequestFixture(), array());
+      $response = $handler($this->getRequestFixture(), []);
 
+      /** @var XMLResponseContent $content */
+      $content = $response->content;
       $this->assertXmlStringEqualsXmlString(
         '<?xml version="1.0" encoding="utf-8"?><board active="no"/>',
-        $response->content->document->saveXml()
+        $content->document->saveXML()
       );
     }
 
     /**
      * @covers \Carica\Firmata\Rest\Pins
      */
-    public function testWithActiveBoard() {
+    public function testWithActiveBoard(): void {
       $pin = $this
         ->getMockBuilder(Firmata\Pin::class)
         ->disableOriginalConstructor()
@@ -44,65 +53,64 @@ namespace Carica\Firmata\Rest {
       $pin
         ->expects($this->once())
         ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('pin', 23)
-            )
-          )
+        ->willReturnMap(
+          [
+            ['pin', 23]
+          ]
         );
 
-      /** @var MockObject|Firmata\Board $board */
+      /** @var MockObject|FirmataBoard $board */
       $board = $this
-        ->getMockBuilder(Firmata\Board::class)
+        ->getMockBuilder(FirmataBoard::class)
         ->disableOriginalConstructor()
         ->getMock();
       $board
         ->expects($this->once())
         ->method('isActive')
-        ->will($this->returnValue(TRUE));
+        ->willReturn(TRUE);
       $board
-        ->expects($this->any())
         ->method('__get')
-        ->will(
-          $this->returnValueMap(
-            array(
-              array('version', '42.21'),
-              array('pins', new \ArrayIterator(array($pin)))
-            )
-          )
+        ->willReturnMap(
+          [
+            ['version', '42.21'],
+            ['pins', new ArrayIterator([$pin])]
+          ]
         );
 
+      /** @var MockObject|PinHandler $pinHandler */
       $pinHandler = $this
-        ->getMockBuilder(Firmata\Rest\Pin::class)
+        ->getMockBuilder(PinHandler::class)
         ->disableOriginalConstructor()
         ->getMock();
       $pinHandler
         ->expects($this->once())
         ->method('appendPin')
-        ->with($this->isInstanceOf(\DOMElement::class), 23);
+        ->with($this->isInstanceOf(DOMElement::class), 23);
 
       $handler = new Pins($board);
       $handler->pinHandler($pinHandler);
-      $response = $handler($this->getRequestFixture(), array());
+      $response = $handler($this->getRequestFixture(), []);
 
+      /** @var XMLResponseContent $content */
+      $content = $response->content;
       $this->assertXmlStringEqualsXmlString(
         '<?xml version="1.0" encoding="utf-8"?><board active="yes" firmata="42.21"/>',
-        $response->content->document->saveXml()
+        $content->document->saveXml()
       );
     }
 
     /**
      * @covers \Carica\Firmata\Rest\Pins
      */
-    public function testPinHandlerGetAfterSet() {
+    public function testPinHandlerGetAfterSet(): void {
+      /** @var MockObject|PinHandler $pinHandler */
       $pinHandler = $this
-        ->getMockBuilder(Firmata\Rest\Pin::class)
+        ->getMockBuilder(PinHandler::class)
         ->disableOriginalConstructor()
         ->getMock();
-      /** @var MockObject|Firmata\Board $board */
+      /** @var MockObject|FirmataBoard $board */
       $board = $this
-        ->getMockBuilder(Firmata\Board::class)
+        ->getMockBuilder(FirmataBoard::class)
         ->disableOriginalConstructor()
         ->getMock();
 
@@ -114,31 +122,34 @@ namespace Carica\Firmata\Rest {
     /**
      * @covers \Carica\Firmata\Rest\Pins
      */
-    public function testPinHandlerGetImplicitCreate() {
-      /** @var MockObject|Firmata\Board $board */
+    public function testPinHandlerGetImplicitCreate(): void {
+      /** @var MockObject|FirmataBoard $board */
       $board = $this
-        ->getMockBuilder(Firmata\Board::class)
+        ->getMockBuilder(FirmataBoard::class)
         ->disableOriginalConstructor()
         ->getMock();
 
       $handler = new Pins($board);
-      $this->assertInstanceOf(Firmata\Rest\Pin::class, $handler->pinHandler());
+      $this->assertNotNull($handler->pinHandler());
     }
 
-    private function getRequestFixture() {
-      /** @var MockObject|Io\Network\Http\Connection $connection */
+    /**
+     * @return MockObject|HTTPRequest
+     */
+    private function getRequestFixture(): MockObject {
+      /** @var MockObject|HTTPConnection $connection */
       $connection = $this
-        ->getMockBuilder(Io\Network\Http\Connection::class)
+        ->getMockBuilder(HTTPConnection::class)
         ->disableOriginalConstructor()
         ->getMock();
       $request = $this
-        ->getMockBuilder(Io\Network\Http\Request::class)
+        ->getMockBuilder(HTTPRequest::class)
         ->disableOriginalConstructor()
         ->getMock();
       $request
         ->expects($this->once())
         ->method('createResponse')
-        ->will($this->returnValue(new Io\Network\Http\Response($connection)));
+        ->willReturn(new Io\Network\Http\Response($connection));
       return $request;
     }
   }

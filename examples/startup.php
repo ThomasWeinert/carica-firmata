@@ -45,5 +45,3 @@ $board
   );
 
 $loop->run();
-
-

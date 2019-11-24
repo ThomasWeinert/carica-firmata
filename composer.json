@@ -12,11 +12,12 @@
     }
   ],
   "require": {
-    "php": ">=7.1",
-    "carica/io": "^1.1"
+    "php": ">=7.3",
+    "ext-dom": "*",
+    "carica/io": "^2.0.1"
   },
   "provide": {
-    "carica/io-devices" : "0.0.1"
+    "carica/io-devices" : "1.0"
   },
   "autoload": {
     "psr-4": {

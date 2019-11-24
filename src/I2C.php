@@ -3,26 +3,29 @@ namespace Carica\Firmata {
 
   use Carica\Io\ByteArray;
   use Carica\Io\Deferred;
-  use Carica\Io\Device;
+  use Carica\Io\Device\I2C as I2CDevice;
+  use Carica\Io\Event\Emitter as EventEmitter;
+  use OutOfRangeException;
 
-  class I2C implements Device\I2C {
+  class I2C implements I2CDevice {
 
-    use /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
-      \Carica\Io\Event\Emitter\Aggregation;
+    use EventEmitter\Aggregation;
 
-    const REQUEST = 0x76;
-    const REPLY = 0x77;
-    const CONFIG = 0x78;
+    public const REQUEST = 0x76;
+    public const REPLY = 0x77;
+    public const CONFIG = 0x78;
 
-    const MODE_WRITE = 0;
-    const MODE_READ = 1;
-    const MODE_CONTINOUS_READ = 2;
-    const MODE_STOP_READING = 3;
+    public const MODE_WRITE = 0;
+    public const MODE_READ = 1;
+    public const MODE_CONTINOUS_READ = 2;
+    public const MODE_STOP_READING = 3;
+
+    public const EVENT_REPLY = 'reply';
 
     /**
      * @var Board
      */
-    private $_board = NULL;
+    private $_board;
 
     /**
      * @var bool Debug mode, blocks actual write() and issues a debug event.
@@ -39,41 +42,41 @@ namespace Carica\Firmata {
      */
     private $_deviceAddress;
 
-    public function __construct(Board $board, $deviceAddress) {
+    public function __construct(Board $board, int $deviceAddress) {
       $this->_board = $board;
       $this->_board->events()->on(
-        'response',
+        Board::EVENT_RESPONSE,
         function(Response $response) {
-          if ($response->command == self::REPLY) {
+          if ($response->command === self::REPLY) {
             $reply = new I2C\Reply(self::REPLY, $response->getRawData());
-            $this->events()->emit('reply-'.$reply->slaveAddress, $reply->data);
+            $this->events()->emit(self::EVENT_REPLY.'-'.$reply->slaveAddress, $reply->data);
           }
         }
       );
-      $this->_deviceAddress = (int)$deviceAddress;
+      $this->_deviceAddress = $deviceAddress;
       if ($this->_deviceAddress <= 0 || $this->_deviceAddress > 127) {
-        throw new \OutOfRangeException('Invalid I2C address.');
+        throw new OutOfRangeException('Invalid I2C address.');
       }
     }
 
     /**
      * Enable/disable debug mode - Blocks write actions and emits a debug event with the data.
-     * @param $enable
+     * @param bool $enable
      */
-    public function debug($enable) {
-      $this->_debug = (bool)$enable;
+    public function debug(bool $enable): void {
+      $this->_debug = $enable;
     }
 
     /**
      * Emit the debug event with the address as hex string and data bytes in binary representation.
-     * 
-     * @param $method
-     * @param $data
+     *
+     * @param string $method
+     * @param array $data
      */
-    private function emitDebug($method, $data) {
+    private function emitDebug(string $method, array $data): void {
       $this->emitEvent(
-        'debug', 
-        $method, 
+        'debug',
+        $method,
         '0x'.str_pad(dechex($this->_deviceAddress), 2, '0', STR_PAD_LEFT),
         ByteArray::createFromArray($data)->asBitString()
       );
@@ -82,14 +85,14 @@ namespace Carica\Firmata {
      /**
      * Allow i2c read/write to make sure that config was called.
      */
-    private function ensureConfiguration() {
+    private function ensureConfiguration(): void {
       if (!$this->_isInitialized) {
         $this->configure();
         $this->_isInitialized = true;
       }
     }
 
-    public function configure($delay = 0) {
+    public function configure(int $delay = 0): void {
       $this
         ->_board
         ->stream()
@@ -110,7 +113,7 @@ namespace Carica\Firmata {
      *
      * @param array $data
      */
-    public function write(array $data) {
+    public function write(array $data): void {
       if ($this->_debug) {
         $this->emitDebug(__FUNCTION__, $data);
         return;
@@ -124,16 +127,16 @@ namespace Carica\Firmata {
      * Request data from an i2c device and trigger callback if the
      * data is sent.
      *
-     * @param integer $byteCount
-     * @return Deferred
+     * @param int $byteCount
+     * @return Deferred\PromiseLike
      */
-    public function read($byteCount) {
+    public function read(int $byteCount): Deferred\PromiseLike {
       $this->ensureConfiguration();
       $defer = new Deferred();
       $this->events()->once(
-        'reply-'.$this->_deviceAddress,
-        function ($bytes) use ($defer, $byteCount) {
-          if (count($bytes) == $byteCount) {
+        self::EVENT_REPLY.'-'.$this->_deviceAddress,
+        static function ($bytes) use ($defer, $byteCount) {
+          if (count($bytes) === $byteCount) {
             $defer->resolve($bytes);
           } else {
             $defer->reject('Invalid I2C response.');
@@ -151,14 +154,14 @@ namespace Carica\Firmata {
      * @param int $byteCount
      * @param callable $listener
      */
-    public function startReading($byteCount, callable $listener) {
+    public function startReading(int $byteCount, callable $listener): void {
       $deviceAddress = $this->_deviceAddress;
       $this->ensureConfiguration();
       $this->stopReading();
       $this->events()->on(
-        'reply-'.$deviceAddress,
-        function ($bytes) use ($deviceAddress, $listener, $byteCount) {
-          if (count($bytes) == $byteCount) {
+        self::EVENT_REPLY.'-'.$deviceAddress,
+        function ($bytes) use ($listener, $byteCount) {
+          if (count($bytes) === $byteCount) {
             $listener($bytes);
           } else {
             $this->stopReading();
@@ -171,8 +174,8 @@ namespace Carica\Firmata {
       $request->send();
     }
 
-    public function stopReading() {
-      $this->events()->removeAllListeners('reply-'.$this->_deviceAddress);
+    public function stopReading(): void {
+      $this->events()->removeAllListeners(self::EVENT_REPLY.'-'.$this->_deviceAddress);
       $request = new I2C\Request(
         $this->_board, $this->_deviceAddress, self::MODE_STOP_READING
       );

@@ -15,18 +15,18 @@ namespace Carica\Firmata\Response\Midi {
     /**
      * @var int
      */
-    private $_port = 0;
+    private $_port;
 
     /**
      * @var int
      */
-    private $_value = 0;
+    private $_value;
 
     /**
      * @param string $command
      * @param array $bytes
      */
-    public function __construct($command, array $bytes) {
+    public function __construct(string $command, array $bytes) {
       parent::__construct($command, $bytes);
       $this->_port = $bytes[0] & 0x0F;
       $this->_value = $bytes[1] | ($bytes[2] << 7);

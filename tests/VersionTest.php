@@ -2,14 +2,17 @@
 
 namespace Carica\Firmata {
 
+  use LogicException;
+  use PHPUnit\Framework\TestCase;
+
   include_once(__DIR__ . '/Bootstrap.php');
 
-  class VersionTest extends \PHPUnit\Framework\TestCase {
+  class VersionTest extends TestCase {
 
     /**
      * @covers \Carica\Firmata\Version
      */
-    public function testConstructor() {
+    public function testConstructor(): void {
       $version = new Version(2, 3);
       $this->assertEquals(2, $version->major);
       $this->assertEquals(3, $version->minor);
@@ -18,7 +21,7 @@ namespace Carica\Firmata {
     /**
      * @covers \Carica\Firmata\Version
      */
-    public function testConstructorWithAllArguments() {
+    public function testConstructorWithAllArguments(): void {
       $version = new Version(2, 3, 'Success');
       $this->assertEquals('Success', $version->text);
     }
@@ -26,7 +29,7 @@ namespace Carica\Firmata {
     /**
      * @covers \Carica\Firmata\Version
      */
-    public function testToString() {
+    public function testToString(): void {
       $version = new Version(2, 3, 'Success');
       $this->assertEquals('Success 2.3', (string)$version);
     }
@@ -34,18 +37,19 @@ namespace Carica\Firmata {
     /**
      * @covers \Carica\Firmata\Version
      */
-    public function testGetPropertyWithIvalidPropertyName() {
+    public function testGetPropertyWithIvalidPropertyName(): void {
       $version = new Version(2, 3, 'Success');
-      $this->expectException(\LogicException::class);
+      $this->expectException(LogicException::class);
+      /** @noinspection PhpUndefinedFieldInspection */
       $version->INVALID;
     }
 
     /**
      * @covers \Carica\Firmata\Version
      */
-    public function testSetProperty() {
+    public function testSetProperty(): void {
       $version = new Version(2, 3, 'Success');
-      $this->expectException(\LogicException::class);
+      $this->expectException(LogicException::class);
       $version->major = 'fail';
     }
   }

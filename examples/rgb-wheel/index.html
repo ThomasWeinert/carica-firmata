@@ -1,66 +1,50 @@
 <!DOCTYPE html!>
 <html>
-  <head>
-    <title>Color Wheel Example</title>
-    <style type="text/css">
-      html, body {
-        background-color: black;
-        width: 100%;
-        height: 100%;
-        padding: 0;
-        margin: 0;
-      }
-      div.wheel {
-        width: 300px;
-        height: 300px;
-        margin: auto;
-        padding-top: 20px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="wheel">
+<head>
+  <title>Color Wheel Example</title>
+  <style type="text/css">
+    html, body {
+      background-color: black;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+    }
 
-    </div>
-    <script
-      type="text/javascript"
-      src="./files/jquery-3.4.1.min.js">
-    </script>
-    <script
-      type="text/javascript"
-      src="./files/raphael-min.js">
-    </script>
-    <script
-      type="text/javascript"
-      src="./files/colorwheel.js">
-    </script>
-    <script type="text/javascript">
-      jQuery(
-        function() {
-          var cw = Raphael.colorwheel($('.wheel'), 300).color('#FFF');
-          var waiting = true;
-          cw.ondrag(
-            null,
-            function(color) {
-              if (waiting) {
-                waiting = false;
-                jQuery
-                  .get(
-                    './rgb',
-                    {
-                      r : parseInt(color.r), g : parseInt(color.g), b : parseInt(color.b)
-                    }
-                  )
-                  .always(
-                    function () {
-                      waiting = true;
-                    }
-                  );
-              }
-            }
-          );
+    div.wheel {
+      width: 300px;
+      height: 300px;
+      margin: auto;
+      padding-top: 20px;
+    }
+  </style>
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/reinvented-color-wheel@0.2.8/css/reinvented-color-wheel.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/reinvented-color-wheel@0.2.8"></script>
+</head>
+<body>
+<div id="wheel">
+
+</div>
+<script type="text/javascript">
+    var colorWheel = new ReinventedColorWheel(
+        {
+            appendTo: document.getElementById("wheel"),
+
+            // appearance
+            wheelDiameter: 200,
+            wheelThickness: 20,
+            handleDiameter: 16,
+            wheelReflectsSaturation: false,
+
+            // handler
+            onChange: function (color) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('get', './rgb?r=' + color.rgb[0] + '&g=' + color.rgb[1] + '&b=' + color.rgb[2]);
+                xhr.send();
+            },
         }
-      );
-    </script>
-  </body>
+    );
+</script>
+</body>
 </html>

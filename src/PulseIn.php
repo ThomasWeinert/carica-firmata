@@ -1,48 +1,58 @@
 <?php
 namespace Carica\Firmata {
 
-  use Carica\Io\Event;
+  use Carica\Io\Deferred;
+  use Carica\Io\Deferred\PromiseLike;
+  use Carica\Io\Event\Emitter as EventEmitter;
 
   class PulseIn {
 
-    use Event\Emitter\Aggregation;
+    use EventEmitter\Aggregation;
 
-    const COMMAND = 0x74;
+    public const COMMAND = 0x74;
+
+    public const EVENT_PULSE_IN = 'pulse-in';
 
     /**
      * @var Board
      */
-    private $_board = NULL;
+    private $_board;
 
+    /**
+     * @param Board $board
+     */
     public function __construct(Board $board) {
       $this->_board = $board;
       $this->_board->events()->on(
-        'response',
+        Board::EVENT_RESPONSE,
         function(Response $response) {
-          if ($response->command == self::COMMAND) {
+          if ($response->command === self::COMMAND) {
             $bytes = $response->getRawData();
             $pin = unpack('C', Response::decodeBytes([$bytes[1], $bytes[2]]));
             $pin = $pin[1];
             $duration = unpack('N', Response::decodeBytes(array_slice($bytes, 3)));
             $duration = $duration[1];
-            $this->events()->emit('pulse-in-'.$pin, $duration);
-            $this->events()->emit('pulse-in', $pin, $duration);
+            $this->events()->emit(self::EVENT_PULSE_IN.'-'.$pin, $duration);
+            $this->events()->emit(self::EVENT_PULSE_IN, $pin, $duration);
           }
         }
       );
     }
 
-    public function __invoke(...$arguments) {
-      return $this->trigger(...$arguments);
-    }
-
-    public function trigger(
-      $pin, $value = Board::DIGITAL_HIGH, $pulseLength = 5, $timeout = 1000000
-    ) {
-      $defer = new \Carica\Io\Deferred();
+    /**
+     * @param int $pin
+     * @param int $value
+     * @param int $pulseLength
+     * @param int $timeout
+     * @return PromiseLike
+     */
+    public function __invoke(
+      int $pin, int $value = Board::DIGITAL_HIGH, int $pulseLength = 5, int $timeout = 1000000
+    ): PromiseLike {
+      $defer = new Deferred();
       $this->events()->once(
-        'pulse-in-'.$pin,
-        function ($duration) use ($defer) {
+        self::EVENT_PULSE_IN.'-'.$pin,
+        static function ($duration) use ($defer) {
           $defer->resolve($duration);
         }
       );

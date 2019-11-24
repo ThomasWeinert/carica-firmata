@@ -7,7 +7,7 @@ namespace Carica\Firmata {
     /**
      * @var Board
      */
-    private $_board = NULL;
+    private $_board;
 
     /**
      * @param Board $board
@@ -19,7 +19,7 @@ namespace Carica\Firmata {
     /**
      * @return Board
      */
-    public function board() {
+    public function board(): Board {
       return $this->_board;
     }
 
@@ -34,8 +34,8 @@ namespace Carica\Firmata {
      * @param string $data
      * @return string
      */
-    public static function encodeBytes($data) {
-      $bytes = array_slice(unpack("C*", "\0".$data), 1);
+    public static function encodeBytes($data): string {
+      $bytes = array_slice(unpack('C*', "\0".$data), 1);
       $result = '';
       foreach ($bytes as $byte) {
         $result .= pack('CC', $byte & 0x7F, ($byte >> 7) & 0x7F);

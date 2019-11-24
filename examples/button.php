@@ -9,8 +9,8 @@ $loop = Io\Event\Loop\Factory::get();
 $board
   ->activate()
   ->done(
-    function () use ($board, $loop) {
-      echo "Firmata ".$board->version." active\n";
+    static function () use ($board, $loop) {
+      echo 'Firmata '.$board->version." active\n";
 
       $buttonPin = 2;
       $ledPin = 13;
@@ -20,15 +20,15 @@ $board
 
       $board->digitalRead(
         $buttonPin,
-        function($value) use ($board, $ledPin) {
-          echo ($value == Firmata\Board::DIGITAL_HIGH) ? "Button down\n" :  "Button up\n";
-          $board->pins[$ledPin]->digital = $value == Firmata\Board::DIGITAL_HIGH;
+        static function($value) use ($board, $ledPin) {
+          echo ($value === Firmata\Board::DIGITAL_HIGH) ? "Button down\n" :  "Button up\n";
+          $board->pins[$ledPin]->digital = $value === Firmata\Board::DIGITAL_HIGH;
         }
       );
     }
   )
   ->fail(
-    function ($error) {
+    static function ($error) {
       echo $error."\n";
     }
   );

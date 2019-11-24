@@ -1,18 +1,16 @@
 <?php
 $board = require(__DIR__.'/../bootstrap.php');
 
-use Carica\Io;
-use Carica\Firmata;
-use Carica\Io\Network\Http;
+use Carica\Io\Network\HTTP;
 
 const PIN_RED = 9;
 const PIN_GREEN = 10;
 const PIN_BLUE = 11;
 
-$route = new Carica\Io\Network\Http\Route();
+$route = new HTTP\Route();
 $route->match(
   '/rgb',
-  static function (Http\Request $request) use ($board) {
+  static function (HTTP\Request $request) use ($board) {
     if (isset($request->query['r'])) {
       $red = (int)$request->query['r'];
       $board->pins[PIN_RED]->value = ($red > 0 && $red < 256) ? $red : 0;
@@ -26,7 +24,7 @@ $route->match(
       $board->pins[PIN_BLUE]->value = ($blue > 0 && $blue < 256) ? $blue : 0;
     }
     $response = $request->createResponse();
-    $response->content = new Http\Response\Content\Text(
+    $response->content = new HTTP\Response\Content\Text(
       'Red: '.$board->pins[PIN_RED]->value.', '.
       'Green: '.$board->pins[PIN_GREEN]->value.', '.
       'Blue: '.$board->pins[PIN_BLUE]->value
@@ -34,8 +32,8 @@ $route->match(
     return $response;
   }
 );
-$route->startsWith('/files', new Http\Route\Directory(__DIR__));
-$route->match('/', new Http\Route\File(__DIR__.'/index.html'));
+$route->startsWith('/files', new HTTP\Route\Directory(__DIR__));
+$route->match('/', new HTTP\Route\File(__DIR__.'/index.html'));
 
 $board
   ->activate()
@@ -48,7 +46,7 @@ $board
       $board->pins[PIN_BLUE]->mode = Carica\Firmata\Pin::MODE_PWM;
 
       echo "Start HTTP server: http://localhost:8080\n";
-      $server = new Carica\Io\Network\Http\Server($route);
+      $server = new Carica\Io\Network\HTTP\Server($board->loop(), $route);
       $server->listen(8080);
     }
   )

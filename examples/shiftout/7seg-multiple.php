@@ -9,8 +9,8 @@ $loop = Io\Event\Loop\Factory::get();
 $board
   ->activate()
   ->done(
-    function () use ($board, $loop) {
-      echo "Firmata ".$board->version." active\n";
+    static function () use ($board, $loop) {
+      echo 'Firmata '.$board->version." active\n";
 
       $shiftOut = new Firmata\ShiftOut(
         $board->pins[8],
@@ -25,7 +25,7 @@ $board
 
 
       $loop->setInterval(
-        function () use ($shiftOut, $numbers, $segments) {
+        static function () use ($shiftOut, $numbers, $segments) {
           static $number = 0;
 
           $digits = str_pad($number, $segments, 0, STR_PAD_LEFT);
@@ -37,7 +37,7 @@ $board
 
           $shiftOut->write($bytes);
 
-          if (++$number > (pow(10, $segments) - 1)) {
+          if (++$number > ((10 ** $segments) - 1)) {
             $number = 0;
           }
         },
@@ -46,7 +46,7 @@ $board
     }
   )
   ->fail(
-    function ($error) {
+    static function ($error) {
       echo $error."\n";
     }
   );

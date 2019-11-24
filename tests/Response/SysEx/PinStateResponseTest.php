@@ -5,14 +5,19 @@ namespace Carica\Firmata\Response\SysEx {
   include_once(__DIR__ . '/../../Bootstrap.php');
 
   use Carica\Firmata;
+  use PHPUnit\Framework\TestCase;
 
-  class PinStateResponseTest extends \PHPUnit\Framework\TestCase {
+  class PinStateResponseTest extends TestCase {
 
     /**
-     * @covers \Carica\Firmata\Response\SysEx\PinStateResponse
+     * @covers       \Carica\Firmata\Response\SysEx\PinStateResponse
      * @dataProvider providePinStateExamples
+     * @param $pin
+     * @param $mode
+     * @param $value
+     * @param $bytes
      */
-    public function testConstructor($pin, $mode, $value, $bytes) {
+    public function testConstructor(int $pin, int $mode, int $value, array $bytes): void {
       $response = new PinStateResponse($bytes);
       $this->assertEquals($pin, $response->pin);
       $this->assertEquals($mode, $response->mode);

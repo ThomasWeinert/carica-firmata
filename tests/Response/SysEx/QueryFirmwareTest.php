@@ -2,14 +2,16 @@
 
 namespace Carica\Firmata\Response\SysEx {
 
-  include_once(__DIR__ . '/../../Bootstrap.php');
+  use PHPUnit\Framework\TestCase;
 
-  class QueryFirmwareTest extends \PHPUnit\Framework\TestCase {
+  include_once(__DIR__.'/../../Bootstrap.php');
+
+  class QueryFirmwareTest extends TestCase {
 
     /**
      * @covers \Carica\Firmata\Response\SysEx\QueryFirmware
      */
-    public function testConstructor() {
+    public function testConstructor(): void {
       $version = new QueryFirmware(
         $data = [
           0x02, 0x03,

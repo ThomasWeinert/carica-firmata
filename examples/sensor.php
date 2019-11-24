@@ -9,7 +9,7 @@ $loop = Io\Event\Loop\Factory::get();
 $board
   ->activate()
   ->done(
-    function () use ($board, $loop) {
+    static function () use ($board, $loop) {
       echo "Started:\n";
 
       /**
@@ -31,7 +31,7 @@ $board
       // if the sensor value changes
       $sensor->events()->on(
         'change-value',
-        function (Firmata\Pin $sensor) use ($led) {
+        static function (Firmata\Pin $sensor) use ($led) {
           // output the actual sensor value a 4 digit string
           echo str_pad($sensor->value, 4, 0, STR_PAD_LEFT), ' ';
           // output a bar using the analog value (float between 0 and 1)
@@ -43,7 +43,7 @@ $board
     }
   )
   ->fail(
-    function ($error) {
+    static function ($error) {
       echo $error."\n";
     }
   );

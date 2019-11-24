@@ -5,6 +5,7 @@ namespace Carica\Firmata {
   use Carica\Io;
   use Carica\Io\Deferred\Promise;
   use Carica\Io\Event;
+  use LogicException;
 
   /**
    * This class represents an Arduino board running firmata.
@@ -59,9 +60,10 @@ namespace Carica\Firmata {
     public const EVENT_CAPABILITY_QUERY = 'capability-query';
     public const EVENT_PIN_STATE = 'pin-state';
     public const EVENT_ANALOG_MAPPING_QUERY = 'analog-mapping-query';
+    public const EVENT_PIN_CHANGE = 'change';
 
     /**
-     * @var \Carica\Firmata\Pins
+     * @var Pins
      */
     private $_pins;
 
@@ -126,10 +128,10 @@ namespace Carica\Firmata {
       $this->_stream->events()->on(
         'read-data',
         function ($data) {
-          if (\count($this->_buffer) === 0) {
+          if (count($this->_buffer) === 0) {
             $data = ltrim($data, pack('C', 0));
           }
-          $bytes = \array_slice(unpack('C*', "\0".$data), 1);
+          $bytes = array_slice(unpack('C*', "\0".$data), 1);
           foreach ($bytes as $byte) {
             $this->handleData($byte);
           }
@@ -174,10 +176,11 @@ namespace Carica\Firmata {
     /**
      * Activate the board, assign the needed callbacks
      *
-     * @param Callable|NULL $callback
+     * @param callable|NULL $callback
+     * @param bool $withHeartBeat
      * @return Promise
      */
-    public function activate(Callable $callback = NULL, $withHeartBeat = TRUE): Promise {
+    public function activate(callable $callback = NULL, bool $withHeartBeat = TRUE): Promise {
       $this->_isActivated = FALSE;
       $this->_activationTry = 1;
       $activation = new Io\Deferred();
@@ -267,7 +270,7 @@ namespace Carica\Firmata {
      *
      * @param string $name
      * @return mixed
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function __get($name) {
       switch ($name) {
@@ -278,7 +281,7 @@ namespace Carica\Firmata {
       case 'pins' :
         return $this->pins();
       }
-      throw new \LogicException(sprintf('Unknown property %s::$%s', __CLASS__, $name));
+      throw new LogicException(sprintf('Unknown property %s::$%s', __CLASS__, $name));
     }
 
     /**
@@ -301,20 +304,20 @@ namespace Carica\Firmata {
      * @param string $name
      * @param mixed $value
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function __set($name, $value) {
       switch ($name) {
       case 'version' :
       case 'firmware' :
-        throw new \LogicException(
+        throw new LogicException(
           sprintf('Property %s::$%s is not writeable.', __CLASS__, $name)
         );
       case 'pins' :
         $this->pins($value);
         return;
       }
-      throw new \LogicException(sprintf('Unknown property %s::$%s', __CLASS__, $name));
+      throw new LogicException(sprintf('Unknown property %s::$%s', __CLASS__, $name));
     }
 
     /**
@@ -361,7 +364,7 @@ namespace Carica\Firmata {
      * @param array $rawData
      *
      */
-    private function handleMessage($command, $rawData): void {
+    private function handleMessage(int $command, array $rawData): void {
       $this->_heartBeatMissed = 0;
       switch ($command) {
       case self::REPORT_VERSION :
@@ -439,7 +442,7 @@ namespace Carica\Firmata {
      * @param array $rawData
      *
      */
-    private function handleExtendedMessage($command, $rawData): void {
+    private function handleExtendedMessage(int $command, array $rawData): void {
       switch ($command) {
       case self::STRING_DATA :
         $this->events()->emit(self::EVENT_RECIEVE_STRING, Response::decodeBytes($rawData));
@@ -485,7 +488,7 @@ namespace Carica\Firmata {
      *
      * @param callable $callback
      */
-    public function reportVersion(Callable $callback) {
+    public function reportVersion(callable $callback): void {
       $this->stream()->write([self::REPORT_VERSION]);
       $interval = $this->loop()->setInterval(
         function () {
@@ -512,7 +515,7 @@ namespace Carica\Firmata {
      *
      * @param callable $callback
      */
-    public function queryFirmware(Callable $callback) {
+    public function queryFirmware(callable $callback): void {
       $this->events()->once(self::EVENT_QUERYFIRMWARE, $callback);
       $this->stream()->write([self::START_SYSEX, self::QUERY_FIRMWARE, self::END_SYSEX]);
     }
@@ -522,7 +525,7 @@ namespace Carica\Firmata {
      *
      * @param callable $callback
      */
-    public function queryCapabilities(Callable $callback): void {
+    public function queryCapabilities(callable $callback): void {
       $this->events()->once(self::EVENT_CAPABILITY_QUERY, $callback);
       $this->stream()->write([self::START_SYSEX, self::CAPABILITY_QUERY, self::END_SYSEX]);
     }
@@ -532,7 +535,7 @@ namespace Carica\Firmata {
      *
      * @param callable $callback
      */
-    public function queryAnalogMapping(Callable $callback): void {
+    public function queryAnalogMapping(callable $callback): void {
       $this->events()->once(self::EVENT_ANALOG_MAPPING_QUERY, $callback);
       $this->stream()->write([self::START_SYSEX, self::ANALOG_MAPPING_QUERY, self::END_SYSEX]);
     }
@@ -540,11 +543,11 @@ namespace Carica\Firmata {
     /**
      * Query pin status (mode and value), and execute callback after it recieved
      *
-     * @param integer $pin 0-16
+     * @param int $pin 0-16
      * @param callable $callback
      */
-    public function queryPinState($pin, Callable $callback): void {
-      $this->events()->once('pin-state-'.$pin, $callback);
+    public function queryPinState($pin, callable $callback): void {
+      $this->events()->once(self::EVENT_PIN_STATE.'-'.$pin, $callback);
       $this->stream()->write([self::START_SYSEX, self::PIN_STATE_QUERY, $pin, self::END_SYSEX]);
     }
 
@@ -560,31 +563,31 @@ namespace Carica\Firmata {
     /**
      * Add a callback for analog read events on a pin
      *
-     * @param integer $pin 0-16
-     * @param Callable $callback
+     * @param int $pin 0-16
+     * @param callable $callback
      */
-    public function analogRead($pin, Callable $callback): void {
-      $this->events()->on('analog-read-'.$pin, $callback);
+    public function analogRead(int $pin, callable $callback): void {
+      $this->events()->on(self::EVENT_ANALOG_READ.'-'.$pin, $callback);
     }
 
     /**
      * Add a callback for diagital read events on a pin
      *
-     * @param integer $pin 0-16
+     * @param int $pin 0-16
      * @param callable $callback
      */
-    public function digitalRead($pin, Callable $callback): void {
-      $this->events()->on('digital-read-'.$pin, $callback);
+    public function digitalRead(int $pin, callable $callback): void {
+      $this->events()->on(self::EVENT_DIGITAL_READ.'-'.$pin, $callback);
     }
 
 
     /**
      * Write an analog value for a pin
      *
-     * @param integer $pin
-     * @param integer $value
+     * @param int $pin
+     * @param int $value
      */
-    public function analogWrite($pin, $value): void {
+    public function analogWrite(int $pin, int $value): void {
       $this->pins[$pin]->setValue($value);
       if ($pin > 15 || $value > 255) {
         $bytes = [self::START_SYSEX, self::EXTENDED_ANALOG, $pin];
@@ -603,22 +606,22 @@ namespace Carica\Firmata {
     /**
      * Move a servo - an alias for analogWrite()
      *
-     * @param integer $pin 0-16
-     * @param integer $value 0-255
+     * @param int $pin 0-16
+     * @param int $value 0-255
      */
-    public function servoWrite($pin, $value) {
+    public function servoWrite(int $pin, int $value): void {
       $this->analogWrite($pin, $value);
     }
 
     /**
      * Write a digital value for a pin (on/off, self::DIGITAL_LOW/self::DIGITAL_HIGH)
      *
-     * @param integer $pin 0-16
-     * @param integer $value 0-1
+     * @param int $pin 0-16
+     * @param int $value 0-1
      */
-    public function digitalWrite($pin, $value) {
+    public function digitalWrite(int $pin, int $value): void {
       /** @noinspection PhpUndefinedMethodInspection */
-      $this->pins[$pin]->setDigital($value == self::DIGITAL_HIGH);
+      $this->pins[$pin]->setDigital($value === self::DIGITAL_HIGH);
       $port = (int)floor($pin / 8);
       $portValue = 0;
       for ($i = 0; $i < 8; $i++) {
@@ -640,10 +643,11 @@ namespace Carica\Firmata {
      *   Carica\FirmataPIN_MODE_PWM,
      *   Carica\FirmataPIN_MODE_SERVO
      *
-     * @param integer $pin 0-16
-     * @param integer $mode
+     * @param int $pin 0-16
+     * @param int $mode
+     * @throws Exception\UnsupportedMode
      */
-    public function pinMode($pin, $mode) {
+    public function pinMode(int $pin, int $mode): void {
       /** @noinspection PhpUndefinedMethodInspection */
       $this->pins[$pin]->setMode($mode);
       $this->stream()->write([self::PIN_MODE, $pin, $this->mapPinModeFirmataMode($mode)]);
@@ -655,11 +659,15 @@ namespace Carica\Firmata {
      *
      * @param callable $callback
      */
-    public function onChange(callable $callback) {
-      $this->events()->on('change', $callback);
+    public function onChange(callable $callback): void {
+      $this->events()->on(self::EVENT_PIN_CHANGE, $callback);
     }
 
-    private function mapPinModeFirmataMode($pinMode) {
+    /**
+     * @param int $pinMode
+     * @return int|null
+     */
+    private function mapPinModeFirmataMode(int $pinMode): ?int {
       $map = [
         Pin::MODE_INPUT => 0x00,
         Pin::MODE_OUTPUT => 0x01,
@@ -669,7 +677,7 @@ namespace Carica\Firmata {
         Pin::MODE_SHIFT => 0x05,
         Pin::MODE_I2C => 0x06
       ];
-      return (isset($map[$pinMode])) ? $map[$pinMode] : FALSE;
+      return $map[$pinMode] ?? NULL;
     }
   }
 }

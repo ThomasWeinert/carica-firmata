@@ -9,7 +9,7 @@ namespace Carica\Firmata\Exception {
     /**
      * @param int $pin
      */
-    public function __construct($pin) {
+    public function __construct(int $pin) {
       parent::__construct(
         sprintf('Pin %d does not exists.', $pin)
       );

@@ -20,7 +20,7 @@ namespace Carica\Firmata\Exception {
      * @param int $pin
      * @param int $mode
      */
-    public function __construct($pin, $mode) {
+    public function __construct(int $pin, int $mode) {
       parent::__construct(
         sprintf('Pin %d does not support mode "%s"', $pin, $this->_modes[$mode])
       );

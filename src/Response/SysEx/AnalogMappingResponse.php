@@ -17,12 +17,12 @@ namespace Carica\Firmata\Response\SysEx {
     /**
      * @var array
      */
-    private $_pins = array();
+    private $_pins = [];
 
     /**
      * @var array
      */
-    private $_channels = array();
+    private $_channels = [];
 
     /**
      * @param array $bytes

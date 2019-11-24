@@ -2,23 +2,32 @@
 
 namespace Carica\Firmata {
 
+  use ArrayAccess;
+  use ArrayIterator;
+  use Countable;
+  use IteratorAggregate;
+  use LogicException;
+  use Traversable;
+
   /**
    * Pins provides an encapsulation for the list of Pin object, allowing to
    * access to the pins using array and iterator syntax
    */
-  class Pins implements \ArrayAccess, \Countable, \IteratorAggregate {
+  class Pins implements ArrayAccess, Countable, IteratorAggregate {
 
     /**
      * List of Pin objects
-     * @var array(integer=>Pin)
+     *
+     * @var array(int=>Pin)
      */
-    private $_pins = array();
+    private $_pins = [];
 
     /**
      * Mapping: analog channel to pin index
-     * @var array(integer=>integer)
+     *
+     * @var array(int=>int)
      */
-    private $_channels = array();
+    private $_channels = [];
 
     /**
      * @param Board $board
@@ -35,6 +44,7 @@ namespace Carica\Firmata {
     /**
      * Set the analog pin mapping, the array contains
      * the nalog channels and the pin index
+     *
      * @param array $channels
      */
     public function setAnalogMapping(array $channels) {
@@ -43,33 +53,32 @@ namespace Carica\Firmata {
 
     /**
      * Get the pin index for an analog pin channel.
-     * @param integer $channel
-     * @return integer
+     *
+     * @param int $channel
+     * @return int
      */
-    public function getPinByChannel($channel) {
+    public function getPinByChannel(int $channel): int {
       if (isset($this->_channels[$channel])) {
         return (int)$this->_channels[$channel];
-      } else {
-        return -1;
       }
+      return -1;
     }
 
     /**
-     * @param integer $offset
-     *
+     * @param int $offset
      * @return bool
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset): bool {
       return array_key_exists((int)$offset, $this->_pins);
     }
 
     /**
-     * @param integer $offset
+     * @param int $offset
      *
      * @return Pin
      * @throws Exception\NonExistingPin
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset): Pin {
       if ($this->offsetExists($offset)) {
         return $this->_pins[(int)$offset];
       }
@@ -77,36 +86,35 @@ namespace Carica\Firmata {
     }
 
     /**
-     * @param integer $offset
+     * @param int $offset
      * @param Pin $value
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function offsetSet($offset, $value) {
-      throw new \LogicException('Pins are not replaceable.');
+      throw new LogicException('Pins are not replaceable.');
     }
 
     /**
-     * @param integer $offset
-     *
-     * @throws \LogicException
+     * @param int $offset
+     * @throws LogicException
      */
     public function offsetUnset($offset) {
-      throw new \LogicException('Pins are not removeable.');
+      throw new LogicException('Pins are not removeable.');
     }
 
     /**
      * @return int
      */
-    public function count() {
+    public function count(): int {
       return count($this->_pins);
     }
 
     /**
-     * @return \Iterator
+     * @return Traversable
      */
-    public function getIterator(){
-      return new \ArrayIterator($this->_pins);
+    public function getIterator(): Traversable {
+      return new ArrayIterator($this->_pins);
     }
   }
 }

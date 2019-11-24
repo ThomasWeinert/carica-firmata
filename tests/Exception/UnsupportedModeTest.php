@@ -2,12 +2,15 @@
 
 namespace Carica\Firmata\Exception {
 
-  include_once(__DIR__ . '/../Bootstrap.php');
+  use Carica\Firmata\Pin as FirmataPin;
+  use PHPUnit\Framework\TestCase;
 
-  class UnsupportedModeTest extends \PHPUnit\Framework\TestCase {
+  include_once(__DIR__.'/../Bootstrap.php');
 
-    public function testConstructor() {
-      $exception = new UnsupportedMode(42, \Carica\Firmata\Pin::MODE_OUTPUT);
+  class UnsupportedModeTest extends TestCase {
+
+    public function testConstructor(): void {
+      $exception = new UnsupportedMode(42, FirmataPin::MODE_OUTPUT);
       $this->assertEquals(
         'Pin 42 does not support mode "digital output"',
         $exception->getMessage()

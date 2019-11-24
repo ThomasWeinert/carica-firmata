@@ -4,22 +4,22 @@ $board = require(__DIR__.'/bootstrap.php');
 use Carica\Io;
 use Carica\Firmata;
 
+$loop = Io\Event\Loop\Factory::get();
 $board = new Firmata\Board(
   //new Io\Stream\Serial('COM3')
-  new Io\Stream\Tcp('127.0.0.1', 5338)
+  new Io\Stream\TCPStream($loop, '127.0.0.1', 5338)
 );
 
-$loop = Io\Event\Loop\Factory::get();
 
 $board
   ->activate()
   ->done(
-    function () use ($board, $loop) {
+    static function () use ($board, $loop) {
       $loop->setInterval(
-        function () use ($board) {
+        static function () use ($board) {
           $board->pulseIn(
             7,
-            function ($duration) {
+            static function ($duration) {
               echo round($duration / 29 / 2)." cm\n";
             }
           );

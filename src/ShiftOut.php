@@ -2,41 +2,43 @@
 namespace Carica\Firmata {
 
   use Carica\Io\Device;
-  
+  use InvalidArgumentException;
+
   class ShiftOut implements Device\ShiftOut {
 
     /**
      * @var Pin
      */
-    private $_latchPin = NULL;
+    private $_latchPin;
     /**
      * @var Pin
      */
-    private $_clockPin = NULL;
+    private $_clockPin;
     /**
      * @var Pin
      */
-    private $_dataPin = NULL;
-    
-    private $_highLatch = FALSE;
-    
-    public function __construct(Pin $latch, Pin $clock, Pin $data, $highLatch = FALSE) {
+    private $_dataPin;
+
+    private $_highLatch;
+
+    public function __construct(Pin $latch, Pin $clock, Pin $data, bool $highLatch = FALSE) {
       $this->_latchPin = $latch;
       $this->_clockPin = $clock;
       $this->_dataPin = $data;
-      $this->_highLatch = (bool)$highLatch;
-      if (!($latch->board == $clock->board && $latch->board == $clock->board)) {
-        throw new \InvalidArgumentException('Pins have to be on the same board');
+      $this->_highLatch = $highLatch;
+      if (!($latch->board === $clock->board && $latch->board === $data->board)) {
+        throw new InvalidArgumentException('Pins have to be on the same board');
       }
     }
 
     /**
      * Write data using shiftOut (this includes being and end)
-     * 
-     * @param $value
+     *
+     * @param int|string|int[] $value
      * @param bool $isBigEndian
+     * @throws Exception\UnsupportedMode
      */
-    public function write($value, $isBigEndian = TRUE) {
+    public function write($value, bool $isBigEndian = TRUE): void {
       $this->begin();
       $this->transfer($value, $isBigEndian);
       $this->end();
@@ -44,18 +46,20 @@ namespace Carica\Firmata {
 
     /**
      * Begin transfer (put the latch pin to low)
+     *
+     * @throws Exception\UnsupportedMode
      */
-    public function begin() {
+    public function begin(): void {
       $this->_latchPin->setMode(Pin::MODE_OUTPUT);
       $this->_clockPin->setMode(Pin::MODE_OUTPUT);
       $this->_dataPin->setMode(Pin::MODE_OUTPUT);
       $this->_latchPin->setDigital($this->_highLatch);
     }
-    
+
     /**
      * Begin transfer (put the latch pin to high)
      */
-    public function end() {
+    public function end(): void {
       $this->_latchPin->setDigital(!$this->_highLatch);
     }
 
@@ -66,13 +70,13 @@ namespace Carica\Firmata {
      * @param int|int[]|string $value
      * @param bool $isBigEndian
      */
-    public function transfer($value, $isBigEndian = TRUE) {
+    public function transfer($value, bool $isBigEndian = TRUE): void {
       $dataPort = floor($this->_dataPin->pin / 8);
       $clockPort = floor($this->_clockPin->pin / 8);
       $dataOffset = 1 << (int)($this->_dataPin->pin - ($dataPort * 8));
       $clockOffset = 1 << (int)($this->_clockPin->pin - ($clockPort * 8));
       $board = $this->_latchPin->board;
-      if ($dataPort == $clockPort) {
+      if ($dataPort === $clockPort) {
         $portValue = $this->getDigitalPortValue($board, $clockPort);
         $low = $portValue & ~$clockOffset & ~$dataOffset;
         $high = $portValue & ~$clockOffset | $dataOffset;
@@ -109,28 +113,28 @@ namespace Carica\Firmata {
         ];
       }
 
-      $write = function ($mask, $value) use ($board, $messages) {
+      $write = static function ($mask, $value) use ($board, $messages) {
         $board->stream()->write(
           $messages[($value & $mask) ? 'high' : 'low']
         );
       };
 
       if (is_string($value)) {
-        $values = array_slice(unpack("C*", "\0".$value), 1);
+        $values = array_slice(unpack('C*', "\0".$value), 1);
       } elseif (is_array($value)) {
         $values = $value;
       } else {
         $values = array((int)$value);
       }
 
-      foreach ($values as $value) {
+      foreach ($values as $partValue) {
         if ($isBigEndian) {
-          for ($mask = 128; $mask > 0; $mask = $mask >> 1) {
-            $write($value, $mask);
+          for ($mask = 128; $mask > 0; $mask >>= 1) {
+            $write($partValue, $mask);
           }
         } else {
-          for ($mask = 0; $mask < 128; $mask = $mask << 1) {
-            $write($value, $mask);
+          for ($mask = 0; $mask < 128; $mask <<= 1) {
+            $write($partValue, $mask);
           }
         }
       }
@@ -143,7 +147,7 @@ namespace Carica\Firmata {
      * @param int $port
      * @return int
      */
-    private function getDigitalPortValue(Board $board, $port) {
+    private function getDigitalPortValue(Board $board, int $port): int {
       $portValue = 0;
       for ($i = 0; $i < 8; $i++) {
         $index = 8 * $port + $i;
